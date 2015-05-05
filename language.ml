@@ -99,5 +99,6 @@ let nat2int ff =
 let int2nat i = 
   let rec i2n ff = function
     | 0 -> ff
-    | _ as x -> i2n (S ff) (x-1) in
+    | _ as x when x > 0-> i2n (S ff) (x-1)
+    | _ as s -> failwith ("Negative nats not supported: " ^ (string_of_int s))in
   i2n Z i
