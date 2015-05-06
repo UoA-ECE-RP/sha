@@ -18,7 +18,7 @@ odes = [dsolve(diff(x(t))-K*(h-x(t)), x(t)),
 # Debug
 map(lambda x: pprint(x), odes)
 
-# FIXME: There is no error checking here!
+# TODO: There is no error checking here!
 # Differentiate the symbolic solutions to get the slope
 slopes = map(lambda x: x.rhs.diff(t), odes)
 
