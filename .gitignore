@@ -68,3 +68,5 @@ setup.log
 
 *.ml
 *.txt
+
+codegen.py
