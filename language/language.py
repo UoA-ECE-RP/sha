@@ -7,12 +7,12 @@ from macropy.case_classes import macros, case
 
 
 @case
-class Ode(ode, arithExpr):
+class Ode(expr, var, initValue):
     pass
 
 
 @case
-class Combinator(symbol, arithExpr):
+class Combinator(symbol, arithExpr, [rest]):
     pass
 
 
@@ -42,7 +42,7 @@ class Loc(name, odeList, combinatorList, invariant):
 
 
 @case
-class Edge(locationTuple, guard, updateList, eventList):
+class Edge(l1, l2, guard, updateList, eventList):
     pass
 
 
