@@ -21,14 +21,15 @@ odes = [dsolve(diff(x(t))-100*(2-x(t)), x(t), ics={x(0): 20}),
         dsolve(diff(x(t)), x(t), ics={x(0): 20})]
 
 # Solve the initial condition
-initcs = [None]*len(odes)
-for i in range(0, len(odes)):
-    initcs[i] = (solve(odes[i].subs([(x(t), inits[i]), (t, 0)]),
-                       Symbol('C1')))[0]
+initcs = map(lambda i, o: solve(o.subs([(x(t), i),
+                                       (t, 0)]),
+                                Symbol('C1'))[0], inits, odes)
+
 # Backsubstitue for C1
-odess = [None]*len(odes)
-for i in range(0, len(odes)):
-    odess[i] = odes[i].subs(C1, initcs[i])
+odess = map(lambda i, o: o.subs([(Symbol('C1'), i),
+                                 (Symbol('t'),
+                                  Mul(Symbol('k'),
+                                      Symbol('d')))]), initcs, odes)
 
 # TODO: There is no error checking here!
 # Differentiate the symbolic solutions to get the slope
@@ -43,11 +44,8 @@ if (reduce(lambda y, x: (x == []) and y, ismonotones, True) == True):
 else:
     print "HA cannot be solved"
 
-funcs = [None]*len(odess)
-for i in range(0, len(odess)):
-    funcs[i] = "ode"+str(i+1), odess[i].rhs
-
-print funcs
+funcs = map(lambda o, i: ("ode"+str(i+1), o.rhs), odess,
+            range(0, len(odess)))
 
 # Need to produce 'C' code from odess
 [(c_name, c_code), (h_name, h_header)] = codegen(funcs, "C", "odes",
