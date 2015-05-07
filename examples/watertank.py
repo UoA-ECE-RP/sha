@@ -36,7 +36,7 @@ e4 = Edge(t3, t1, Guard(sympify("True")),
 e5 = Edge(t3, t4, Guard(sympify("x>=20 & x<=20")),
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("C")])
-e6 = Edge(t3, t1, sympify("True"),
+e6 = Edge(t3, t1, Guard(sympify("True")),
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("ON")])
 
