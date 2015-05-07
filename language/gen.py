@@ -6,50 +6,57 @@ from sympy.utilities.codegen import codegen
 
 
 # Function to generate code from Ode
-def OdeCodegen(ode):
-    with patterns:
-        Ode(ode, var, iValue) << ode
-        try:
-            # Symbolically solve the ode
-            o = dsolve(ode, var)
-            i = solve(o.subs([(var, iValue),
-                              (Symbol('t'), 0)]), Symbol('C1'))[0]
-            o = o.subs([(Symbol('C1'), i),
-                        (Symbol('t'),
-                         Mul(Symbol('k'),
-                             Symbol('d')))])
-            [(c_name, c_code),
-             (h_name, h_header)] = codegen(funcs, "C", "odes",
-                                           header=False,
-                                           empty=False)
-            return (c_name, c_code, h_name, h_header)
-        except Exception as e:
-            print e.__doc__
-            return None
-    return None
+def OdeCodegen(os, name):
+    odes = [None]*len(os)
+    vars = [None]*len(os)
+    iValues = [None]*len(os)
+    for i in range(0, len(os)):
+        with patterns:
+            Ode(ode, var, iValue) << os[i]
+            odes[i] = ode
+            vars[i] = var
+            iValues[i] = iValue
+    try:
+        odes = map(lambda x, y: dsolve(x, y), odes, vars)
+        initcs = map(lambda i, o, v:
+                     solve(o.subs([(v, i),
+                                   (Symbol('t'), 0)]),
+                           Symbol('C1'))[0],
+                     iValues, odes, vars)
+        odess = map(lambda i, o:
+                    o.subs([(Symbol('C1'), i),
+                            (Symbol('t'),
+                                Mul(Symbol('k'),
+                                    Symbol('d')))]), initcs, odes)
+        funcs = map(lambda o, i: ("ode"+str(i+1), o.rhs), odess,
+                    range(0, len(odess)))
+        codegen(funcs, "C", name, header=False, empty=False, to_files=True)
+    except Exception as e:
+        raise e
 
 
 # Function to generate code from HA
 def WhaCodegen(ha):
-    # Call odecode gen from here
-    return None
+    with patterns:
+        Ha(ls, sloc, edges) << ha
+        for i in range(len(ls)):
+            with patterns:
+                Loc(name, odes, clist, y) << ls[i]
+                # This function will write out the c files
+                OdeCodegen(odes, name+(str(i)))
+
 
 # Function that checks the ode is OK
 def isOdeOK(odee):
     with switch(odee):
         if Ode(ode, var, iValue):
-            # Get the
             try:
-                # Symbolically solve the ode
                 o = dsolve(ode, var)
-                # Get the slope of the ode
                 s = o.rhs.diff(Symbol('t'))
-                # Check if this is monotone
+                # TODO: check that this root finding is enough for
+                # monotonicity
                 m = solve(s, Symbol('t'))
-                if m == []:
-                    return True
-                else:
-                    return False
+                return (m == [])
             except Exception as e:
                 print e.__doc__
                 return False

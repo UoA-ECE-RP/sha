@@ -44,5 +44,8 @@ waterTank = Ha([t1, t2, t3, t4], t4, [e1, e2, e3, e4, e5, e6])
 
 # Check if the HA is well defined
 
-print waterTank
-print isWha(waterTank)
+# print waterTank
+# print isWha(waterTank)
+
+# Write some code out!
+WhaCodegen(waterTank)
