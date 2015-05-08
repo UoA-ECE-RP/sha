@@ -37,7 +37,7 @@ class Update():
 
 
 @case
-class Loc(name, odeList, combinatorList, invariant):
+class Loc(name, odeList, combinatorList, invariant, {rest}):
     pass
 
 

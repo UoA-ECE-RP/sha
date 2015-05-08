@@ -1,3 +1,7 @@
+# TODO: The combinator functions are not being used right now!  TODO:
+# The codegen is not very efficient, because symbolic solutions are
+# being regenerated every time
+
 from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
 from language import *
 
@@ -36,7 +40,7 @@ def OdeCodegen(os, name):
 
 
 # Function to generate code from HA
-def WhaCodegen(ha):
+def codeGen(ha):
     with patterns:
         Ha(ls, sloc, edges) << ha
         for i in range(len(ls)):
@@ -44,6 +48,45 @@ def WhaCodegen(ha):
                 Loc(name, odes, clist, y) << ls[i]
                 # This function will write out the c files
                 OdeCodegen(odes, name+(str(i)))
+
+
+def getShortestTimes(ode, invariants):
+    try:
+        with patterns:
+            Ode(od, var, iValue) << ode
+            o = dsolve(ode, var)
+            i = solve(o.subs([(var, iValue),
+                              (Symbol('t'), 0)]),
+                      Symbol('C1'))[0]
+            on = o.subs((Symbol('C1'), i))
+            # Get the largest invariant
+            inv = max([x.rhs for x in invariants[var]])
+            time = solve(on-inv, S('t'))
+            if time != []:
+                return time[0]
+            else:
+                None
+    except KeyError as k:
+        print k.__doc__
+        return None
+
+
+# NOTE: There should be an invariant for each ode on the location.
+def updateLocNsteps(loc):
+    with patterns:
+        Loc(n, odes, clist, y) << loc
+        times = map(lambda o: getShortestTimes(o, y), odes)
+        tts = map(lambda x: x == times[0], times[1:])
+        if all(tts):
+            return Loc(n, odes, clist, y, time=min(times))
+        else:
+            None
+
+
+def getSHA(ha):
+    with patterns:
+        Ha(ls, sloc, edges) << ha
+        return Ha(map(updateLocNsteps, ls), sloc, edges)
 
 
 # Function that checks the ode is OK
