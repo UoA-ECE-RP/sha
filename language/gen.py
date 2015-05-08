@@ -50,25 +50,38 @@ def codeGen(ha):
                 OdeCodegen(odes, name+(str(i)))
 
 
+# This is a very important function
 def getShortestTimes(ode, invariants):
     try:
         with patterns:
             Ode(od, var, iValue) << ode
-            o = dsolve(ode, var)
-            i = solve(o.subs([(var, iValue),
-                              (Symbol('t'), 0)]),
-                      Symbol('C1'))[0]
-            on = o.subs((Symbol('C1'), i))
-            # Get the largest invariant
-            inv = max([x.rhs for x in invariants[var]])
-            time = solve(on-inv, S('t'))
-            if time != []:
-                return time[0]
+            # This means you could not provide a static initial
+            # condition
+            if iValue is None:
+                # Return infinity as the time-bound
+                return S('oo')
             else:
-                None
-    except KeyError as k:
+                o = dsolve(od, var)
+                i = solve(o.subs([(var, iValue),
+                                  (Symbol('t'), 0)]),
+                          Symbol('C1'))[0]
+                on = o.subs(S('C1'), i)
+                if on.rhs.is_Number:
+                    return S('oo')
+                else:
+                    invvs = ([y.rhs for x in invariants[var]
+                              for y in x])
+                    # Used for increasing functions
+                    inv_max = max(invvs)
+                    # Used for decreasing functions
+                    inv_min = min(invvs)
+                    time_max = solve(on.rhs-inv_max, S('t'))[0]
+                    time_min = solve(on.rhs-inv_min, S('t'))[0]
+                    time = Max(time_max, time_min)
+                    return time
+    except Exception as k:
         print k.__doc__
-        return None
+    return None
 
 
 # NOTE: There should be an invariant for each ode on the location.
@@ -76,14 +89,16 @@ def updateLocNsteps(loc):
     with patterns:
         Loc(n, odes, clist, y) << loc
         times = map(lambda o: getShortestTimes(o, y), odes)
+        # This means that all odes in the location evolve for same amout
+        # of time in the worst case
         tts = map(lambda x: x == times[0], times[1:])
         if all(tts):
-            return Loc(n, odes, clist, y, time=min(times))
+            return Loc(n, odes, clist, y, time=times[0])
         else:
             None
 
 
-def getSHA(ha):
+def getSha(ha):
     with patterns:
         Ha(ls, sloc, edges) << ha
         return Ha(map(updateLocNsteps, ls), sloc, edges)

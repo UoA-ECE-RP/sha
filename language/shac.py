@@ -1,16 +1,19 @@
 # This is the compiler main module
-from gen import isWha, getSha, codeGen
+import gen
 import sys
 
 
 def compile(ha, **kwargs):
     # Step-1: Make sure that the hybrid automaton is well-formed
-    if isWha(ha):
+    if gen.isWha(ha):
         # Step-2 get a new ha with the Nsteps for each loc computed
         # FIXME: Nsteps might be None in the general case
-        sha = getSha(ha)
+        sha = gen.getSha(ha)
         # Step-3 generate code
-        codeGen(sha)
+        if sha is None:
+            raise "Cannot generate code!"
+        else:
+            gen.codeGen(sha)
 
 
 def main(argv):

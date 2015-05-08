@@ -9,10 +9,12 @@ from sympy import *
 import shac
 
 
-# K = 100, h = 20
-ode1 = Ode(sympify("diff(x(t))-100*(20-x(t))"), sympify("x(t)"), 20)
+# K = 1 heating rate in t4, h = 0, K = -0.1 cooling rate in t3
+# The above values are from Matlab: bang-bang controller example
+
+ode1 = Ode(sympify("diff(x(t))-1*x(t)"), sympify("x(t)"), 20)
 ode2 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 100)
-ode3 = Ode(sympify("diff(x(t))+100*x(t)"), sympify("x(t)"), 100)
+ode3 = Ode(sympify("diff(x(t))+0.1*x(t)"), sympify("x(t)"), 100)
 ode4 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 20)
 
 # The locations of the hybrid automaton
