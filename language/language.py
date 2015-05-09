@@ -47,5 +47,5 @@ class Edge(l1, l2, guard, updateList, eventList):
 
 
 @case
-class Ha(locations, startLocation, edges):
+class Ha(name, locations, startLocation, edges):
     pass

@@ -32,22 +32,75 @@ def OdeCodegen(os, name):
                             (Symbol('t'),
                                 Mul(Symbol('k'),
                                     Symbol('d')))]), initcs, odes)
-        funcs = map(lambda o, i: ("ode"+str(i+1), o.rhs), odess,
+        funcs = map(lambda o, i: (name+"_ode_"+str(i+1), o.rhs), odess,
                     range(0, len(odess)))
-        codegen(funcs, "C", name, header=False, empty=False, to_files=True)
+        [(c_name, c_code), (h_name, h_header)] = codegen(
+            funcs, "C", name, header=False, empty=False, to_files=False)
+        return (c_code, h_name, h_header)
     except Exception as e:
         raise e
+
+
+def getEventList(edge):
+    with patterns:
+        Edge(l1, l2, guard, ulist, eventList) << edge
+        events = [None]*len(eventList)
+        for i in range(len(eventList)):
+            with patterns:
+                Event(x) << eventList[i]
+                events[i] = x
+                return events
 
 
 # Function to generate code from HA
 def codeGen(ha):
     with patterns:
-        Ha(ls, sloc, edges) << ha
+        Ha(han, ls, sloc, edges) << ha
+        lnames = [None]*len(ls)
+        cCodeFile = [None]*len(ls)
+        hns = [None]*len(ls)
+        hcs = [None]*len(ls)
         for i in range(len(ls)):
             with patterns:
                 Loc(name, odes, clist, y) << ls[i]
-                # This function will write out the c files
-                OdeCodegen(odes, name+(str(i)))
+                (cCodeFile[i], hns[i], hcs[i]) = OdeCodegen(odes, name)
+                lnames[i] = name
+
+        # Start generating code
+        # First the required headers
+        headers = ['#include<stdint.h>']
+        # Include other headers as needed here
+
+        # The needed #defines
+        defs = ['#define TRUE 1', '#define FALSE 0']
+
+        # The string that declares all the Events
+        eventList = map(getEventList, edges)
+        eventSet = set([item for sl in eventList for item in sl])
+        eventDecl = ['uint8_t ' + ', '.join(eventSet) + ';']
+
+        # Build the main function
+
+        # Append the included headers
+        mainCFile = headers
+        # Append the #defines
+        mainCFile += defs
+        # Append the event declarations
+        mainCFile += eventDecl
+        # Append state declaration
+        mainCFile += ['enum states {' + ' , '.join(lnames)+'};']
+
+        # Append the odes
+        mainCFile = mainCFile + cCodeFile
+
+        # This is the final set, write to files
+        with open(han+".c", 'w') as cFile:
+            cFile.write('\n\n'.join(mainCFile))
+
+        # Write the header files out
+        for i in range(len(hns)):
+            with open(hns[i], 'w') as f:
+                f.write(hcs[i])
 
 
 # This is a very important function
@@ -100,8 +153,8 @@ def updateLocNsteps(loc):
 
 def getSha(ha):
     with patterns:
-        Ha(ls, sloc, edges) << ha
-        return Ha(map(updateLocNsteps, ls), sloc, edges)
+        Ha(n, ls, sloc, edges) << ha
+        return Ha(n, map(updateLocNsteps, ls), sloc, edges)
 
 
 # Function that checks the ode is OK
@@ -135,7 +188,7 @@ def isWhaLoc(loc):
 # Function to test if the ha is wha
 def isWha(ha):
     with switch(ha):
-        if Ha(ls, sloc, edges):
+        if Ha(n, ls, sloc, edges):
             return reduce(lambda init, x: isWhaLoc(x) and init,
                           ls, True)
         else:
