@@ -28,26 +28,29 @@ t4 = Loc("t4", [ode4], [],
          {S("x(t)"): [Guard(S("x>=20")), Guard(S("x <= 20"))]})
 
 # The edges
-e1 = Edge(t1, t2, {S("x(t)"): [Guard(S("x>=100")), Guard(S("x >= 100"))]},
+e1 = Edge('t1', 't2', {S("x(t)"): [Guard(S("x>=100")),
+                                   Guard(S("x <= 100"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("B")])
-e2 = Edge(t2, t3, {S("x(t)"): [Guard(sympify("True"))]},
+e2 = Edge('t2', 't3', {S("x(t)"): [Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("OFF")])
-e3 = Edge(t1, t3, {S("x(t)"): [Guard(sympify("True"))]},
+e3 = Edge('t1', 't3', {S("x(t)"): [Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("OFF")])
-e4 = Edge(t3, t1, {S("x(t)"): [Guard(sympify("True"))]},
+e4 = Edge('t3', 't1', {S("x(t)"): [Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("ON")])
-e5 = Edge(t3, t4, {S("x(t)"): [Guard(S("x>=20")), Guard(S("x >= 20"))]},
+e5 = Edge('t3', 't4', {S("x(t)"): [Guard(S("x>=20")),
+                                   Guard(S("x <= 20"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("C")])
-e6 = Edge(t3, t1, {S("x(t)"): [Guard(sympify("True"))]},
+e6 = Edge('t4', 't1', {S("x(t)"): [Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("ON")])
 
-waterTank = Ha("watertank", [t1, t2, t3, t4], t4, [e1, e2, e3, e4, e5, e6])
+waterTank = Ha("watertank", [t1, t2, t3, t4], t4,
+               [e1, e2, e3, e4, e5, e6])
 
 
 # Compile
