@@ -290,7 +290,7 @@ def getShortestTimes(lname, ode, invariants):
             # condition
             if iValue is None:
                 # Return infinity as the time-bound
-                print(colored(warn, color='None',
+                print(colored(warn, color='red',
                               attrs=['bold', 'blink']))
                 return S('oo')
             else:
