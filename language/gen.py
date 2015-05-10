@@ -7,6 +7,8 @@ from language import *
 
 from sympy import *
 from sympy.utilities.codegen import codegen
+import colorama
+from termcolor import colored
 
 
 # Function to generate code from Ode
@@ -278,7 +280,9 @@ def codeGen(ha):
 
 
 # This is a very important function
-def getShortestTimes(ode, invariants):
+def getShortestTimes(lname, ode, invariants):
+    colorama.init(autoreset=True)
+    warn = '[WARNING: Location '+lname+' needs fairness]'
     try:
         with patterns:
             Ode(od, var, iValue) << ode
@@ -286,6 +290,8 @@ def getShortestTimes(ode, invariants):
             # condition
             if iValue is None:
                 # Return infinity as the time-bound
+                print(colored(warn, color='None',
+                              attrs=['bold', 'blink']))
                 return S('oo')
             else:
                 o = dsolve(od, var)
@@ -294,6 +300,8 @@ def getShortestTimes(ode, invariants):
                           Symbol('C1'))[0]
                 on = o.subs(S('C1'), i)
                 if on.rhs.is_Number:
+                    print(colored(warn, color='red',
+                                  attrs=['bold', 'blink']))
                     return S('oo')
                 else:
                     invvs = ([y.rhs for x in invariants[var]
@@ -315,7 +323,7 @@ def getShortestTimes(ode, invariants):
 def updateLocNsteps(loc):
     with patterns:
         Loc(n, odes, clist, y) << loc
-        times = map(lambda o: getShortestTimes(o, y), odes)
+        times = map(lambda o: getShortestTimes(n, o, y), odes)
         # This means that all odes in the
         # location evolve for same amout
         # of time in the worst case
