@@ -187,9 +187,13 @@ def makeMain(sloc, rName):
     with patterns:
         Loc(name, x, y, z) << sloc
         main += [tab*level+'enum states cstate = '+name+';']
+        main += [tab*level+'while(True) {']
+        level += 1
         main += [tab*level+'readInput();']
-        main += [tab*level+rName+'(cstate);']
+        main += [tab*level+'cstate = '+rName+'(cstate);']
         main += [tab*level+'writeOutput();']
+        level -= 1
+        main += [tab*level+'}']
     main += ['}']
     return ['\n'.join(main)]
 
