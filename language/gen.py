@@ -246,7 +246,7 @@ def codeGen(ha):
         mainCFile += contDecl
         # Append the step-size and step declarations
         mainCFile += ['//Step-size constant d']
-        mainCFile += ['double d;']
+        mainCFile += ['extern double d;']
         mainCFile += ['//Nstep constant k']
         mainCFile += ['double k;']
         # Append state declaration
