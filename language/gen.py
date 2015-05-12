@@ -56,7 +56,7 @@ def getEventList(edge):
                 return events
 
 
-def getInvariantAndOdeExpr(loc):
+def getInvariantAndOdeExpr(loc, events):
     with patterns:
         Loc(lname, odes, clist, y) << loc
         exprs = [item for sl in y.values() for item in sl]
@@ -65,6 +65,7 @@ def getInvariantAndOdeExpr(loc):
             with patterns:
                 Guard(y) << x
                 invs[i] = y
+        # Adding not events as well to this expr
         stmts = [None]*len(odes)
         for i, od in enumerate(odes):
             with patterns:
@@ -72,7 +73,8 @@ def getInvariantAndOdeExpr(loc):
                 lhs = str(var.func)
                 rhs = str(S(lname+'_ode_'+str(i+1)+'(d, k)'))
                 stmts[i] = lhs + ' = ' + rhs + ';'
-        return (' && '.join(map(str, invs)), stmts)
+        nevents = map(lambda x: '!'+x, events)
+        return (' && '.join((map(str, invs)+nevents)), stmts)
 
 
 def edgesWithstateSource(edges, sname):
@@ -134,7 +136,8 @@ def makeReactionFunction(fname, locs, edges, snames, events):
         ret += [tab*level+'case (' + state + '):']
         level += 1
         # Code for state transitions
-        (invExpr, odeStmts) = getInvariantAndOdeExpr(locs[i])
+        (invExpr, odeStmts) = getInvariantAndOdeExpr(locs[i],
+                                                     events)
 
         # If the ode is still begin solved
         ret += [tab*level+'if('+invExpr+'){']
