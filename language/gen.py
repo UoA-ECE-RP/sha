@@ -30,10 +30,10 @@ def OdeCodegen(os, name):
                            Symbol('C1'))[0],
                      iValues, odes, vars)
         odess = map(lambda i, o:
-                    o.subs([(Symbol('C1'), i),
+                    o.subs([(S('C1'), S(str(var.func)+'_u')),
                             (Symbol('t'),
-                                Mul(Symbol('k'),
-                                    Symbol('d')))]), initcs, odes)
+                             Mul(Symbol('k'),
+                                 Symbol('d')))]), enumerate(initcs), odes)
         funcs = map(lambda o, i:
                     (name+"_ode_"+str(i+1), o.rhs), odess,
                     range(0, len(odess)))
@@ -70,8 +70,17 @@ def getInvariantAndOdeExpr(loc, events):
         for i, od in enumerate(odes):
             with patterns:
                 Ode(ode, var, iValue) << od
-                lhs = str(var.func)
-                rhs = str(S(lname+'_ode_'+str(i+1)+'(d, k)'))
+                lhs = str(var.func)+'_u'
+                # This if condition only works, because we make sure
+                # that all odes have same worst case time in a given
+                # location
+                if loc.rest['time'] != S('oo'):
+                    rhs = str(S(lname+'_ode_' +
+                                str(i+1)+'(d, k,' +
+                                str(var.func)+')'))
+                else:
+                    rhs = str(S(lname+'_ode_'+str(i+1) +
+                                '('+str(var.func)+')'))
                 stmts[i] = lhs + ' = ' + rhs + ';'
         nevents = map(lambda x: '!'+x, events)
         return (' && '.join((map(str, invs)+nevents)), stmts)
@@ -118,7 +127,7 @@ def getEAndGAndU(edge, events):
                 if Update.Update1(v, xx):
                     updates[i] = str(v) + '=' + str(xx) + ';'
                 elif Update.Update2(v, xx):
-                    updates[i] = str(v) + '=' + str(xx) + ';'
+                    updates[i] = str(v) + '_u = ' + str(xx) + ';'
                 else:
                     raise ("Unrecognized update: ", update)
         updates = filter(lambda x: not (x is None), updates)
@@ -185,17 +194,26 @@ def makeReactionFunction(fname, locs, edges, snames, events):
     return ['\n'.join(ret)]
 
 
-def makeMain(sloc, rName):
+def makeMain(sloc, rName, cvars):
     tab = ' '*2
     level = 1
     main = ['void main(void) {']
     with patterns:
-        Loc(name, x, y, z) << sloc
+        Loc(name, ol, y, z) << sloc
+        # Initialize the continous vars for the sloc
+        for i, o in enumerate(ol):
+            with patterns:
+                Ode(ode, var, iValue) << o
+                main += [tab*level + str(var.func) + ' = ' + str(iValue) + ';']
         main += [tab*level+'enum states cstate = '+name+';']
         main += [tab*level+'while(True) {']
         level += 1
         main += [tab*level+'readInput();']
         main += [tab*level+'cstate = '+rName+'(cstate);']
+        # Update the conts with uconts
+        updates = map(lambda x: tab * level + x + ' = ' + x +
+                      '_u;', cvars)
+        main += updates
         main += [tab*level+'writeOutput();']
         level -= 1
         main += [tab*level+'}']
@@ -240,6 +258,9 @@ def codeGen(ha):
         # Declare the continous variables as doubles
         contSet = set([str(item) for sl in contVars for item in sl])
         contDecl = ['double ' + ', '.join(contSet) + ';']
+        # Declare the update continous variables
+        uContSet = set([str(item)+"_u" for sl in contVars for item in sl])
+        uContDecl = ['double ' + ', '.join(uContSet) + ';']
 
         # Build the main function
 
@@ -253,6 +274,9 @@ def codeGen(ha):
         # Append the continous variables
         mainCFile += ['//Continous variables']
         mainCFile += contDecl
+        # The updated continous variables
+        mainCFile += ['//Continous variables']
+        mainCFile += uContDecl
         # Append the step-size and step declarations
         mainCFile += ['//Step-size constant d']
         mainCFile += ['extern double d;']
@@ -270,7 +294,7 @@ def codeGen(ha):
                                           list(eventSet))
 
         # Make the main function
-        mainCFile += makeMain(sloc, han)
+        mainCFile += makeMain(sloc, han, list(contSet))
 
         # This is the final set, write to files
         with open(han+".c", 'w') as cFile:
