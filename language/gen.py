@@ -75,12 +75,13 @@ def getInvariantAndOdeExpr(loc, events):
                 # that all odes have same worst case time in a given
                 # location
                 if loc.rest['time'] != S('oo'):
-                    rhs = str(S(lname+'_ode_' +
-                                str(i+1)+'(d, k,' +
-                                str(var.func)+')'))
+                    rhs = lname+'_ode_' + str(i+1)
+                    r2 = '(d, k, ' + str(var.func)+')'
+                    rhs += r2
                 else:
-                    rhs = str(S(lname+'_ode_'+str(i+1) +
-                                '('+str(var.func)+')'))
+                    rhs = lname+'_ode_'+str(i+1)
+                    r2 = '('+str(var.func)+')'
+                    rhs += r2
                 stmts[i] = lhs + ' = ' + rhs + ';'
         nevents = map(lambda x: '!'+x, events)
         return (' && '.join((map(str, invs)+nevents)), stmts)
