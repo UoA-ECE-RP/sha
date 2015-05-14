@@ -56,10 +56,10 @@ def getEventList(edge):
                 return events
 
 
-def getInvariantAndOdeExpr(loc, events):
+def getInvariantAndOdeExpr(loc, events, tab):
     with patterns:
-        Loc(lname, odes, clist, y) << loc
-        exprs = [item for sl in y.values() for item in sl]
+        Loc(lname, odes, clist, guards) << loc
+        exprs = [item for sl in guards.values() for item in sl]
         invs = [None]*len(exprs)
         for i, x in enumerate(exprs):
             with patterns:
@@ -83,6 +83,44 @@ def getInvariantAndOdeExpr(loc, events):
                     r2 = '('+str(var.func)+')'
                     rhs += r2
                 stmts[i] = lhs + ' = ' + rhs + ';'
+                # Now put the saturation function in
+                o = dsolve(ode, var)
+                if not (iValue is None):
+                    i = solve(o.subs([(var, iValue),
+                                      (Symbol('t'), 0)]),
+                              Symbol('C1'))[0]
+                    o = o.subs(S('C1'), i)
+                    if not o.rhs.is_Number:
+                        s = o.rhs.diff(S('t'))
+                        s = s.subs(S('t'), 0)
+                        if s.is_Number:
+                            gs = guards[var]
+                            mm = [None]*len(gs)
+                            for i, g in enumerate(gs):
+                                with patterns:
+                                    Guard(xx) << g
+                                    mm[i] = xx.rhs
+                            if s > 0:
+                                cb = str(max(mm))
+                                stmts += ['if('+str(
+                                    var.func)+'_u > ' + cb + ')']
+                                stmts += [tab + str(
+                                    var.func) + '_u = ' + cb]
+                            else:
+                                # Decreasing function
+                                cb = str(min(mm))
+                                stmts += ['if('+str(
+                                    var.func)+'_u < ' + cb + ')']
+                                stmts += [tab + str(
+                                    var.func) + '_u = ' + cb]
+                        else:
+                            raise Exception('Don\'t know how to saturate')
+                    else:
+                        print ('Cannot saturate: ', str(o),
+                               ' in loc: ', lname, '\n')
+                else:
+                    print ('Cannot saturate: ', str(o),
+                           ' in loc: ', lname, '\n')
         nevents = map(lambda x: '!'+x, events)
         return (' && '.join((map(str, invs)+nevents)), stmts)
 
@@ -147,7 +185,7 @@ def makeReactionFunction(fname, locs, edges, snames, events):
         level += 1
         # Code for state transitions
         (invExpr, odeStmts) = getInvariantAndOdeExpr(locs[i],
-                                                     events)
+                                                     events, tab)
 
         # If the ode is still begin solved
         ret += [tab*level+'if('+invExpr+'){']
@@ -168,7 +206,7 @@ def makeReactionFunction(fname, locs, edges, snames, events):
             ret += [tab*level+'if('+(' && '.join([eeExpr,
                                                  egExpr]))+') {']
             level += 1
-            ret += [level*tab+'//staurate here if needed']
+            # Saturate currently only works for non-combinator functions
             ret += [level*tab+'k=0;']
             ret += [level*tab+'cstate='+dState+';']
             # Put the updates from edge here!
