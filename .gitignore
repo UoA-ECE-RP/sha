@@ -87,3 +87,6 @@ docs/_build/
 
 # PyBuilder
 target/
+
+*.c
+*.h
