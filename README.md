@@ -24,4 +24,5 @@ Plot the wout.csv file in excel!
 2. macropy
 3. colorama
 4. termcolor
+
 * Install dependencies using pip
