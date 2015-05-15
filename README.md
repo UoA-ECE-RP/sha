@@ -1,8 +1,8 @@
 # sha
 Generate synchronous code from subset of hybrid automata
 
-This is the procedure to run the code for the watertank example in the
-examples directory:
+## This is the procedure to run the code for the watertank example in the
+## examples directory:
 
 * To compile
 ```bash
@@ -20,4 +20,8 @@ gcc watertank.c wio.c -o w -lm
 ```
 Plot the wout.csv file in excel!
 
-# Python dependencies
+## Python dependencies
+sympy
+macropy
+
+* Install dependencies using pip
