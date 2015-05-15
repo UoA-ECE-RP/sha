@@ -11,6 +11,8 @@
 #define TRUE 1
 #define FALSE 0
 
+extern double x;
+
 /* The step size */
 double d = 0.2;
 
@@ -94,7 +96,7 @@ void readInput() {
 }
 
 /* Write output x to file */
-void writeOutput(double x){
+void writeOutput(){
   static unsigned char count = 0;
   if (0 == count){
     fo = fopen(OFILE, "w");
