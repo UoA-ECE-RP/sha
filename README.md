@@ -18,5 +18,6 @@ gcc watertank.c wio.c -o w -lm
 ```bash
 ./w
 ```
-
 Plot the wout.csv file in excel!
+
+# Python dependencies
