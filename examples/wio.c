@@ -12,12 +12,7 @@
 #define FALSE 0
 
 /* The step size */
-double d = 0.00005;
-
-/* The output variable that needs to be written to file */
-/* It is extern, because the real thing is defined in the
-   compiled code */
-extern double x;
+double d = 0.2;
 
 /* The events to read from file */
 unsigned char ON, C, B, OFF;
@@ -57,8 +52,10 @@ void readInput() {
   */
   char in[256];
   if (fgets(in,255,fi) == NULL){
-    perror("Could not scan inputs\n");
-    exit(1);
+    ON = FALSE;
+    C = FALSE;
+    B = FALSE;
+    OFF = FALSE;
   }
   else{
     char *ret = NULL, *v = NULL;
@@ -91,19 +88,22 @@ void readInput() {
       ret = strtok(NULL, ",");
     }
   }
+  fprintf(stdout, "%s:%d %s:%d %s:%d %s:%d tick:%ld\n", "ON", ON,
+	  "OFF", OFF, "B", B, "C", C, tick);
+  fflush(stdout);
 }
 
 /* Write output x to file */
-void writeOutput(){
+void writeOutput(double x){
   static unsigned char count = 0;
   if (0 == count){
-    fo = fopen(OFILE, "r");
+    fo = fopen(OFILE, "w");
     if (fo == NULL){
       perror(OFILE);
       exit(1);
     }
     ++count;
   }
-  fprintf(fo, "%ld,%e\n", ++tick, x);
+  fprintf(fo, "%ld,%f\n", ++tick, x);
 }
 

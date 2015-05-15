@@ -203,7 +203,7 @@ def makeReactionFunction(fname, locs, edges, snames, events):
         for edge in edgesWithstateSource(edges, state):
             (eeExpr, egExpr, uStmts, dState) = getEAndGAndU(edge,
                                                             events)
-            ret += [tab*level+'if('+(' && '.join([eeExpr,
+            ret += [tab*level+'else if('+(' && '.join([eeExpr,
                                                  egExpr]))+') {']
             level += 1
             # Saturate currently only works for non-combinator functions
@@ -236,7 +236,7 @@ def makeReactionFunction(fname, locs, edges, snames, events):
 def makeMain(sloc, rName, cvars):
     tab = ' '*2
     level = 1
-    main = ['void main(void) {']
+    main = ['int main(void) {']
     with patterns:
         Loc(name, ol, y, z) << sloc
         # Initialize the continous vars for the sloc
@@ -256,6 +256,7 @@ def makeMain(sloc, rName, cvars):
         main += [tab*level+'writeOutput();']
         level -= 1
         main += [tab*level+'}']
+        main += [tab*level+'return 0;']
     main += ['}']
     return ['\n'.join(main)]
 
