@@ -20,7 +20,7 @@ gcc watertank.c wio.c -o w -lm
 Plot the wout.csv file in excel!
 
 ## Python dependencies
-sympy
-macropy
+1. sympy
+2. macropy
 
 * Install dependencies using pip
