@@ -105,22 +105,22 @@ def getInvariantAndOdeExpr(loc, events, tab):
                                 stmts += ['if('+str(
                                     var.func)+'_u > ' + cb + ')']
                                 stmts += [tab + str(
-                                    var.func) + '_u = ' + cb]
+                                    var.func) + '_u = ' + cb + ';']
                             else:
                                 # Decreasing function
                                 cb = str(min(mm))
                                 stmts += ['if('+str(
                                     var.func)+'_u < ' + cb + ')']
                                 stmts += [tab + str(
-                                    var.func) + '_u = ' + cb]
+                                    var.func) + '_u = ' + cb + ';']
                         else:
                             raise Exception('Don\'t know how to saturate')
                     else:
                         print ('Cannot saturate: ', str(o),
-                               ' in loc: ', lname, '\n')
+                               ' in loc: ', lname)
                 else:
                     print ('Cannot saturate: ', str(o),
-                           ' in loc: ', lname, '\n')
+                           ' in loc: ', lname)
         nevents = map(lambda x: '!'+x, events)
         return (' && '.join((map(str, invs)+nevents)), stmts)
 
