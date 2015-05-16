@@ -16,7 +16,7 @@ def OdeCodegen(os, name):
     odes = [None]*len(os)
     vars = [None]*len(os)
     iValues = [None]*len(os)
-    for i in range(0, len(os)):
+    for i in xrange(0, len(os)):
         with patterns:
             Ode(ode, var, iValue) << os[i]
             odes[i] = ode
@@ -25,7 +25,8 @@ def OdeCodegen(os, name):
     try:
         odes = map(lambda x, y: dsolve(x, y), odes, vars)
         # TODO: Check!!
-        iodes = map(lambda o: o.subs(var, S(str(var.func)+'_u')), odes)
+        iodes = map(lambda o: o.subs(var, S(str(var.func)+'_u')),
+                    odes)
         iodes = map(lambda o: o.subs(S('t'), 0), iodes)
         iodes = map(lambda o: solve(o, S('C1'))[0], iodes)
         odess = map(lambda o:
@@ -34,7 +35,7 @@ def OdeCodegen(os, name):
                                  Symbol('d')))]), odes)
         funcs = map(lambda o, i:
                     (name+"_ode_"+str(i+1), o.rhs), odess,
-                    range(0, len(odess)))
+                    xrange(0, len(odess)))
         ifuncs = map(lambda (i, o): (name+"_init_"+(str(i+1)), o),
                      enumerate(iodes))
         [(c_name, c_code), (h_name, h_header)] = codegen(
@@ -49,7 +50,7 @@ def getEventList(edge):
     with patterns:
         Edge(l1, l2, guard, ulist, eventList) << edge
         events = [None]*len(eventList)
-        for i in range(len(eventList)):
+        for i in xrange(len(eventList)):
             with patterns:
                 Event(x) << eventList[i]
                 events[i] = x
@@ -278,7 +279,7 @@ def codeGen(ha):
         hns = [None]*len(ls)
         hcs = [None]*len(ls)
         contVars = [None]*len(ls)
-        for i in range(len(ls)):
+        for i in xrange(len(ls)):
             with patterns:
                 Loc(name, odes, clist, y) << ls[i]
                 (cCodeFile[i], hns[i],
@@ -354,7 +355,7 @@ def codeGen(ha):
             cFile.write('\n\n'.join(mainCFile))
 
         # Write the header files out
-        for i in range(len(hns)):
+        for i in xrange(len(hns)):
             with open(hns[i], 'w') as f:
                 f.write(hcs[i])
 
