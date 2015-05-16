@@ -24,21 +24,21 @@ def OdeCodegen(os, name):
             iValues[i] = iValue
     try:
         odes = map(lambda x, y: dsolve(x, y), odes, vars)
-        initcs = map(lambda i, o, v:
-                     solve(o.subs([(v, i),
-                                   (Symbol('t'), 0)]),
-                           Symbol('C1'))[0],
-                     iValues, odes, vars)
-        odess = map(lambda i, o:
-                    o.subs([(S('C1'), S(str(var.func)+'_u')),
-                            (Symbol('t'),
+        # TODO: Check!!
+        iodes = map(lambda o: o.subs(var, S(str(var.func)+'_u')), odes)
+        iodes = map(lambda o: o.subs(S('t'), 0), iodes)
+        iodes = map(lambda o: solve(o, S('C1'))[0], iodes)
+        odess = map(lambda o:
+                    o.subs([(Symbol('t'),
                              Mul(Symbol('k'),
-                                 Symbol('d')))]), enumerate(initcs), odes)
+                                 Symbol('d')))]), odes)
         funcs = map(lambda o, i:
                     (name+"_ode_"+str(i+1), o.rhs), odess,
                     range(0, len(odess)))
+        ifuncs = map(lambda (i, o): (name+"_init_"+(str(i+1)), o),
+                     enumerate(iodes))
         [(c_name, c_code), (h_name, h_header)] = codegen(
-            funcs, "C", name,
+            (funcs+ifuncs), "C", name,
             header=False, empty=False, to_files=False)
         return (c_code, h_name, h_header, [cv.func for cv in vars])
     except Exception as e:
@@ -66,23 +66,27 @@ def getInvariantAndOdeExpr(loc, events, tab):
                 Guard(y) << x
                 invs[i] = y
         # Adding not events as well to this expr
-        stmts = [None]*len(odes)
+        stmts = []
         for i, od in enumerate(odes):
             with patterns:
                 Ode(ode, var, iValue) << od
+                # Get the initial value once!
+                stmts += ['if (pstate != cstate)']
+                rr = lname+'_init_'+str(i+1)+'('+str(var.func)+')'
+                stmts += [tab+'C1 = '+rr+';']
                 lhs = str(var.func)+'_u'
                 # This if condition only works, because we make sure
                 # that all odes have same worst case time in a given
                 # location
                 if loc.rest['time'] != S('oo'):
                     rhs = lname+'_ode_' + str(i+1)
-                    r2 = '(d, k, ' + str(var.func)+')'
+                    r2 = '(C1, d, k)'
                     rhs += r2
                 else:
                     rhs = lname+'_ode_'+str(i+1)
-                    r2 = '('+str(var.func)+')'
+                    r2 = '(C1)'
                     rhs += r2
-                stmts[i] = lhs + ' = ' + rhs + ';'
+                stmts += [lhs + ' = ' + rhs + ';']
                 # Now put the saturation function in
                 o = dsolve(ode, var)
                 if not (iValue is None):
@@ -176,7 +180,8 @@ def getEAndGAndU(edge, events):
 def makeReactionFunction(fname, locs, edges, snames, events):
     level = 1
     tab = ' '*2
-    ret = ['enum states ' + fname + '(enum states cstate) {']
+    ret = ['enum states ' + fname +
+           '(enum states cstate, enum states pstate) {']
     ret += [tab*level+'switch (cstate) {']
 
     # All code for state transition goes in here
@@ -244,11 +249,14 @@ def makeMain(sloc, rName, cvars):
             with patterns:
                 Ode(ode, var, iValue) << o
                 main += [tab*level + str(var.func) + ' = ' + str(iValue) + ';']
+        main += [tab*level+'enum states pstate = -1;']
         main += [tab*level+'enum states cstate = '+name+';']
         main += [tab*level+'while(True) {']
         level += 1
         main += [tab*level+'readInput();']
-        main += [tab*level+'cstate = '+rName+'(cstate);']
+        main += [tab*level+'enum states rstate = '+rName+'(cstate, pstate);']
+        main += [tab*level+'pstate = cstate;']
+        main += [tab*level+'cstate = rstate;']
         # Update the conts with uconts
         updates = map(lambda x: tab * level + x + ' = ' + x +
                       '_u;', cvars)
@@ -315,8 +323,11 @@ def codeGen(ha):
         mainCFile += ['//Continous variables']
         mainCFile += contDecl
         # The updated continous variables
-        mainCFile += ['//Continous variables']
+        mainCFile += ['//Continous variable update']
         mainCFile += uContDecl
+        # The constant variable
+        mainCFile += ['//The constant variable']
+        mainCFile += ['double C1;']
         # Append the step-size and step declarations
         mainCFile += ['//Step-size constant d']
         mainCFile += ['extern double d;']
@@ -325,6 +336,8 @@ def codeGen(ha):
         # Append state declaration
         mainCFile += ['//States']
         mainCFile += ['enum states {' + ' , '.join(lnames)+'};']
+        # The previous state variable
+        mainCFile += ['//Previous state variable']
 
         # Append the odes
         mainCFile += cCodeFile
