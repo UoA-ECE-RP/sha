@@ -9,7 +9,9 @@ def compile(ha, **kwargs):
         # Step-2 get a new ha with the Nsteps for each loc computed
         # FIXME: Nsteps might be None in the general case
         sha = gen.getSha(ha)
-        # Step-3 generate code
+        print "titi"
+		print sha
+		# Step-3 generate code
         if sha is None:
             raise "Cannot generate code!"
         else:

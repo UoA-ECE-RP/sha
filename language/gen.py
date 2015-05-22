@@ -25,7 +25,7 @@ def OdeCodegen(os, name):
     try:
         odes = map(lambda x, y: dsolve(x, y), odes, vars)
         # TODO: Check!!
-        iodes = map(lambda o, v: o.subs(var, S(str(v.func)+'_u')),
+        iodes = map(lambda o, v: o.subs(v, S(str(v.func)+'_u')),
                     odes, vars)
         iodes = map(lambda o: o.subs(S('t'), 0), iodes)
         iodes = map(lambda o: solve(o, S('C1'))[0], iodes)
@@ -79,12 +79,11 @@ def getInvariantAndOdeExpr(loc, events, tab):
                 # This if condition only works, because we make sure
                 # that all odes have same worst case time in a given
                 # location
+                rhs = lname+'_ode_' + str(i+1)
                 if loc.rest['time'] != S('oo'):
-                    rhs = lname+'_ode_' + str(i+1)
                     r2 = '(C1, d, k)'
                     rhs += r2
                 else:
-                    rhs = lname+'_ode_'+str(i+1)
                     r2 = '(C1)'
                     rhs += r2
                 stmts += [lhs + ' = ' + rhs + ';']
@@ -373,17 +372,19 @@ def getShortestTimes(lname, ode, invariants):
                 # Return infinity as the time-bound
                 print(colored(warn, color='red',
                               attrs=['bold', 'blink']))
-                return S('oo')
+                return {var: (S('oo'),None)}
             else:
                 o = dsolve(od, var)
+                
                 i = solve(o.subs([(var, iValue),
                                   (Symbol('t'), 0)]),
                           Symbol('C1'))[0]
                 on = o.subs(S('C1'), i)
+                
                 if on.rhs.is_Number:
                     print(colored(warn, color='red',
                                   attrs=['bold', 'blink']))
-                    return S('oo')
+                    return {var:(S('oo'),None)}
                 else:
                     invvs = ([y.rhs for x in invariants[var]
                               for y in x])
@@ -394,7 +395,8 @@ def getShortestTimes(lname, ode, invariants):
                     time_max = solve(on.rhs-inv_max, S('t'))[0]
                     time_min = solve(on.rhs-inv_min, S('t'))[0]
                     time = Max(time_max, time_min)
-                    return time
+                    #print "time: ", time
+                    return {var:(time,on)}
     except Exception as k:
         print k.__doc__
     return None
@@ -403,16 +405,27 @@ def getShortestTimes(lname, ode, invariants):
 # NOTE: There should be an invariant for each ode on the location.
 def updateLocNsteps(loc):
     with patterns:
-        Loc(n, odes, clist, y) << loc
+        Loc(n, odes, cf, y) << loc
         times = map(lambda o: getShortestTimes(n, o, y), odes)
         # This means that all odes in the
         # location evolve for same amout
         # of time in the worst case
-        tts = map(lambda x: x == times[0], times[1:])
+        (tt, g) = times[0].values()[0] 
+        tts = [True]
+        for y in times[1:]:
+            for u,vv in y.values():
+                tts.append(u==tt)
         if all(tts):
-            return Loc(n, odes, clist, y, time=times[0])
+            return Loc(n, odes, cf, y, time=tt)
         else:
-            raise Exception("Not a WHA!")
+            ttr = []
+            for y in times:
+                for i in y.items():
+                    (b, (m, v)) = i
+                    if m != S('oo'):
+                        v = v.subs(S('t'),m)
+                        cf = cf.values()[0].subs(b, v)
+            print cf
 
 
 def getSha(ha):
