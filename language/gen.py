@@ -25,8 +25,8 @@ def OdeCodegen(os, name):
     try:
         odes = map(lambda x, y: dsolve(x, y), odes, vars)
         # TODO: Check!!
-        iodes = map(lambda o: o.subs(var, S(str(var.func)+'_u')),
-                    odes)
+        iodes = map(lambda o, v: o.subs(var, S(str(v.func)+'_u')),
+                    odes, vars)
         iodes = map(lambda o: o.subs(S('t'), 0), iodes)
         iodes = map(lambda o: solve(o, S('C1'))[0], iodes)
         odess = map(lambda o:
@@ -412,7 +412,7 @@ def updateLocNsteps(loc):
         if all(tts):
             return Loc(n, odes, clist, y, time=times[0])
         else:
-            None
+            raise Exception("Not a WHA!")
 
 
 def getSha(ha):
