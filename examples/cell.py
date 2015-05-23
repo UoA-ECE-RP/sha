@@ -9,49 +9,47 @@ from sympy import *
 import shac
 
 
-# K = 1 heating rate in t4, h = 0, K = -0.1 cooling rate in t3
-# The above values are from Matlab: bang-bang controller example
+# This the the single dimension in "x" example artificially paced cell
+# without any value for f(lambda).
 
-ode1 = Ode(sympify("diff(x(t))-1*x(t)"), sympify("x(t)"), 20)
-ode2 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 100)
-ode3 = Ode(sympify("diff(x(t))+0.1*x(t)"), sympify("x(t)"), 100)
-ode4 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 20)
+ode1 = Ode(S("diff(x(t))+0.1*x(t)"), S("x(t)"), 0.0001)
+ode2 = Ode(S("diff(x(t))-800"), S("x(t)"), 20)
+ode3 = Ode(S("diff(x(t))-200.0*x(t)"), S("x(t)"), 20)
+ode4 = Ode(S("diff(x(t))+0.002*x(t)"), S("x(t)"), 138)
 
 # The locations of the hybrid automaton
 t1 = Loc("t1", [ode1], [],
-         {S("x(t)"): [Guard(S("x>=20")), Guard(S("x <= 100"))]})
+         {S("x(t)"): [Guard(S("x<=20"))]})
 t2 = Loc("t2", [ode2], [],
-         {S("x(t)"): [Guard(S("x>=100")), Guard(S("x <= 100"))]})
+         {S("x(t)"): [Guard(S("x < 20"))]})
 t3 = Loc("t3", [ode3], [],
-         {S("x(t)"): [Guard(S("x>=20")), Guard(S("x <= 100"))]})
+         {S("x(t)"): [Guard(S("x>=20")), Guard(S("x < 138"))]})
 t4 = Loc("t4", [ode4], [],
-         {S("x(t)"): [Guard(S("x>=20")), Guard(S("x <= 20"))]})
+         {S("x(t)"): [Guard(S("x>20")), Guard(S("x <= 138"))]})
 
 # The edges
-e1 = Edge('t1', 't2', {S("x(t)"): [Guard(S("x>=100")),
-                                   Guard(S("x <= 100"))]},
+e1 = Edge('t1', 't2', {S("x(t)"): [Guard(S("x < 20"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("B")])
-e2 = Edge('t2', 't3', {S("x(t)"): [Guard(sympify("True"))]},
+          [Event("VS")])
+e2 = Edge('t2', 't1', {S("x(t)"): [Guard(S("x < 20"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("OFF")])
-e3 = Edge('t1', 't3', {S("x(t)"): [Guard(sympify("True"))]},
+          [Event("VSP")])
+e3 = Edge('t2', 't3', {S("x(t)"): [Guard(S("x <= 20")),
+                                   Guard(S("x >= 20"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("OFF")])
-e4 = Edge('t3', 't1', {S("x(t)"): [Guard(sympify("True"))]},
+          [])
+e4 = Edge('t3', 't4', {S("x(t)"): [Guard(S("x <= 138")),
+                                   Guard(S("x >= 138"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("ON")])
-e5 = Edge('t3', 't4', {S("x(t)"): [Guard(S("x>=20")),
-                                   Guard(S("x <= 20"))]},
+          [])
+e5 = Edge('t4', 't1', {S("x(t)"): [Guard(S("x <= 20")),
+                                   Guard(S("x >= 20"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("C")])
-e6 = Edge('t4', 't1', {S("x(t)"): [Guard(sympify("True"))]},
-          [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("ON")])
+          [])
 
-waterTank = Ha("watertank", [t1, t2, t3, t4], t4,
-               [e1, e2, e3, e4, e5, e6])
+cell1D = Ha("cell1D", [t1, t2, t3, t4], t1,
+            [e1, e2, e3, e4, e5])
 
 
 # Compile
-shac.compile(waterTank)
+shac.compile(cell1D)
