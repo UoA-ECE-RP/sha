@@ -31,16 +31,16 @@ t2 = Loc("t2", [ode2], [],
 
 
 # The edges
-e1 = Edge('t0', 't1', {S("x(t)"): [Guard(sympify("True"))]},
+e1 = Edge('t0', 't1', {S("x(t)"):[Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("add1")])
-e2 = Edge('t1', 't0', {S("x(t)"): [Guard(sympify("True"))]},
+e2 = Edge('t1', 't0', {S("x(t)"):[Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("remove1")])
-e3 = Edge('t0', 't2', {S("x(t)"): [Guard(sympify("True"))]},
+e3 = Edge('t0', 't2', {S("x(t)"):[Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("add2")])
-e4 = Edge('t2', 't0', {S("x(t)"): [Guard(sympify("True"))]},
+e4 = Edge('t2', 't0', {S("x(t)"):[Guard(sympify("True"))]},
           [Update.Update2(Symbol('x'), Symbol('x'))],
           [Event("remove2")])
 
