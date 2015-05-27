@@ -27,7 +27,7 @@ def OdeCodegen(os, name):
         # TODO: Check!!
         iodes = map(lambda o, v: o.subs(v, S(str(v.func)+'_u')),
                     odes, vars)
-        iodes = map(lambda o: o.subs(S('t'), 0), iodes)
+	iodes = map(lambda o: o.subs(S('t'), 0), iodes)
         iodes = map(lambda o: solve(o, S('C1'))[0], iodes)
         odess = map(lambda o:
                     o.subs([(Symbol('t'),
@@ -49,13 +49,12 @@ def OdeCodegen(os, name):
 def getEventList(edge):
     with patterns:
         Edge(l1, l2, guard, ulist, eventList) << edge
-        events = []
+        events = [None]*len(eventList)
         for i in xrange(len(eventList)):
             with patterns:
                 Event(x) << eventList[i]
-                if x is not None:
-                    events.append(x)
-        return events
+                events[i] = x
+                return events
 
 
 def getInvariantAndOdeExpr(loc, events, tab):
@@ -108,16 +107,14 @@ def getInvariantAndOdeExpr(loc, events, tab):
                             if s > 0:
                                 cb = str(max(mm))
                                 stmts += ['if('+str(
-                                    var.func)+'_u > ' + cb +
-                                          ' && C1 < ' + cb + ')']
+                                    var.func)+'_u > ' + cb + ')']
                                 stmts += [tab + str(
                                     var.func) + '_u = ' + cb + ';']
                             else:
                                 # Decreasing function
                                 cb = str(min(mm))
                                 stmts += ['if('+str(
-                                    var.func)+'_u < ' + cb +
-                                          ' && C1 > ' + cb + ')']
+                                    var.func)+'_u < ' + cb + ')']
                                 stmts += [tab + str(
                                     var.func) + '_u = ' + cb + ';']
                         else:
@@ -146,20 +143,20 @@ def getEAndGAndU(edge, events):
     with patterns:
         Edge(t1, t2, guards, uList, eList) << edge
         guards = [item for sl in guards.values() for item in sl]
-        gus = []
+        gus = [None]*len(guards)
         for i, guard in enumerate(guards):
             with patterns:
                 Guard(xx) << guard
-                gus.append(str(xx))
+                gus[i] = str(xx)
         egExpr = ' && '.join(filter(lambda x: not(x is None), gus))
         if egExpr == '':
             egExpr = 'False'
         # Now the event list
-        eus = []
+        eus = [None]*len(eList)
         for i, event in enumerate(eList):
             with patterns:
                 Event(xx) << event
-                eus.append(str(xx))
+                eus[i] = str(xx)
         eus = filter(lambda x: not(x is None), eus)
         nevents = filter(lambda x: not(x in eus), events)
         nevents = map(lambda x: '!'+x, nevents)
@@ -167,13 +164,13 @@ def getEAndGAndU(edge, events):
         if eeExpr == '':
             eeExpr = 'False'
         # Now for the update statements
-        updates = []
+        updates = [None]*len(uList)
         for update in uList:
             with switch(update):
                 if Update.Update1(v, xx):
-                    updates.append(str(v) + '=' + str(xx) + ';')
+                    updates[i] = str(v) + '=' + str(xx) + ';'
                 elif Update.Update2(v, xx):
-                    updates.append(str(v) + '_u = ' + str(xx) + ';')
+                    updates[i] = str(v) + '_u = ' + str(xx) + ';'
                 else:
                     raise ("Unrecognized update: ", update)
         updates = filter(lambda x: not (x is None), updates)
@@ -212,7 +209,7 @@ def makeReactionFunction(fname, locs, edges, snames, events):
             (eeExpr, egExpr, uStmts, dState) = getEAndGAndU(edge,
                                                             events)
             ret += [tab*level+'else if('+(' && '.join([eeExpr,
-                                                       egExpr]))+') {']
+                                                 egExpr]))+') {']
             level += 1
             # Saturate currently only works for non-combinator functions
             ret += [level*tab+'k=0;']
@@ -375,17 +372,19 @@ def getShortestTimes(lname, ode, invariants):
                 # Return infinity as the time-bound
                 print(colored(warn, color='red',
                               attrs=['bold', 'blink']))
-                return {var: (S('oo'), None)}
+                return {var: (S('oo'),None)}
             else:
                 o = dsolve(od, var)
+                
                 i = solve(o.subs([(var, iValue),
                                   (Symbol('t'), 0)]),
                           Symbol('C1'))[0]
                 on = o.subs(S('C1'), i)
+                
                 if on.rhs.is_Number:
                     print(colored(warn, color='red',
                                   attrs=['bold', 'blink']))
-                    return {var: (S('oo'), None)}
+                    return {var:(S('oo'),None)}
                 else:
                     invvs = ([y.rhs for x in invariants[var]
                               for y in x])
@@ -396,10 +395,11 @@ def getShortestTimes(lname, ode, invariants):
                     time_max = solve(on.rhs-inv_max, S('t'))[0]
                     time_min = solve(on.rhs-inv_min, S('t'))[0]
                     time = Max(time_max, time_min)
-                    return {var: (time, on)}
+                    #print "time: ", time
+                    return {var:(time,on)}
     except Exception as k:
         print k.__doc__
-        return None
+    return None
 
 
 # NOTE: There should be an invariant for each ode on the location.
@@ -410,23 +410,25 @@ def updateLocNsteps(loc):
         # This means that all odes in the
         # location evolve for same amout
         # of time in the worst case
-        (tt, g) = times[0].values()[0]
+        (tt, g) = times[0].values()[0] 
         tts = [True]
         for y in times[1:]:
-            for u, vv in y.values():
-                tts.append(u == tt)
+            for u,vv in y.values():
+                tts.append(u==tt)
         if all(tts):
             return Loc(n, odes, cf, y, time=tt)
         else:
-            raise Exception("Not a WHA!!")
-            # ttr = []
-            # for y in times:
-            #     for i in y.items():
-            #         (b, (m, v)) = i
-            #         if m != S('oo'):
-            #             v = v.subs(S('t'), m)
-            #             cf = cf.values()[0].subs(b, v)
-            # print cf
+            ttr = []
+            for y in times:
+                for i in y.items():
+                    (b, (m, v)) = i
+                    if m != S('oo'):
+                        v = v.subs(S('t'),m)
+                        cf = cf.values()[0].subs(b, v)
+            print cf
+##            print times
+##            raise Exception("Not a WHA!!")
+##            return None
 
 
 def getSha(ha):
