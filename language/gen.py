@@ -121,7 +121,8 @@ def getInvariantAndOdeExpr(loc, events, tab):
                                 stmts += [tab + str(
                                     var.func) + '_u = ' + cb + ';']
                         else:
-                            raise Exception('Don\'t know how to saturate')
+                            raise
+                        Exception('Don\'t know how to saturate')
                     else:
                         print ('Cannot saturate: ', str(o),
                                ' in loc: ', lname)
@@ -211,10 +212,11 @@ def makeReactionFunction(fname, locs, edges, snames, events):
         for edge in edgesWithstateSource(edges, state):
             (eeExpr, egExpr, uStmts, dState) = getEAndGAndU(edge,
                                                             events)
-            ret += [tab*level+'else if('+(' && '.join([eeExpr,
-                                                       egExpr]))+') {']
+            ret += [tab*level+'else if('+(
+                ' && '.join([eeExpr, egExpr]))+') {']
             level += 1
-            # Saturate currently only works for non-combinator functions
+            # Saturate currently only
+            # works for non-combinator functions
             ret += [level*tab+'k=0;']
             ret += [level*tab+'cstate='+dState+';']
             # Put the updates from edge here!
@@ -251,13 +253,15 @@ def makeMain(sloc, rName, cvars):
         for i, o in enumerate(ol):
             with patterns:
                 Ode(ode, var, iValue) << o
-                main += [tab*level + str(var.func) + ' = ' + str(iValue) + ';']
+                main += [tab*level + str(var.func) + ' = ' +
+                         str(iValue) + ';']
         main += [tab*level+'enum states pstate = -1;']
         main += [tab*level+'enum states cstate = '+name+';']
         main += [tab*level+'while(True) {']
         level += 1
         main += [tab*level+'readInput();']
-        main += [tab*level+'enum states rstate = '+rName+'(cstate, pstate);']
+        main += [tab*level+'enum states rstate = ' + rName +
+                 '(cstate, pstate);']
         main += [tab*level+'pstate = cstate;']
         main += [tab*level+'cstate = rstate;']
         # Update the conts with uconts
@@ -310,7 +314,8 @@ def codeGen(ha):
         contSet = set([str(item) for sl in contVars for item in sl])
         contDecl = ['double ' + ', '.join(contSet) + ';']
         # Declare the update continous variables
-        uContSet = set([str(item)+"_u" for sl in contVars for item in sl])
+        uContSet = set([str(item)+"_u"
+                        for sl in contVars for item in sl])
         uContDecl = ['double ' + ', '.join(uContSet) + ';']
 
         # Build the main function
