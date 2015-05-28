@@ -91,3 +91,4 @@ target/
 *.c
 *.h
 *.csv
+Makefile
