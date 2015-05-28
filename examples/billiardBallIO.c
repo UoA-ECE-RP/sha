@@ -5,8 +5,8 @@
 #include<assert.h>
 
 /* The files are in csv format */
-#define OFILE "billardBallout.csv"
-#define IFILE "billardBallin.csv"
+#define OFILE "billiardBallout.csv"
+#define IFILE "billiardBallin.csv"
 
 #define TRUE 1
 #define FALSE 0

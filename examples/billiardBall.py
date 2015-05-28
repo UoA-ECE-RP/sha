@@ -21,30 +21,35 @@ import shac
 
 ode0x =  Ode(sympify("diff(x(t))"), sympify("x(t)"), 5) #intial location of the ball is (5,5)
 ode0y =  Ode(sympify("diff(y(t))"), sympify("y(t)"), 5)
-ode1x =  Ode(sympify("diff(x(t))-0.866*x(t)+0"), sympify("x(t)"), 0)
-ode1y =  Ode(sympify("diff(y(t))-0.500*y(t)+0"), sympify("y(t)"), 0) #initalisation to zero does not make sense
-ode2x =  Ode(sympify("diff(x(t))-0.866*x(t)+0"), sympify("x(t)"), 0)
-ode2y =  Ode(sympify("diff(y(t))+0.500*y(t)+0"), sympify("y(t)"), 0)
-ode3x =  Ode(sympify("diff(x(t))+0.866*x(t)+0"), sympify("x(t)"), 0)
-ode3y =  Ode(sympify("diff(y(t))+0.500*y(t)+0"), sympify("y(t)"), 0)
-ode4x =  Ode(sympify("diff(x(t))+0.866*x(t)+0"), sympify("x(t)"), 0)
-ode4y =  Ode(sympify("diff(y(t))-0.500*y(t)+0"), sympify("y(t)"), 0)
+ode1x =  Ode(sympify("diff(x(t))-0.866"), sympify("x(t)"), 0)
+ode1y =  Ode(sympify("diff(y(t))-0.500"), sympify("y(t)"), 0) #initalisation to zero does not make sense
+ode2x =  Ode(sympify("diff(x(t))-0.866"), sympify("x(t)"), 0)
+ode2y =  Ode(sympify("diff(y(t))+0.500"), sympify("y(t)"), 0)
+ode3x =  Ode(sympify("diff(x(t))+0.866"), sympify("x(t)"), 0)
+ode3y =  Ode(sympify("diff(y(t))+0.500"), sympify("y(t)"), 0)
+ode4x =  Ode(sympify("diff(x(t))+0.866"), sympify("x(t)"), 0)
+ode4y =  Ode(sympify("diff(y(t))-0.500"), sympify("y(t)"), 0)
 
 # The locations of the hybrid automaton
-t0 = Loc("t0", [ode0x,ode0y], [],
+# t0 = Loc("t0", [ode0x,ode0y], {S('v(t)'): S('Min(x(t),y(t))')},
+t0 = Loc("t0", [ode0x,ode0y], None,
          {S("x(t)"): [ Guard(S("x >= 0")),
                        Guard(S("x <= 33")) ],
           S("y(t)"):[  Guard(S("y >= 0")),
                        Guard(S("y <= 10")) ]
           })
-t1 = Loc("t1", [ode1x,ode1y], [],
-         {S("y(t)"): [ Guard(S("y < 10"))  ]})
-t2 = Loc("t2", [ode2x,ode2y], [],
-         {S("x(t)"): [ Guard(S("x < 33"))  ]})
-t3 = Loc("t3", [ode3x,ode3y], [],
-         {S("y(t)"): [ Guard(S("y > 0"))  ]})
-t4 = Loc("t4", [ode4x,ode4y], [],
-         {S("x(t)"): [ Guard(S("x > 0"))  ]})
+t1 = Loc("t1", [ode1x,ode1y], None,
+         {S("y(t)"): [ Guard(S("y <= 10"))],
+		 S("x(t)"):[Guard(S("x <= 33"))]})
+t2 = Loc("t2", [ode2x,ode2y], None,
+         {S("x(t)"): [ Guard(S("x < 33"))],
+		 S("y(t)"): [ Guard(S("y <= 10"))]})
+t3 = Loc("t3", [ode3x,ode3y], None,
+         {S("y(t)"): [ Guard(S("y > 0"))],
+		 S("x(t)"):[Guard(S("x <= 33"))]})
+t4 = Loc("t4", [ode4x,ode4y], None,
+         {S("x(t)"): [Guard(S("x > 0"))],
+		 S("y(t)"): [Guard(S("y > 0"))]})
 
 
 # The edges
