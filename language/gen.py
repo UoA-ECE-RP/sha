@@ -395,6 +395,7 @@ def getShortestTimes(lname, ode, invariants):
                     invvs = ([y for x in invariants[var]
                               for y in x if not isinstance(y, bool)])
                     if invvs != []:
+                        invvs = map(lambda x: x.rhs, invvs)
                         # Used for increasing functions
                         inv_max = max(invvs)
                         # Used for decreasing functions
