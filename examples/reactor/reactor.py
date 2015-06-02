@@ -21,7 +21,7 @@ ode2 = Ode(sympify("diff(x(t))-0.1*x(t)+60"), sympify("x(t)"), 550)
 
 # The locations of the hybrid automaton
 t0 = Loc("t0", [ode0], [],
-         {S("x(t)"): [ Guard(S("x <= 550"))]})
+         {S("x(t)"): [Guard(S("x <= 550"))]})
 t1 = Loc("t1", [ode1], [],
          {S("x(t)"): [Guard(S("x>=510"))]})
 t2 = Loc("t2", [ode2], [],
@@ -44,7 +44,7 @@ e4 = Edge('t2', 't0', {S("x(t)"): [Guard(S("x<=510"))]},
 
 
 reactorPlant = Ha("reactor", [t0, t1, t2], t0,
-               [e1, e2, e3, e4])
+                  [e1, e2, e3, e4])
 
 
 # Compile

@@ -99,9 +99,10 @@ def getInvariantAndOdeExpr(loc, events, tab):
                         s = o.rhs.diff(S('t'))
                         s = s.subs(S('t'), 0)
                         if s.is_Number:
+                            # TODO: Combinator saturation is needed here
                             gs = guards[var]
                             mm = []
-                            for i, g in enumerate(gs):
+                            for g in gs:
                                 with patterns:
                                     Guard(xx) << g
                                     if not isinstance(xx, bool):
@@ -406,6 +407,9 @@ def getShortestTimes(lname, ode, invariants):
                         return {var: (time, on)}
                     else:
                         return {var: (S('oo'), None)}
+    except KeyError:
+        # TODO: check if this is OK
+        return {var: (S('oo'), None)}
     except Exception as k:
         raise k
 
@@ -420,8 +424,8 @@ def updateLocNsteps(loc):
         # of time in the worst case
         (tt, g) = times[0].values()[0]
         tts = [True]
-        for y in times[1:]:
-            for u, vv in y.values():
+        for yoo in times[1:]:
+            for u, vv in yoo.values():
                 tts.append(u == tt)
         if all(tts):
             return Loc(n, odes, cf, y, time=tt)
