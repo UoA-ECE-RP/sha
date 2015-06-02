@@ -3,10 +3,11 @@
 #include<sys/types.h>
 #include<string.h>
 #include<assert.h>
+#include <time.h>
 
 /* The files are in csv format */
-#define OFILE "file7out.csv"
-#define IFILE "file5in.csv"
+#define OFILE "file7.csv"
+#define IFILE "file5.csv"
 
 #define TRUE 1
 #define FALSE 0
@@ -30,6 +31,11 @@ FILE *fo = NULL;
 /* The input file pointer */
 FILE *fi = NULL;
 
+ unsigned int retTime;
+ void waitFor (unsigned int secs) {
+    retTime = time(0) + secs;     // Get finishing time.
+    while (time(0) < retTime);    // Loop until it arrives.
+}
 static inline unsigned char getValue(unsigned char t, char* e){
   assert(t == TRUE || t == FALSE);
   return t;
@@ -54,29 +60,30 @@ void readInput() {
     ON, ON_Value, C, C_Value, B, B_Value, OFF, OFF_Value
   */
   char in[256];
-  if (fgets(in,255,fi) == NULL){
-    VS = FALSE;
-    VSP = FALSE;
+  while (fgets(in,255,fi) == NULL){
+	perror("No input");
+	waitFor(2);
+	//exit(1);
   }
-  else{
+  //else{
     char *ret = NULL, *v = NULL;
     ret = strtok(in, ",");
     if(ret == NULL){
       /* This means nothing found! */
       /* Set all events to false */
-      VS = FALSE;
-      VSP = FALSE;
+      perror("NULL strtok error");
+      exit(1);
     }
     while(ret != NULL) {
       v = strtok(NULL, ",");
       if (v != NULL) {
-	if (strcmp(ret, "VS") == 0)
-	  VS = getValue((unsigned char)atoi(v), ret);
-	else if(strcmp(ret, "VSP") == 0)
-	  VSP = getValue((unsigned char)atoi(v), ret);
-  else if(strcmp(ret, "g") == 0)
-    g = atof(v);
-      }
+		if (strcmp(ret, "VS") == 0)
+		  VS = getValue((unsigned char)atoi(v), ret);
+		else if(strcmp(ret, "VSP") == 0)
+		  VSP = getValue((unsigned char)atoi(v), ret);
+		else if(strcmp(ret, "g") == 0)
+			g = atof(v);
+		}
       else {
 	perror("NULL while scanning input");
 	exit(1);
@@ -84,7 +91,7 @@ void readInput() {
       /* Read the next one! */
       ret = strtok(NULL, ",");
     }
-  }
+  //}
   fprintf(stdout, "%s:%d %s:%d %s:%f tick:%ld\n", "VS", VS,
 	  "VSP", VSP, "g", g, tick);
   fflush(stdout);
@@ -99,8 +106,19 @@ void writeOutput(){
       perror(OFILE);
       exit(1);
     }
+	fclose(fo);
     ++count;
   }
-  fprintf(fo, "%ld,%f\n", ++tick, x);
+  // each write...
+    fo = fopen(OFILE, "a");
+    if (fo == NULL){
+      perror(OFILE);
+      exit(1);
+    }
+    fprintf(fo, "x1,%f\n", x);
+    fflush(fo);
+    fclose(fo);
+	
+  tick++;
 }
 

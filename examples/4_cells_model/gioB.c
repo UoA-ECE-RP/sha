@@ -6,20 +6,18 @@
 #include <time.h>
 
 /* The files are in csv format */
-#define OFILE "file8.csv"
-#define IFILE "file6.csv"
+#define OFILE "file6.csv"
+#define IFILE1 "file2.csv"
 
 #define TRUE 1
 #define FALSE 0
 
-extern double x;
+double x1; //inputs continuous
 
-/* The step size */
-double d = 0.2;
+//Continuous variables and Outputs
 
-/* The events to read from file */
-unsigned char VS, VSP;
-double g;
+extern double v_aggregate; //output continuous g
+unsigned char VSP, VS;
 
 /* The tick counter */
 /* It is static to hide it inside this file */
@@ -29,7 +27,8 @@ static size_t tick = 0;
 FILE *fo = NULL;
 
 /* The input file pointer */
-FILE *fi = NULL;
+FILE *fi1 = NULL;
+
  unsigned int retTime;
  void waitFor (unsigned int secs) {
     retTime = time(0) + secs;     // Get finishing time.
@@ -46,11 +45,12 @@ void readInput() {
   static unsigned char count = 0;
   /* The check here is very expensive! */
   if(0 == count) {
-    fi = fopen(IFILE, "r");
-    if (fi == NULL){
-      perror(IFILE);
+    fi1 = fopen(IFILE1, "r");
+    if (fi1 == NULL){
+      perror(IFILE1);
       exit(1);
     }
+
     ++count;
   }
   
@@ -59,41 +59,45 @@ void readInput() {
   /*
     ON, ON_Value, C, C_Value, B, B_Value, OFF, OFF_Value
   */
-  char in[256];
-  while (fgets(in,255,fi) == NULL){
+  char in1[256];
+  while (fgets(in1,255,fi1) == NULL ){
 	perror("No input");
 	waitFor(2);
 	//exit(1);
   }
   //else{
+	  // input 1
     char *ret = NULL, *v = NULL;
-    ret = strtok(in, ",");
+    ret = strtok(in1, ",");
     if(ret == NULL){
       /* This means nothing found! */
       /* Set all events to false */
-      perror("NULL strtok error");
+	  perror("NULL strtok error");
       exit(1);
     }
     while(ret != NULL) {
       v = strtok(NULL, ",");
       if (v != NULL) {
-		if (strcmp(ret, "VS") == 0)
-		  VS = getValue((unsigned char)atoi(v), ret);
-		else if(strcmp(ret, "VSP") == 0)
-		  VSP = getValue((unsigned char)atoi(v), ret);
-		else if(strcmp(ret, "g") == 0)
-			g = atof(v);
+		if (strcmp(ret, "x1") == 0){
+			//x1 = getValue((unsigned char)atoi(v), ret);
+			x1 = atof(v);
 		}
-      else {
-	perror("NULL while scanning input");
-	exit(1);
       }
+      else {
+		perror("NULL while scanning input");
+		exit(1);
+      }
+
       /* Read the next one! */
       ret = strtok(NULL, ",");
     }
-  //}
-  fprintf(stdout, "%s:%d %s:%d %s:%f tick:%ld\n", "VS", VS,
-	  "VSP", VSP, "g", g, tick);
+	
+	
+ // }
+  
+  
+  
+  fprintf(stdout, "%s:%f  tick:%ld\n", "x1", x1, tick);
   fflush(stdout);
 }
 
@@ -109,16 +113,16 @@ void writeOutput(){
 	fclose(fo);
     ++count;
   }
-  // each write...
+    // each write...
     fo = fopen(OFILE, "a");
     if (fo == NULL){
       perror(OFILE);
       exit(1);
     }
-    fprintf(fo, "x2,%f\n", x);
-    fflush(fo);
-    fclose(fo);
+	fprintf(fo, "VS,0,VSP,0,g,%f\n", v_aggregate);
+	fflush(fo);
+	fclose(fo);
 	
-  tick++;
+	tick++;
 }
 
