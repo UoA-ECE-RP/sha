@@ -9,11 +9,12 @@
 #define OFILE "file9.csv"
 #define IFILE1 "file7.csv"
 #define IFILE2 "file8.csv"
+#define PFILE "NPCx.csv"
 
 #define TRUE 1
 #define FALSE 0
 
-double x1, x2; //inputs continuous
+double x1, x2, x_pre; //inputs continuous
 
 //Continuous variables and Outputs
 
@@ -30,12 +31,14 @@ FILE *fo = NULL;
 /* The input file pointer */
 FILE *fi1 = NULL;
 FILE *fi2 = NULL;
+FILE *fp = NULL;
 
  unsigned int retTime;
  void waitFor (unsigned int secs) {
     retTime = time(0) + secs;     // Get finishing time.
-    while (time(0) < retTime);    // Loop until it arrives.
-}
+    for (int i_timer=0 ; i_timer<10000 ; i_timer ++){
+      for (int j_timer=0 ; j_timer<10000 ; j_timer ++) {}}   // Loop until it arrives.
+ }
 
 static inline unsigned char getValue(unsigned char t, char* e){
   assert(t == TRUE || t == FALSE);
@@ -133,10 +136,61 @@ void readInput() {
   
   
   
-  fprintf(stdout, "%s:%d %s:%d tick:%ld\n", "x1", x1,
+  fprintf(stdout, "%s:%f %s:%f tick:%ld\n", "x1", x1,
 	  "x2", x2, tick);
   fflush(stdout);
 }
+
+ /* Read previous state */
+void readPreviousState() {
+  static unsigned char count = 0;
+  /* The check here is very expensive! */
+  if(0 == count) {
+    fp = fopen(PFILE, "r");
+    if (fp == NULL){
+      perror(PFILE);
+      exit(1);
+    }
+    ++count;
+  }
+  
+  /* The format of input is 1 line/tick */
+  /* for the events above the format is: */
+  /*
+    ON, ON_Value, C, C_Value, B, B_Value, OFF, OFF_Value
+  */
+  char pre[256];
+  while (fgets(pre,255,fp) == NULL ){
+  perror("No input");
+  waitFor(2);
+  }
+
+  char *retp = NULL, *vp = NULL;
+  retp = strtok(pre, ",");
+  if(retp == NULL){
+    /* This means nothing found! */
+    perror("NULL strtok error");
+    exit(1);
+  }
+  while(retp != NULL) {
+    vp = strtok(NULL, ",");
+    if (vp != NULL) {
+      if (strcmp(retp, "x") == 0){
+      x_pre = atof(vp);
+      }
+    }
+    else {
+      perror("NULL while scanning input");
+      exit(1);
+      }
+      /* Read the next one! */
+      retp = strtok(NULL, ",");
+    }
+  
+  fprintf(stdout, "%s:%f tick:%ld\n","x_pre", x_pre, tick);
+  fflush(stdout);
+}
+
 
 /* Write output x to file */
 void writeOutput(){

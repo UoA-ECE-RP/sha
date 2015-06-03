@@ -10,10 +10,10 @@
 
 
 extern void readInput();
-
+extern void readPreviousState();
 extern void writeOutput();
-extern double x1; //inputs continuous
-extern double xme; //inputs continuous
+extern double x_apc; //inputs continuous
+extern double x_pre; //inputs continuous
 
 //Continuous variables and Outputs
 
@@ -73,10 +73,11 @@ int main(int argc, char **argv) {
 	
 	while(True) {
 		readInput();
-		v_i_pre[0]=x1;
+		v_i_pre[0]=x_apc;
 		
 		if(flag==1){
-			v_k_pre = xme;
+			readPreviousState();
+			v_k_pre = x_pre;
 		}
 		// Compute the aggregate voltage.
 		v_aggregate = g(A_m, C_m, v_k_pre, d_ik, gamma_ik, sigma_ik, v_i_pre, neighbourCount);

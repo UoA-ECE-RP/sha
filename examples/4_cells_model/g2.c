@@ -10,9 +10,9 @@
 
 
 extern void readInput();
-
+extern void readPreviousState();
 extern void writeOutput();
-extern double x1, x2; //inputs continuous
+extern double x1, x2, x_pre; //inputs continuous
 
 //Continuous variables and Outputs
 
@@ -66,17 +66,25 @@ int main(int argc, char **argv) {
 	double d_ik[] = {1, 2, 1.5};			// Distance between the neighbouring cells "i" and the central cell "k". Units of millimeters.
 	double gamma_ik[] = {0.1, 0.2, 0.1};	// Surface/cross-sectional area between neighbouring cells "i" and the central cell "k". Units of millimeter squared
 	double sigma_ik[] = {0.1, 0.2, 0.1};	// Electrical conductivity (not isotropic or homogeneous) between neighbouring cells "i" and the central cell "k". Units of per millisiemens per millimeter squared.
-	double v_i_pre[] = {-10};		// Voltage of neighbouring cells "i" at the previous time of "t - delta(t)". Units of millivolt.
-	int neighbourCount = 1;					// Number of neighbouring cells.
+	double v_i_pre[] = {-10, -10};		// Voltage of neighbouring cells "i" at the previous time of "t - delta(t)". Units of millivolt.
+	int neighbourCount = 2;					// Number of neighbouring cells.
+	int flag=0;
 
 	while(True) {
 		readInput();
 		v_i_pre[0]=x1;
+		v_i_pre[1]=x2;
+
+		if(flag==1){
+			readPreviousState();
+			v_k_pre = x_pre;
+		}
 		
 		// Compute the aggregate voltage.
-		double v_aggregate = g(A_m, C_m, v_k_pre, d_ik, gamma_ik, sigma_ik, v_i_pre, neighbourCount);
+		v_aggregate = g(A_m, C_m, v_k_pre, d_ik, gamma_ik, sigma_ik, v_i_pre, neighbourCount);
 		printf("Aggregated voltage is %f mV\n", v_aggregate);
 		writeOutput();
+		flag=1;
 	}
 
 	return 0;

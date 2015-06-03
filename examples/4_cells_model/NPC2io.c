@@ -33,8 +33,9 @@ FILE *fi = NULL;
  unsigned int retTime;
  void waitFor (unsigned int secs) {
     retTime = time(0) + secs;     // Get finishing time.
-    while (time(0) < retTime);    // Loop until it arrives.
-}
+    for (int i_timer=0 ; i_timer<10000 ; i_timer ++){
+      for (int j_timer=0 ; j_timer<10000 ; j_timer ++) {}}   // Loop until it arrives.
+ }
 
 static inline unsigned char getValue(unsigned char t, char* e){
   assert(t == TRUE || t == FALSE);
