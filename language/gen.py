@@ -408,37 +408,63 @@ def getShortestTimes(lname, ode, invariants):
                     else:
                         return {var: (S('oo'), None)}
     except KeyError:
-        # TODO: check if this is OK
-        return {var: (S('oo'), None)}
+        # This means that the invariant be on the combinator function
+        o = dsolve(od, var)
+        i = solve(o.subs([(var, iValue),
+                          (Symbol('t'), 0)]),
+                  Symbol('C1'))[0]
+        on = o.subs(S('C1'), i)
+        return {var: (-1, on)}
     except Exception as k:
         raise k
 
 
-# NOTE: There should be an invariant for each ode on the location.
 def updateLocNsteps(loc):
     with patterns:
-        Loc(n, odes, cf, y) << loc
-        times = map(lambda o: getShortestTimes(n, o, y), odes)
-        # This means that all odes in the
-        # location evolve for same amout
-        # of time in the worst case
+        Loc(n, odes, cf, invariants) << loc
+        times = map(lambda o: getShortestTimes(n, o, invariants), odes)
         (tt, g) = times[0].values()[0]
         tts = [True]
         for yoo in times[1:]:
             for u, vv in yoo.values():
                 tts.append(u == tt)
-        if all(tts):
-            return Loc(n, odes, cf, y, time=tt)
+        if all(tts) and tt >= 0:
+            return Loc(n, odes, cf, invariants, time=tt)
+        elif all(tts) and tt == -1:
+            for y in times:
+                for i in y.items():
+                    (b, (m, v)) = i
+                    for c in cf:
+                        for k, val in c.iteritems():
+                            c[k] = val.subs(b, v.rhs)
+            # Now we can check if the invariants hold on the combinator
+            # functions
+            for c in cf:
+                for k in c:
+                    if c[k].is_Number:
+                        print(colored(warn, color='red', attrs=['bold', 
+                                                                'blink']))
+                        return Loc(n, odes, cf, invariants, time=S('oo'))
+                    else:
+                        try:
+                            invvs = ([y for x in invariants[k]
+                                      for y in x if not isinstance(y, bool)])
+                            if invvs != []:
+                                invvs = map(lambda x: x.rhs, invvs)
+                                # Used for increasing functions
+                                inv_max = max(invvs)
+                                # Used for decreasing functions
+                                inv_min = min(invvs)
+                                time_max = solve(c[k]-inv_max, S('t'))[0]
+                                time_min = solve(c[k]-inv_min, S('t'))[0]
+                                print time_max, time_min
+                                tie = Max(time_max, time_min)
+                                return Loc(n, odes, cf, 
+                                           invariants, time=tie)
+                        except KeyError:
+                            raise Exception("Not a WHA!!")
         else:
             raise Exception("Not a WHA!!")
-            # ttr = []
-            # for y in times:
-            #     for i in y.items():
-            #         (b, (m, v)) = i
-            #         if m != S('oo'):
-            #             v = v.subs(S('t'), m)
-            #             cf = cf.values()[0].subs(b, v)
-            # print cf
 
 
 def getSha(ha):
@@ -459,7 +485,7 @@ def isOdeOK(odee):
                 m = solve(s, Symbol('t'))
                 return (m == [])
             except Exception as e:
-                print e.__doc__
+                print e
                 return False
         else:
             return False
