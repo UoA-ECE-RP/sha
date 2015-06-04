@@ -1,9 +1,10 @@
-#include<stdint.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<sys/types.h>
-#include<string.h>
-#include<time.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <string.h>
+#include <time.h>
+#include "wait.h"
 
 #define OFILE "NPCx.csv"
 #define IFILE1 "file7.csv"
@@ -28,12 +29,6 @@ FILE *fi1 = NULL;
 FILE *fi2 = NULL;
 FILE *fi3 = NULL;
 
-
- unsigned int retTime;
- void waitFor (unsigned int secs) {
-    retTime = time(0) + secs;     // Get finishing time.
-    while (time(0) < retTime);    // Loop until it arrives.
-}
 
 /* Read input x1, x2, x from files */
 void readInput() {
@@ -65,15 +60,15 @@ void readInput() {
 
     while (fgets(in1,255,fi1) == NULL ){
       perror("No input 1");
-      waitFor(2);
+      waitFor();
     }
     while (fgets(in2,255,fi2) == NULL ){
       perror("No input 2");
-      waitFor(2);
+      waitFor();
     }
     while (fgets(in3,255,fi3) == NULL ){
       perror("No input 3");
-      waitFor(2);
+      waitFor();
     }
   
     char *ret1 = NULL, *v1 = NULL;

@@ -1,9 +1,10 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<sys/types.h>
-#include<string.h>
-#include<assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <string.h>
+#include <assert.h>
 #include <time.h>
+#include "wait.h"
 
 /* The files are in csv format */
 #define OFILE "file9.csv"
@@ -33,12 +34,6 @@ FILE *fi1 = NULL;
 FILE *fi2 = NULL;
 FILE *fp = NULL;
 
- unsigned int retTime;
- void waitFor (unsigned int secs) {
-    retTime = time(0) + secs;     // Get finishing time.
-    for (int i_timer=0 ; i_timer<10000 ; i_timer ++){
-      for (int j_timer=0 ; j_timer<10000 ; j_timer ++) {}}   // Loop until it arrives.
- }
 
 static inline unsigned char getValue(unsigned char t, char* e){
   assert(t == TRUE || t == FALSE);
@@ -72,12 +67,12 @@ void readInput() {
 
     while (fgets(in1,255,fi1) == NULL ){
 	perror("No input");
-	waitFor(2);
+	waitFor();
 	//exit(1);
     }
 	while (fgets(in2,255,fi2) == NULL ){
 	perror("No input");
-	waitFor(2);
+	waitFor();
 	//exit(1);
     }
   //else{
@@ -162,7 +157,7 @@ void readPreviousState() {
   char pre[256];
   while (fgets(pre,255,fp) == NULL ){
   perror("No input");
-  waitFor(2);
+  waitFor();
   }
 
   char *retp = NULL, *vp = NULL;
