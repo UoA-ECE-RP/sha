@@ -27,16 +27,32 @@ ode4z = Ode(S("diff(z(t))+0.008*z(t)"), S("z(t)"), None)
 # The locations of the hybrid automaton
 t1 = Loc("t1", [ode1x, ode1y, ode1z],
          [{S('v(t)'): S('x(t) - y(t) + z(t)')}],
-         {S("v(t)"): [Guard(S("v<=20"))]})
+         {S("v(t)"): [Guard(S("v<=20"))],
+          # The below state that x(t)'s invariant depends upon some
+          # other function. Only one such function can be given as a
+          # dependency. Also, a chain of such dependencies cannot be
+          # created.
+          S('x(t)'): [S('v(t)')],
+          S('y(t)'): [S('v(t)')],
+          S('z(t)'): [S('v(t)')]})
 t2 = Loc("t2", [ode2x, ode2y, ode2z],
          [{S('v(t)'): S('x(t) - y(t) + z(t)')}],
-         {S("v(t)"): [Guard(S("v < 20"))]})
+         {S("v(t)"): [Guard(S("v < 20"))],
+          S('x(t)'): [S('v(t)')],
+          S('y(t)'): [S('v(t)')],
+          S('z(t)'): [S('v(t)')]})
 t3 = Loc("t3", [ode3x, ode3z, ode3y],
          [{S('v(t)'): S('x(t) - y(t) + z(t)')}],
-         {S("v(t)"): [Guard(S("v >= 20")), Guard(S("v < 138"))]})
+         {S("v(t)"): [Guard(S("v >= 20")), Guard(S("v < 138"))],
+          S('x(t)'): [S('v(t)')],
+          S('y(t)'): [S('v(t)')],
+          S('z(t)'): [S('v(t)')]})
 t4 = Loc("t4", [ode4x, ode4y, ode4z],
          [{S('v(t)'): S('x(t) - y(t) + z(t)')}],
-         {S("v(t)"): [Guard(S("v > 20")), Guard(S("v <= 138"))]})
+         {S("v(t)"): [Guard(S("v > 20")), Guard(S("v <= 138"))],
+          S('x(t)'): [S('v(t)')],
+          S('y(t)'): [S('v(t)')],
+          S('z(t)'): [S('v(t)')]})
 
 # The edges
 e1 = Edge('t1', 't2', {S("v(t)"): [Guard(S("v < 20"))]},

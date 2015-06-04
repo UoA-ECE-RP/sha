@@ -1,6 +1,5 @@
-# TODO: The combinator functions are not being used right now!  TODO:
-# The codegen is not very efficient, because symbolic solutions are
-# being regenerated every time
+# TODO: The codegen is not very efficient, because symbolic solutions
+# are being regenerated every time
 
 from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
 from language import *
@@ -8,6 +7,7 @@ from language import *
 from sympy import *
 from sympy.utilities.codegen import codegen
 import colorama
+import copy
 from termcolor import colored
 
 
@@ -58,17 +58,41 @@ def getEventList(edge):
         return events
 
 
-def getInvariantAndOdeExpr(loc, events, tab):
+def subb(oexpr, expr, contVars):
+    if str(expr.func) in contVars:
+        return oexpr.subs(expr, S(str(expr.func)))
+    else:
+        for arg in expr.args:
+            oexpr = subb(oexpr, arg, contVars)
+    return oexpr
+
+
+def subsc(c, contVars):
+    for k, v in c.iteritems():
+        c[k] = subb(v, v, contVars)
+    return c
+
+
+def getInvariantAndOdeExpr(loc, events, tab, contVars):
     with patterns:
         Loc(lname, odes, clist, guards) << loc
         exprs = [item for sl in guards.values() for item in sl]
         invs = [None]*len(exprs)
         for i, x in enumerate(exprs):
-            with patterns:
-                Guard(y) << x
-                invs[i] = y
+            with switch(x):
+                if Guard(y):
+                    invs[i] = y
+        invs = filter(lambda x: x is not None, invs)
         # Adding not events as well to this expr
         stmts = []
+        cstmts = []
+        # Compute the combinator function values. This needs to be done
+        # using a recursive function call
+        clist = map(lambda c: subsc(c, contVars), clist)
+        for c in clist:
+            for k, v in c.iteritems():
+                cstmts += ['double ' + str(k.func) +
+                           ' = ' + str(v) + ';']
         for i, od in enumerate(odes):
             with patterns:
                 Ode(ode, var, iValue) << od
@@ -99,14 +123,13 @@ def getInvariantAndOdeExpr(loc, events, tab):
                         s = o.rhs.diff(S('t'))
                         s = s.subs(S('t'), 0)
                         if s.is_Number:
-                            # TODO: Combinator saturation is needed here
                             gs = guards[var]
                             mm = []
                             for g in gs:
-                                with patterns:
-                                    Guard(xx) << g
-                                    if not isinstance(xx, bool):
-                                        mm.append(xx.rhs)
+                                with switch(g):
+                                    if Guard(xx):
+                                        if not isinstance(xx, bool):
+                                            mm.append(xx.rhs)
                             if mm != []:
                                 if s > 0:
                                     cb = str(max(mm))
@@ -134,7 +157,7 @@ def getInvariantAndOdeExpr(loc, events, tab):
                     print ('Cannot saturate: ', str(o),
                            ' in loc: ', lname)
         nevents = map(lambda x: '!'+x, events)
-        return (' && '.join((map(str, invs)+nevents)), stmts)
+        return (' && '.join((map(str, invs)+nevents)), stmts, cstmts)
 
 
 def edgesWithstateSource(edges, sname):
@@ -176,7 +199,7 @@ def getEAndGAndU(edge, events):
         for update in uList:
             with switch(update):
                 if Update.Update1(v, xx):
-                    updates.append(str(v) + '=' + str(xx) + ';')
+                    updates.append(str(v) + '_u =' + str(xx) + ';')
                 elif Update.Update2(v, xx):
                     updates.append(str(v) + '_u = ' + str(xx) + ';')
                 else:
@@ -185,7 +208,8 @@ def getEAndGAndU(edge, events):
         return (eeExpr, egExpr, updates, t2)
 
 
-def makeReactionFunction(fname, locs, edges, snames, events):
+def makeReactionFunction(fname, locs, edges, snames, events,
+                         contVars):
     level = 1
     tab = ' '*2
     ret = ['enum states ' + fname +
@@ -197,10 +221,14 @@ def makeReactionFunction(fname, locs, edges, snames, events):
         ret += [tab*level+'case (' + state + '):']
         level += 1
         # Code for state transitions
-        (invExpr, odeStmts) = getInvariantAndOdeExpr(locs[i],
-                                                     events, tab)
+        (invExpr, odeStmts,
+         cstmts) = getInvariantAndOdeExpr(locs[i],
+                                          events, tab,
+                                          contVars)
 
         # If the ode is still begin solved
+        for cst in cstmts:
+            ret += [tab*level+cst]
         ret += [tab*level+'if('+invExpr+'){']
         # The code for ode solving goes here!
         level += 1
@@ -353,7 +381,7 @@ def codeGen(ha):
 
         # Make the main reaction function
         mainCFile += makeReactionFunction(han, ls, edges, lnames,
-                                          list(eventSet))
+                                          list(eventSet), list(contSet))
 
         # Make the main function
         mainCFile += makeMain(sloc, han, list(contSet))
@@ -393,8 +421,11 @@ def getShortestTimes(lname, ode, invariants):
                                   attrs=['bold', 'blink']))
                     return {var: (S('oo'), None)}
                 else:
-                    invvs = ([y for x in invariants[var]
-                              for y in x if not isinstance(y, bool)])
+                    invvs = filter(lambda x:
+                                   (lambda y:
+                                    (not isinstance(y, bool)),
+                                    x), invariants[var])
+                    invvs = filter(lambda x: not x.is_Function, invvs)
                     if invvs != []:
                         invvs = map(lambda x: x.rhs, invvs)
                         # Used for increasing functions
@@ -406,15 +437,16 @@ def getShortestTimes(lname, ode, invariants):
                         time = Max(time_max, time_min)
                         return {var: (time, on)}
                     else:
-                        return {var: (S('oo'), None)}
-    except KeyError:
-        # This means that the invariant be on the combinator function
-        o = dsolve(od, var)
-        i = solve(o.subs([(var, iValue),
-                          (Symbol('t'), 0)]),
-                  Symbol('C1'))[0]
-        on = o.subs(S('C1'), i)
-        return {var: (-1, on)}
+                        invvs = filter(lambda x:
+                                       (lambda y:
+                                        (not isinstance(y, bool)),
+                                        x), invariants[var])
+                        if invvs != []:
+                            return {var: (-1, on)}
+                        else:
+                            print(colored(warn, color='red',
+                                          attrs=['bold', 'blink']))
+                            return {var: (S('oo'), None)}
     except Exception as k:
         raise k
 
@@ -431,18 +463,20 @@ def updateLocNsteps(loc):
         if all(tts) and tt >= 0:
             return Loc(n, odes, cf, invariants, time=tt)
         elif all(tts) and tt == -1:
+            cc = copy.deepcopy(cf)
             for y in times:
                 for i in y.items():
                     (b, (m, v)) = i
-                    for c in cf:
+                    for c in cc:
                         for k, val in c.iteritems():
                             c[k] = val.subs(b, v.rhs)
             # Now we can check if the invariants hold on the combinator
             # functions
-            for c in cf:
+            tts = []
+            for c in cc:
                 for k in c:
                     if c[k].is_Number:
-                        print(colored(warn, color='red', attrs=['bold', 
+                        print(colored(warn, color='red', attrs=['bold',
                                                                 'blink']))
                         return Loc(n, odes, cf, invariants, time=S('oo'))
                     else:
@@ -457,12 +491,13 @@ def updateLocNsteps(loc):
                                 inv_min = min(invvs)
                                 time_max = solve(c[k]-inv_max, S('t'))[0]
                                 time_min = solve(c[k]-inv_min, S('t'))[0]
-                                print time_max, time_min
-                                tie = Max(time_max, time_min)
-                                return Loc(n, odes, cf, 
-                                           invariants, time=tie)
+                                tts.append(Max(time_max, time_min))
                         except KeyError:
                             raise Exception("Not a WHA!!")
+            if all(tts):
+                return Loc(n, odes, cf, invariants, time=tts[0])
+            else:
+                raise Exception("Not a WHA!!")
         else:
             raise Exception("Not a WHA!!")
 
