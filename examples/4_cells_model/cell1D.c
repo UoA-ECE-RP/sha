@@ -47,7 +47,7 @@ enum states {t1 , t2 , t3 , t4};
 #include <math.h>
 double t1_ode_1(double C1, double d, double k) {
    double t1_ode_1_result;
-   t1_ode_1_result = C1*exp(-0.1*d*k)-g*d*k;
+   t1_ode_1_result = C1*exp(-0.1*d*k)+g*d*k;
    return t1_ode_1_result;
 }
 double t1_init_1(double x_u) {
@@ -61,7 +61,7 @@ double t1_init_1(double x_u) {
 #include <math.h>
 double t2_ode_1(double C1, double d, double k) {
    double t2_ode_1_result;
-   t2_ode_1_result = C1 + 800*d*k-g*d*k;
+   t2_ode_1_result = C1 + 800*d*k+g*d*k;
    return t2_ode_1_result;
 }
 double t2_init_1(double x_u) {
