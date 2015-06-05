@@ -8,6 +8,7 @@ from sympy import *
 from sympy.utilities.codegen import codegen
 import colorama
 import copy
+import pdb
 from termcolor import colored
 
 
@@ -29,10 +30,12 @@ def OdeCodegen(os, name):
                     odes, vars)
         iodes = map(lambda o: o.subs(S('t'), 0), iodes)
         iodes = map(lambda o: solve(o, S('C1'))[0], iodes)
-        odess = map(lambda o:
+        odess = map(lambda o, v:
                     o.subs([(Symbol('t'),
                              Mul(Symbol('k'),
-                                 Symbol('d')))]), odes)
+                                 Symbol('d'))),
+                            (Symbol('C1'), S('C1'+str(v.func)))]),
+                    odes, vars)
         funcs = map(lambda o, i:
                     (name+"_ode_"+str(i+1), o.rhs), odess,
                     xrange(0, len(odess)))
@@ -58,18 +61,21 @@ def getEventList(edge):
         return events
 
 
-def subb(oexpr, expr, contVars):
+def subb(oexpr, expr, contVars, u):
     if str(expr.func) in contVars:
-        return oexpr.subs(expr, S(str(expr.func)))
+        if not u:
+            return oexpr.subs(expr, S(str(expr.func)))
+        else:
+            return oexpr.subs(expr, S(str(expr.func)+'_u'))
     else:
         for arg in expr.args:
-            oexpr = subb(oexpr, arg, contVars)
+            oexpr = subb(oexpr, arg, contVars, u)
     return oexpr
 
 
-def subsc(c, contVars):
+def subsc(c, contVars, u):
     for k, v in c.iteritems():
-        c[k] = subb(v, v, contVars)
+        c[k] = (subb(v[0], v[0], contVars, u), v[1])
     return c
 
 
@@ -86,31 +92,30 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
         # Adding not events as well to this expr
         stmts = []
         cstmts = []
+        cks = []
         # Compute the combinator function values. This needs to be done
         # using a recursive function call
-        clist = map(lambda c: subsc(c, contVars), clist)
-        for c in clist:
+        cllist = map(lambda c: subsc(c, contVars, False),
+                     copy.deepcopy(clist))
+        for c in cllist:
             for k, v in c.iteritems():
-                cstmts += ['double ' + str(k.func) +
-                           ' = ' + str(v) + ';']
+                cstmts += [str(k.func) + ' = ' + str(v[0]) + ';']
+                cks.append(str(k.func))
+                cks.append(str(k.func)+'_u')
         for i, od in enumerate(odes):
             with patterns:
                 Ode(ode, var, iValue) << od
                 # Get the initial value once!
                 stmts += ['if (pstate != cstate)']
                 rr = lname+'_init_'+str(i+1)+'('+str(var.func)+')'
-                stmts += [tab+'C1 = '+rr+';']
+                stmts += [tab+'C1'+str(var.func)+' = '+rr+';']
                 lhs = str(var.func)+'_u'
-                # This if condition only works, because we make sure
-                # that all odes have same worst case time in a given
-                # location
                 rhs = lname+'_ode_' + str(i+1)
-                if loc.rest['time'] != S('oo'):
-                    r2 = '(C1, d, k)'
-                    rhs += r2
+                if dsolve(ode, var).rhs.diff(S('t')) != 0:
+                    r2 = '(C1'+str(var.func)+', d, k)'
                 else:
-                    r2 = '(C1)'
-                    rhs += r2
+                    r2 = '(C1'+str(var.func)+')'
+                rhs += r2
                 stmts += [lhs + ' = ' + rhs + ';']
                 # Now put the saturation function in
                 o = dsolve(ode, var)
@@ -135,7 +140,8 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                     cb = str(max(mm))
                                     stmts += ['if('+str(
                                         var.func)+'_u > ' + cb +
-                                              ' && C1 < ' + cb + ')']
+                                              ' && C1'+str(
+                                                  var.func)+' < ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                                 else:
@@ -143,7 +149,8 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                     cb = str(min(mm))
                                     stmts += ['if('+str(
                                         var.func)+'_u < ' + cb +
-                                              ' && C1 > ' + cb + ')']
+                                              ' && C1'+str(
+                                                  var.func)+' > ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                             else:
@@ -151,13 +158,73 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                         else:
                             raise Exception('Don\'t know how to saturate')
                     else:
-                        print ('Cannot saturate: ', str(o),
-                               ' in loc: ', lname)
+                        print 'Cannot saturate: ', str(o), ' in loc: ', lname
                 else:
-                    print ('Cannot saturate: ', str(o),
-                           ' in loc: ', lname)
+                    print 'Cannot saturate: ', str(o), ' in loc: ', lname
+        # Add the saturation function for combinators
+        # Step-1 solve odes
+        os = [None]*len(odes)
+        for i, o in enumerate(odes):
+            with patterns:
+                Ode(ode, v, iValue) << o
+                os[i] = (v, dsolve(ode, v).subs(S('C1'),
+                                                S('C1'+str(v.func))).rhs)
+        # Step-2 compose the odes according to combinator functions.
+        composed = copy.deepcopy(clist)
+        for c in composed:
+            for k, v in c.iteritems():
+                c[k] = (v[0].subs(os), v[1])
+        # Step-3 saturate!
+        for c in copy.deepcopy(composed):
+            for k, v in c.iteritems():
+                # This code below is just a copy of the above code.
+                # Later on refractor this code and the above code
+                # into a single function.
+                gs = guards[k]
+                mm = []
+                for g in gs:
+                    with patterns:
+                        Guard(xx) << g
+                        if not isinstance(xx, bool):
+                            mm.append(xx.rhs)
+                if mm != []:
+                    # Compute the combinator expression
+                    cluist = map(lambda c: subsc(c, contVars, True),
+                                 copy.deepcopy(clist))
+                    for i, cu in enumerate(cluist):
+                        for k, v in cu.iteritems():
+                            stmts += [str(k.func) + '_u = ' + str(v[0]) + ';']
+                            if clist[i][k][2]:
+                                cb = str(max(mm))
+                            else:
+                                cb = str(min(mm))
+                            # First compute "k"
+                            fk = Add(composed[i][k][0].subs(S('t'), S('k*d')),
+                                     Mul(-1, S(cb)))
+                            print fk
+                            sfk = solve(fk, S('k'), check=False, quick=True,
+                                        minimal=True,
+                                        exclude=[S('C1x'), S('C1y'),
+                                                 S('C1z')])
+                            print sfk
+                            stmts += ['// Increasing function']
+                            stmts += ['if('+str(k.func)+'_u > ' + cb +
+                                      ' && '+str(k.func)+' < ' + cb +
+                                      ' && ' + str(k.func)+'_u >= ' +
+                                      str(k.func) + '){']
+                            stmts += ["}"]
+                            stmts += ['// Decreasing function']
+                            stmts += ['else if('+str(k.func)+'_u < ' + cb +
+                                      ' &&  '+str(k.func)+' > ' + cb +
+                                      ' && ' + str(k.func) + '_u < ' +
+                                      str(k.func)+'){']
+                            stmts += []
+                            stmts += ["}"]
+                else:
+                    pass
         nevents = map(lambda x: '!'+x, events)
-        return (' && '.join((map(str, invs)+nevents)), stmts, cstmts)
+        return (' && '.join((map(str, invs)+nevents)), stmts, cstmts,
+                set(cks))
 
 
 def edgesWithstateSource(edges, sname):
@@ -218,14 +285,15 @@ def makeReactionFunction(fname, locs, edges, snames, events,
 
     # All code for state transition goes in here
     for i, state in enumerate(snames):
-        ret += [tab*level+'case (' + state + '):']
-        level += 1
         # Code for state transitions
         (invExpr, odeStmts,
-         cstmts) = getInvariantAndOdeExpr(locs[i],
-                                          events, tab,
-                                          contVars)
-
+         cstmts, cks) = getInvariantAndOdeExpr(locs[i],
+                                               events, tab,
+                                               contVars)
+        if i == 0:
+            ret += [tab*level+'double '+', '.join(cks)+';']
+        ret += [tab*level+'case (' + state + '):']
+        level += 1
         # If the ode is still begin solved
         for cst in cstmts:
             ret += [tab*level+cst]
@@ -364,7 +432,9 @@ def codeGen(ha):
         mainCFile += uContDecl
         # The constant variable
         mainCFile += ['//The constant variable']
-        mainCFile += ['double C1;']
+        constSet = {"C1"+x for x in contSet}
+        constDecl = ['double ' + ', '.join(constSet) + ';']
+        mainCFile += constDecl
         # Append the step-size and step declarations
         mainCFile += ['//Step-size constant d']
         mainCFile += ['extern double d;']
@@ -469,13 +539,13 @@ def updateLocNsteps(loc):
                     (b, (m, v)) = i
                     for c in cc:
                         for k, val in c.iteritems():
-                            c[k] = val.subs(b, v.rhs)
+                            c[k] = (val[0].subs(b, v.rhs), val[1])
             # Now we can check if the invariants hold on the combinator
             # functions
             tts = []
             for c in cc:
                 for k in c:
-                    if c[k].is_Number:
+                    if c[k][0].is_Number:
                         print(colored(warn, color='red', attrs=['bold',
                                                                 'blink']))
                         return Loc(n, odes, cf, invariants, time=S('oo'))
@@ -489,8 +559,8 @@ def updateLocNsteps(loc):
                                 inv_max = max(invvs)
                                 # Used for decreasing functions
                                 inv_min = min(invvs)
-                                time_max = solve(c[k]-inv_max, S('t'))[0]
-                                time_min = solve(c[k]-inv_min, S('t'))[0]
+                                time_max = solve(c[k][0]-inv_max, S('t'))[0]
+                                time_min = solve(c[k][0]-inv_min, S('t'))[0]
                                 tts.append(Max(time_max, time_min))
                         except KeyError:
                             raise Exception("Not a WHA!!")
@@ -517,7 +587,7 @@ def isOdeOK(odee):
                 s = o.rhs.diff(Symbol('t'))
                 # TODO: check that this root finding is enough for
                 # monotonicity
-                m = solve(s, Symbol('t'))
+                m = solve(s, Symbol('t'), check=True)
                 return (m == [])
             except Exception as e:
                 print e
@@ -530,6 +600,8 @@ def isOdeOK(odee):
 def isWhaLoc(loc):
     with switch(loc):
         if Loc(x, odes, clist, y):
+            # TODO: Check that the combinator functions are also
+            # monotonic
             return reduce(lambda init, ode: isOdeOK(ode) and init,
                           odes, True)
         else:
