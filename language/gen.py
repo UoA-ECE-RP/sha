@@ -323,8 +323,9 @@ def makeReactionFunction(fname, locs, edges, snames, events,
          cstmts, cks) = getInvariantAndOdeExpr(locs[i],
                                                events, tab,
                                                contVars)
-        if (i == 0) and (cks != []):
-            ret += [tab*level+'double '+', '.join(cks)+', fk;']
+        cks = list(cks) + ['fk']
+        if (i == 0):
+            ret += [tab*level+'double '+', '.join(cks)+';']
         ret += [tab*level+'case (' + state + '):']
         level += 1
         # If the ode is still begin solved
