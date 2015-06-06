@@ -4,11 +4,10 @@
 from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
 from language import *
 
-from sympy import *
+from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function
 from sympy.utilities.codegen import codegen
 import colorama
 import copy
-import pdb
 from termcolor import colored
 
 
@@ -168,7 +167,9 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
             with patterns:
                 Ode(ode, v, iValue) << o
                 os[i] = (v, dsolve(ode, v).subs(S('C1'),
-                                                S('C1'+str(v.func))).rhs)
+                                                Symbol('C1'+str(v.func),
+                                                       real=True)).rhs)
+                os[i] = nsimplify(os[i])
         # Step-2 compose the odes according to combinator functions.
         composed = copy.deepcopy(clist)
         for c in composed:
@@ -199,14 +200,18 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                             else:
                                 cb = str(min(mm))
                             # First compute "k"
-                            fk = Add(composed[i][k][0].subs(S('t'), S('k*d')),
-                                     Mul(-1, S(cb)))
-                            print fk
-                            sfk = solve(fk, S('k'), check=False, quick=True,
-                                        minimal=True,
-                                        exclude=[S('C1x'), S('C1y'),
-                                                 S('C1z')])
-                            print sfk
+                            fk = nsimplify(
+                                Eq(composed[i][k][0].subs(S('t'),
+                                                          S('k*d')), S(cb)))
+                            # Do numeric solving using nsolve
+                            sfk = solve(fk, S('k'), check=False)
+                            sfk = [r for r in sfk
+                                   if ('I' not in str(r) and
+                                       r.is_finite is not False)]
+                            if sfk != []:
+                                sfk = sfk[0]
+                            else:
+                                raise Exception('Not a WHA!' + str(fk))
                             stmts += ['// Increasing function']
                             stmts += ['if('+str(k.func)+'_u > ' + cb +
                                       ' && '+str(k.func)+' < ' + cb +
@@ -290,7 +295,7 @@ def makeReactionFunction(fname, locs, edges, snames, events,
          cstmts, cks) = getInvariantAndOdeExpr(locs[i],
                                                events, tab,
                                                contVars)
-        if i == 0:
+        if (i == 0) and (cks != []):
             ret += [tab*level+'double '+', '.join(cks)+';']
         ret += [tab*level+'case (' + state + '):']
         level += 1
@@ -479,7 +484,7 @@ def getShortestTimes(lname, ode, invariants):
                 # Return infinity as the time-bound
                 print(colored(warn, color='red',
                               attrs=['bold', 'blink']))
-                return {var: (S('oo'), None)}
+                return {var: (S('oo'), None, False)}
             else:
                 o = dsolve(od, var)
                 i = solve(o.subs([(var, iValue),
@@ -489,15 +494,19 @@ def getShortestTimes(lname, ode, invariants):
                 if on.rhs.is_Number:
                     print(colored(warn, color='red',
                                   attrs=['bold', 'blink']))
-                    return {var: (S('oo'), None)}
+                    return {var: (S('oo'), None, False)}
                 else:
-                    invvs = filter(lambda x:
-                                   (lambda y:
-                                    (not isinstance(y, bool)),
-                                    x), invariants[var])
-                    invvs = filter(lambda x: not x.is_Function, invvs)
+                    invvs = [y for y in invariants[var]
+                             if not isinstance(y, Function)]
+                    for i, g in enumerate(invvs):
+                        with patterns:
+                            Guard(xx) << g
+                            if not isinstance(xx, bool):
+                                invvs[i] = xx.rhs
+                            else:
+                                invvs[i] = None
+                    invvs = filter(lambda x: x is not None, invvs)
                     if invvs != []:
-                        invvs = map(lambda x: x.rhs, invvs)
                         # Used for increasing functions
                         inv_max = max(invvs)
                         # Used for decreasing functions
@@ -505,18 +514,16 @@ def getShortestTimes(lname, ode, invariants):
                         time_max = solve(on.rhs-inv_max, S('t'))[0]
                         time_min = solve(on.rhs-inv_min, S('t'))[0]
                         time = Max(time_max, time_min)
-                        return {var: (time, on)}
+                        return {var: (time, on, False)}
                     else:
-                        invvs = filter(lambda x:
-                                       (lambda y:
-                                        (not isinstance(y, bool)),
-                                        x), invariants[var])
+                        invvs = [y for y in invariants[var]
+                                 if isinstance(y, Function)]
                         if invvs != []:
-                            return {var: (-1, on)}
+                            return {var: (-1, on, True)}
                         else:
                             print(colored(warn, color='red',
                                           attrs=['bold', 'blink']))
-                            return {var: (S('oo'), None)}
+                            return {var: (S('oo'), None, False)}
     except Exception as k:
         raise k
 
@@ -525,18 +532,18 @@ def updateLocNsteps(loc):
     with patterns:
         Loc(n, odes, cf, invariants) << loc
         times = map(lambda o: getShortestTimes(n, o, invariants), odes)
-        (tt, g) = times[0].values()[0]
+        (tt, g, mine) = times[0].values()[0]
         tts = [True]
-        for yoo in times[1:]:
-            for u, vv in yoo.values():
+        for yoo in times:
+            for u, vv, oot in yoo.values():
                 tts.append(u == tt)
-        if all(tts) and tt >= 0:
+        if all(tts) and (not mine):
             return Loc(n, odes, cf, invariants, time=tt)
-        elif all(tts) and tt == -1:
+        elif all(tts) and mine:
             cc = copy.deepcopy(cf)
             for y in times:
                 for i in y.items():
-                    (b, (m, v)) = i
+                    (b, (m, v, oot)) = i
                     for c in cc:
                         for k, val in c.iteritems():
                             c[k] = (val[0].subs(b, v.rhs), val[1])
@@ -567,9 +574,9 @@ def updateLocNsteps(loc):
             if all(tts):
                 return Loc(n, odes, cf, invariants, time=tts[0])
             else:
-                raise Exception("Not a WHA!!")
+                raise Exception("Not a WHA!!: " + str(times))
         else:
-            raise Exception("Not a WHA!!")
+            raise Exception("Not a WHA!!: " + str(times))
 
 
 def getSha(ha):
