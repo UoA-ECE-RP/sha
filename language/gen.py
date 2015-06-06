@@ -4,7 +4,7 @@
 from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
 from language import *
 
-from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function
+from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode
 from sympy.utilities.codegen import codegen
 import colorama
 import copy
@@ -76,6 +76,21 @@ def subsc(c, contVars, u):
     for k, v in c.iteritems():
         c[k] = (subb(v[0], v[0], contVars, u), v[1])
     return c
+
+
+def outcode(stmts, tab, sfk, odes, lname):
+    stmts += [tab+ccode(sfk, assign_to=S('fk'))]
+    for i, od in enumerate(odes):
+        with patterns:
+            Ode(ode, var, ii) << od
+            lhs = str(var.func)+'_u'
+            rhs = lname+'_ode_' + str(i+1)
+            if dsolve(ode, var).rhs.diff(S('t')) != 0:
+                r2 = '(C1'+str(var.func)+', d, fk)'
+            else:
+                r2 = '(C1'+str(var.func)+')'
+            rhs += r2
+            stmts += [tab+lhs + ' = ' + rhs + ';']
 
 
 def getInvariantAndOdeExpr(loc, events, tab, contVars):
@@ -169,7 +184,6 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                 os[i] = (v, dsolve(ode, v).subs(S('C1'),
                                                 Symbol('C1'+str(v.func),
                                                        real=True)).rhs)
-                os[i] = nsimplify(os[i])
         # Step-2 compose the odes according to combinator functions.
         composed = copy.deepcopy(clist)
         for c in composed:
@@ -200,9 +214,8 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                             else:
                                 cb = str(min(mm))
                             # First compute "k"
-                            fk = nsimplify(
-                                Eq(composed[i][k][0].subs(S('t'),
-                                                          S('k*d')), S(cb)))
+                            fk = Eq(composed[i][k][0].subs(S('t'),
+                                                           S('k*d')), S(cb))
                             # Do numeric solving using nsolve
                             sfk = solve(fk, S('k'), check=False)
                             sfk = [r for r in sfk
@@ -211,20 +224,35 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                             if sfk != []:
                                 sfk = sfk[0]
                             else:
-                                raise Exception('Not a WHA!' + str(fk))
-                            stmts += ['// Increasing function']
-                            stmts += ['if('+str(k.func)+'_u > ' + cb +
-                                      ' && '+str(k.func)+' < ' + cb +
-                                      ' && ' + str(k.func)+'_u >= ' +
-                                      str(k.func) + '){']
-                            stmts += ["}"]
-                            stmts += ['// Decreasing function']
-                            stmts += ['else if('+str(k.func)+'_u < ' + cb +
-                                      ' &&  '+str(k.func)+' > ' + cb +
-                                      ' && ' + str(k.func) + '_u < ' +
-                                      str(k.func)+'){']
-                            stmts += []
-                            stmts += ["}"]
+                                print(colored(('Not a WHA!: ' + str(fk)),
+                                              color='red',
+                                              attrs=['bold', 'blink']))
+                            if clist[i][k][2]:
+                                stmts += ['// Increasing function']
+                                stmts += ['if('+str(k.func)+'_u > ' + cb +
+                                          ' && '+str(k.func)+' < ' + cb +
+                                          ' && ' + str(k.func)+'_u >= ' +
+                                          str(k.func) + '){']
+                                if sfk == []:
+                                    stmts += [tab +
+                                              'fprintf(stderr, "Not a WHA!");']
+                                    stmts += [tab+'exit(1);']
+                                else:
+                                    outcode(stmts, tab, sfk, odes, lname)
+                                stmts += ["}"]
+                            else:
+                                stmts += ['// Decreasing function']
+                                stmts += ['if('+str(k.func)+'_u < ' + cb +
+                                          ' &&  '+str(k.func)+' > ' + cb +
+                                          ' && ' + str(k.func) + '_u < ' +
+                                          str(k.func)+'){']
+                                if sfk == []:
+                                    stmts += [tab +
+                                              'fprintf(stderr, "Not a WHA!");']
+                                    stmts += [tab+'exit(1);']
+                                else:
+                                    outcode(stmts, tab, sfk, odes, lname)
+                                stmts += ["}"]
                 else:
                     pass
         nevents = map(lambda x: '!'+x, events)
@@ -296,7 +324,7 @@ def makeReactionFunction(fname, locs, edges, snames, events,
                                                events, tab,
                                                contVars)
         if (i == 0) and (cks != []):
-            ret += [tab*level+'double '+', '.join(cks)+';']
+            ret += [tab*level+'double '+', '.join(cks)+', fk;']
         ret += [tab*level+'case (' + state + '):']
         level += 1
         # If the ode is still begin solved
@@ -482,7 +510,7 @@ def getShortestTimes(lname, ode, invariants):
             # condition
             if iValue is None:
                 # Return infinity as the time-bound
-                print(colored(warn, color='red',
+                print(colored(warn, color='green',
                               attrs=['bold', 'blink']))
                 return {var: (S('oo'), None, False)}
             else:
@@ -492,7 +520,7 @@ def getShortestTimes(lname, ode, invariants):
                           Symbol('C1'))[0]
                 on = o.subs(S('C1'), i)
                 if on.rhs.is_Number:
-                    print(colored(warn, color='red',
+                    print(colored(warn, color='green',
                                   attrs=['bold', 'blink']))
                     return {var: (S('oo'), None, False)}
                 else:
@@ -521,7 +549,7 @@ def getShortestTimes(lname, ode, invariants):
                         if invvs != []:
                             return {var: (-1, on, True)}
                         else:
-                            print(colored(warn, color='red',
+                            print(colored(warn, color='green',
                                           attrs=['bold', 'blink']))
                             return {var: (S('oo'), None, False)}
     except Exception as k:
@@ -553,7 +581,7 @@ def updateLocNsteps(loc):
             for c in cc:
                 for k in c:
                     if c[k][0].is_Number:
-                        print(colored(warn, color='red', attrs=['bold',
+                        print(colored(warn, color='green', attrs=['bold',
                                                                 'blink']))
                         return Loc(n, odes, cf, invariants, time=S('oo'))
                     else:
