@@ -153,18 +153,16 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                 if s > 0:
                                     cb = str(max(mm))
                                     stmts += ['if('+str(
-                                        var.func)+'_u > ' + cb +
-                                              ' && C1'+str(
-                                                  var.func)+' < ' + cb + ')']
+                                        var.func)+'_u > ' + cb + ' && C1'+str(
+                                            var.func)+' < ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                                 else:
                                     # Decreasing function
                                     cb = str(min(mm))
                                     stmts += ['if('+str(
-                                        var.func)+'_u < ' + cb +
-                                              ' && C1'+str(
-                                                  var.func)+' > ' + cb + ')']
+                                        var.func)+'_u < ' + cb + ' && C1'+str(
+                                            var.func)+' > ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                             else:
@@ -208,7 +206,8 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                  copy.deepcopy(clist))
                     for i, cu in enumerate(cluist):
                         for k, v in cu.iteritems():
-                            stmts += [str(k.func) + '_u = ' + str(v[0]) + ';']
+                            stmts += [str(k.func) + '_u = ' + str(
+                                v[0]) + ';']
                             if clist[i][k][2]:
                                 cb = str(max(mm))
                                 stmts += ['// Increasing function']
@@ -238,7 +237,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                               attrs=['bold', 'blink']))
                             if sfk == []:
                                 stmts += [tab +
-                                            'fprintf(stderr, "Not a WHA!");']
+                                          'fprintf(stderr, "Not a WHA!");']
                                 stmts += [tab+'exit(1);']
                             else:
                                 outcode(stmts, tab, sfk, odes, lname)
