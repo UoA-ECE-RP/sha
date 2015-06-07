@@ -211,12 +211,21 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                             stmts += [str(k.func) + '_u = ' + str(v[0]) + ';']
                             if clist[i][k][2]:
                                 cb = str(max(mm))
+                                stmts += ['// Increasing function']
+                                stmts += ['if('+str(k.func)+'_u > ' + cb +
+                                          ' && '+str(k.func)+' < ' + cb +
+                                          ' && ' + str(k.func)+'_u >= ' +
+                                          str(k.func) + '){']
                             else:
                                 cb = str(min(mm))
+                                stmts += ['// Decreasing function']
+                                stmts += ['if('+str(k.func)+'_u < ' + cb +
+                                          ' &&  '+str(k.func)+' > ' + cb +
+                                          ' && ' + str(k.func) + '_u < ' +
+                                          str(k.func)+'){']
                             # First compute "k"
                             fk = Eq(composed[i][k][0].subs(S('t'),
                                                            S('k*d')), S(cb))
-                            # Do numeric solving using nsolve
                             sfk = solve(fk, S('k'), check=False)
                             sfk = [r for r in sfk
                                    if ('I' not in str(r) and
@@ -227,32 +236,13 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                 print(colored(('Not a WHA!: ' + str(fk)),
                                               color='red',
                                               attrs=['bold', 'blink']))
-                            if clist[i][k][2]:
-                                stmts += ['// Increasing function']
-                                stmts += ['if('+str(k.func)+'_u > ' + cb +
-                                          ' && '+str(k.func)+' < ' + cb +
-                                          ' && ' + str(k.func)+'_u >= ' +
-                                          str(k.func) + '){']
-                                if sfk == []:
-                                    stmts += [tab +
-                                              'fprintf(stderr, "Not a WHA!");']
-                                    stmts += [tab+'exit(1);']
-                                else:
-                                    outcode(stmts, tab, sfk, odes, lname)
-                                stmts += ["}"]
+                            if sfk == []:
+                                stmts += [tab +
+                                            'fprintf(stderr, "Not a WHA!");']
+                                stmts += [tab+'exit(1);']
                             else:
-                                stmts += ['// Decreasing function']
-                                stmts += ['if('+str(k.func)+'_u < ' + cb +
-                                          ' &&  '+str(k.func)+' > ' + cb +
-                                          ' && ' + str(k.func) + '_u < ' +
-                                          str(k.func)+'){']
-                                if sfk == []:
-                                    stmts += [tab +
-                                              'fprintf(stderr, "Not a WHA!");']
-                                    stmts += [tab+'exit(1);']
-                                else:
-                                    outcode(stmts, tab, sfk, odes, lname)
-                                stmts += ["}"]
+                                outcode(stmts, tab, sfk, odes, lname)
+                            stmts += ["}"]
                 else:
                     pass
         nevents = map(lambda x: '!'+x, events)
