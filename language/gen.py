@@ -152,17 +152,17 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                             if mm != []:
                                 if s > 0:
                                     cb = str(max(mm))
-                                    stmts += ['if('+str(
-                                        var.func)+'_u > ' + cb + ' && C1'+str(
-                                            var.func)+' < ' + cb + ')']
+                                    stmts += ['if('+str(var.func)+'_u > ' +
+                                              cb + ' && C1'+str(var.func) +
+                                              ' < ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                                 else:
                                     # Decreasing function
                                     cb = str(min(mm))
-                                    stmts += ['if('+str(
-                                        var.func)+'_u < ' + cb + ' && C1'+str(
-                                            var.func)+' > ' + cb + ')']
+                                    stmts += ['if('+str(var.func) +
+                                              '_u < ' + cb + ' && C1' +
+                                              str(var.func)+' > ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                             else:
@@ -493,7 +493,6 @@ def codeGen(ha):
 def getShortestTimes(lname, ode, invariants):
     colorama.init(autoreset=True)
     warn = '[WARNING: Location '+lname+' needs fairness]'
-    print 'anything'
     try:
         with patterns:
             Ode(od, var, iValue) << ode
@@ -505,19 +504,16 @@ def getShortestTimes(lname, ode, invariants):
                               attrs=['bold', 'blink']))
                 return {var: (S('oo'), None, False)}
             else:
-                print 'e2'
                 o = dsolve(od, var)
                 i = solve(o.subs([(var, iValue),
                                   (Symbol('t'), 0)]),
                           Symbol('C1'))[0]
                 on = o.subs(S('C1'), i)
-                print on, 'plop'
                 if on.rhs.is_Number:
                     print(colored(warn, color='green',
                                   attrs=['bold', 'blink']))
                     return {var: (S('oo'), None, False)}
                 else:
-                    print 'hey', on
                     invvs = [y for y in invariants[var]
                              if not isinstance(y, Function)]
                     for i, g in enumerate(invvs):
@@ -528,7 +524,6 @@ def getShortestTimes(lname, ode, invariants):
                             else:
                                 invvs[i] = None
                     invvs = filter(lambda x: x is not None, invvs)
-                    print 'hello', invvs
                     if invvs != []:
                         # Used for increasing functions
                         inv_max = max(invvs)
@@ -574,7 +569,6 @@ def updateLocNsteps(loc):
             # Now we can check if the invariants hold on the combinator
             # functions
             tts = []
-            print 'hi'
             for c in cc:
                 for k in c:
                     if c[k][0].is_Number:
@@ -593,7 +587,8 @@ def updateLocNsteps(loc):
                                 inv_min = min(invvs)
                                 time_max = solve(c[k][0]-inv_max, S('t'))[0]
                                 time_min = solve(c[k][0]-inv_min, S('t'))[0]
-                                tts.append(Max(N(Abs(time_max)), (N(Abs(time_min)))))
+                                tts.append(Max(N(Abs(time_max)),
+                                               (N(Abs(time_min)))))
                         except KeyError:
                             raise Exception("Not a WHA!!")
             if all(tts):
