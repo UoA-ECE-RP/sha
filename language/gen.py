@@ -5,7 +5,7 @@ from macropy.experimental.pattern import macros, _matching, switch, patterns, Li
 from language import *
 
 from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode
-from sympy.utilities.codegen import codegen
+from sympy.utilities.codegen import codegen, make_routine
 import colorama
 import copy
 from termcolor import colored
@@ -40,10 +40,18 @@ def OdeCodegen(os, name):
                     xrange(0, len(odess)))
         ifuncs = map(lambda (i, o): (name+"_init_"+(str(i+1)), o),
                      enumerate(iodes))
+        # make the routine to see the arguments
+        func_rs = map(lambda o, i:
+                      make_routine(name+"_ode_"+str(i+1), o.rhs),
+                      odess, xrange(len(odess)))
+        ifunc_rs = map(lambda (i, o):
+                       make_routine(name+"_init_"+(str(i+1)), o),
+                       enumerate(iodes))
         [(c_name, c_code), (h_name, h_header)] = codegen(
             (funcs+ifuncs), "C", name,
             header=False, empty=False, to_files=False)
-        return (c_code, h_name, h_header, [cv.func for cv in vars])
+        return (c_code, h_name, h_header, [cv.func for cv in vars],
+                func_rs, ifunc_rs)
     except Exception as e:
         raise e
 
@@ -93,7 +101,8 @@ def outcode(stmts, tab, sfk, odes, lname):
             stmts += [tab+lhs + ' = ' + rhs + ';']
 
 
-def getInvariantAndOdeExpr(loc, events, tab, contVars):
+def getInvariantAndOdeExpr(loc, events, tab, contVars,
+                           funcrs, ifuncrs):
     with patterns:
         Loc(lname, odes, clist, guards) << loc
         exprs = [item for sl in guards.values() for item in sl]
@@ -121,15 +130,14 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                 Ode(ode, var, iValue) << od
                 # Get the initial value once!
                 stmts += ['if (pstate != cstate)']
-                rr = lname+'_init_'+str(i+1)+'('+str(var.func)+')'
+                rr = lname + '_init_' + str(
+                    i+1) + '(' + ', '.join(
+                        [str(arg.name) for arg in ifuncrs[i].arguments]) + ')'
                 stmts += [tab+'C1'+str(var.func)+' = '+rr+';']
                 lhs = str(var.func)+'_u'
                 rhs = lname+'_ode_' + str(i+1)
-                if dsolve(ode, var).rhs.diff(S('t')) != 0:
-                    r2 = '(C1'+str(var.func)+', d, k)'
-                else:
-                    r2 = '(C1'+str(var.func)+')'
-                rhs += r2
+                rhs += '(' + ', '.join(
+                    [str(arg.name) for arg in funcrs[i].arguments]) + ')'
                 stmts += [lhs + ' = ' + rhs + ';']
                 # Now put the saturation function in
                 o = dsolve(ode, var)
@@ -298,7 +306,7 @@ def getEAndGAndU(edge, events):
 
 
 def makeReactionFunction(fname, locs, edges, snames, events,
-                         contVars):
+                         contVars, funcrs, ifuncrs):
     level = 1
     tab = ' '*2
     ret = ['enum states ' + fname +
@@ -311,7 +319,8 @@ def makeReactionFunction(fname, locs, edges, snames, events,
         (invExpr, odeStmts,
          cstmts, cks) = getInvariantAndOdeExpr(locs[i],
                                                events, tab,
-                                               contVars)
+                                               contVars,
+                                               funcrs[i], ifuncrs[i])
         cks = list(cks) + ['fk']
         if (i == 0):
             ret += [tab*level+'double '+', '.join(cks)+';']
@@ -405,14 +414,16 @@ def codeGen(ha):
         cCodeFile = [None]*len(ls)
         hns = [None]*len(ls)
         hcs = [None]*len(ls)
+        funcrs = [None]*len(ls)
+        ifuncrs = [None]*len(ls)
         contVars = [None]*len(ls)
         for i in xrange(len(ls)):
             with patterns:
                 Loc(name, odes, clist, y) << ls[i]
                 (cCodeFile[i], hns[i],
-                 hcs[i], contVars[i]) = OdeCodegen(odes, name)
+                 hcs[i], contVars[i],
+                 funcrs[i], ifuncrs[i]) = OdeCodegen(odes, name)
                 lnames[i] = name
-
         # Start generating code
         # First the required headers
         headers = ['#include<stdint.h>']
@@ -474,7 +485,8 @@ def codeGen(ha):
 
         # Make the main reaction function
         mainCFile += makeReactionFunction(han, ls, edges, lnames,
-                                          list(eventSet), list(contSet))
+                                          list(eventSet), list(contSet),
+                                          funcrs, ifuncrs)
 
         # Make the main function
         mainCFile += makeMain(sloc, han, list(contSet))
@@ -572,7 +584,7 @@ def updateLocNsteps(loc):
                 for k in c:
                     if c[k][0].is_Number:
                         print(colored(warn, color='green', attrs=['bold',
-                                                                'blink']))
+                                                                  'blink']))
                         return Loc(n, odes, cf, invariants, time=S('oo'))
                     else:
                         try:
