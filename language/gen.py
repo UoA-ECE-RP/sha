@@ -4,7 +4,7 @@
 from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
 from language import *
 
-from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs
+from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs, sign
 from sympy.utilities.codegen import codegen
 import colorama
 import copy
@@ -141,7 +141,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                     if not o.rhs.is_Number:
                         s = o.rhs.diff(S('t'))
                         s = s.subs(S('t'), 0)
-                        if s.is_Number:
+                        if sign(s).is_Number:
                             gs = guards[var]
                             mm = []
                             for g in gs:
@@ -150,7 +150,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                         if not isinstance(xx, bool):
                                             mm.append(xx.rhs)
                             if mm != []:
-                                if s > 0:
+                                if sign(s) > 0:
                                     cb = str(max(mm))
                                     stmts += ['if('+str(var.func)+'_u > ' +
                                               cb + ' && C1'+str(var.func) +
@@ -158,7 +158,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                                 else:
-                                    # Decreasing function
+                                    # Decreasing or non-increasing function
                                     cb = str(min(mm))
                                     stmts += ['if('+str(var.func) +
                                               '_u < ' + cb + ' && C1' +
@@ -168,7 +168,9 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars):
                             else:
                                 pass
                         else:
-                            raise Exception('Don\'t know how to saturate')
+                            raise Exception('Don\'t know how to saturate: '
+                                            + str(o) + ' with slope: ' +
+                                            str(s))
                     else:
                         print 'Cannot saturate: ', str(o), ' in loc: ', lname
                 else:
