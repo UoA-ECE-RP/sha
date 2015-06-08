@@ -5,7 +5,7 @@ from macropy.experimental.pattern import macros, _matching, switch, patterns, Li
 from language import *
 
 from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs, sign
-from sympy.utilities.codegen import codegen
+from sympy.utilities.codegen import codegen, make_routine
 import colorama
 import copy
 from termcolor import colored
