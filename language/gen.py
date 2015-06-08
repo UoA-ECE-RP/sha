@@ -4,8 +4,8 @@
 from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
 from language import *
 
-from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode
-from sympy.utilities.codegen import codegen, make_routine
+from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs, sign
+from sympy.utilities.codegen import codegen
 import colorama
 import copy
 from termcolor import colored
@@ -149,7 +149,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                     if not o.rhs.is_Number:
                         s = o.rhs.diff(S('t'))
                         s = s.subs(S('t'), 0)
-                        if s.is_Number:
+                        if sign(s).is_Number:
                             gs = guards[var]
                             mm = []
                             for g in gs:
@@ -158,25 +158,27 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                                         if not isinstance(xx, bool):
                                             mm.append(xx.rhs)
                             if mm != []:
-                                if s > 0:
+                                if sign(s) > 0:
                                     cb = str(max(mm))
-                                    stmts += ['if('+str(
-                                        var.func)+'_u > ' + cb + ' && C1'+str(
-                                            var.func)+' < ' + cb + ')']
+                                    stmts += ['if('+str(var.func)+'_u > ' +
+                                              cb + ' && C1'+str(var.func) +
+                                              ' < ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                                 else:
-                                    # Decreasing function
+                                    # Decreasing or non-increasing function
                                     cb = str(min(mm))
-                                    stmts += ['if('+str(
-                                        var.func)+'_u < ' + cb + ' && C1'+str(
-                                            var.func)+' > ' + cb + ')']
+                                    stmts += ['if('+str(var.func) +
+                                              '_u < ' + cb + ' && C1' +
+                                              str(var.func)+' > ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                             else:
                                 pass
                         else:
-                            raise Exception('Don\'t know how to saturate')
+                            raise Exception('Don\'t know how to saturate: '
+                                            + str(o) + ' with slope: ' +
+                                            str(s))
                     else:
                         print 'Cannot saturate: ', str(o), ' in loc: ', lname
                 else:
@@ -543,7 +545,8 @@ def getShortestTimes(lname, ode, invariants):
                         inv_min = min(invvs)
                         time_max = solve(on.rhs-inv_max, S('t'))[0]
                         time_min = solve(on.rhs-inv_min, S('t'))[0]
-                        time = Max(time_max, time_min)
+
+                        time = Max(N(Abs(time_max)), N(Abs(time_min)))
                         return {var: (time, on, False)}
                     else:
                         invvs = [y for y in invariants[var]
@@ -598,7 +601,8 @@ def updateLocNsteps(loc):
                                 inv_min = min(invvs)
                                 time_max = solve(c[k][0]-inv_max, S('t'))[0]
                                 time_min = solve(c[k][0]-inv_min, S('t'))[0]
-                                tts.append(Max(time_max, time_min))
+                                tts.append(Max(N(Abs(time_max)),
+                                               (N(Abs(time_min)))))
                         except KeyError:
                             raise Exception("Not a WHA!!")
             if all(tts):
