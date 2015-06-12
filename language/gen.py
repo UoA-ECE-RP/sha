@@ -6,11 +6,13 @@ from language import *
 
 from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs, sign
 from sympy.utilities.codegen import codegen, make_routine
+from functools import partial
 import colorama
 import copy
 from termcolor import colored
 
 ALL_BETS_OFF = False
+
 
 # Function to generate code from Ode
 def OdeCodegen(os, name):
@@ -183,7 +185,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                                           attrs=['bold', 'blink']))
                             if mm != []:
                                 cb = str(max(mm))
-                                stmts += ['if((' + str(s) + '> 0) && ' +
+                                stmts += ['if((' + str(s) + ' > 0) && ' +
                                           str(var.func)+'_u > ' +
                                           cb + ' && C1'+str(var.func) +
                                           ' < ' + cb + ')']
@@ -535,7 +537,7 @@ def codeGen(ha):
 
 
 # This is a very important function
-def getShortestTimes(lname, ode, invariants):
+def getShortestTimes(excludes, lname, ode, invariants):
     colorama.init(autoreset=True)
     warn = '[WARNING: Location '+lname+' needs fairness]'
     try:
@@ -574,9 +576,13 @@ def getShortestTimes(lname, ode, invariants):
                         inv_max = max(invvs)
                         # Used for decreasing functions
                         inv_min = min(invvs)
-                        time_max = solve(on.rhs-inv_max, S('t'))[0]
-                        time_min = solve(on.rhs-inv_min, S('t'))[0]
-
+                        time_max = solve(on.rhs-inv_max, S('t'),
+                                         exclude=excludes, check=False)[0]
+                        if len(invvs) == 1:
+                            time_min = time_max
+                        else:
+                            time_min = solve(on.rhs-inv_min, S('t'),
+                                             exclude=excludes, check=False)[0]
                         time = Max(N(Abs(time_max)), N(Abs(time_min)))
                         return {var: (time, on, False)}
                     else:
@@ -592,10 +598,11 @@ def getShortestTimes(lname, ode, invariants):
         raise k
 
 
-def updateLocNsteps(loc):
+def updateLocNsteps(excludes, loc):
     with patterns:
         Loc(n, odes, cf, invariants) << loc
-        times = map(lambda o: getShortestTimes(n, o, invariants), odes)
+        times = map(lambda o: getShortestTimes(excludes, n, o, invariants),
+                    odes)
         (tt, g, mine) = times[0].values()[0]
         tts = [True]
         for yoo in times:
@@ -647,7 +654,8 @@ def updateLocNsteps(loc):
 def getSha(ha):
     with patterns:
         Ha(n, ls, sloc, edges, gvs) << ha
-        return Ha(n, map(updateLocNsteps, ls), sloc, edges, gvs)
+        return Ha(n, map(partial(updateLocNsteps, gvs), ls),
+                  sloc, edges, gvs)
 
 
 # Function that checks that the ode is OK
