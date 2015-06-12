@@ -10,6 +10,7 @@ import colorama
 import copy
 from termcolor import colored
 
+ALL_BETS_OFF = False
 
 # Function to generate code from Ode
 def OdeCodegen(os, name):
@@ -149,14 +150,14 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                     if not o.rhs.is_Number:
                         s = o.rhs.diff(S('t'))
                         s = s.subs(S('t'), 0)
+                        gs = guards[var]
+                        mm = []
+                        for g in gs:
+                            with switch(g):
+                                if Guard(xx):
+                                    if not isinstance(xx, bool):
+                                        mm.append(xx.rhs)
                         if sign(s).is_Number:
-                            gs = guards[var]
-                            mm = []
-                            for g in gs:
-                                with switch(g):
-                                    if Guard(xx):
-                                        if not isinstance(xx, bool):
-                                            mm.append(xx.rhs)
                             if mm != []:
                                 if sign(s) > 0:
                                     cb = str(max(mm))
@@ -175,10 +176,32 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                                         var.func) + '_u = ' + cb + ';']
                             else:
                                 pass
+                        elif ALL_BETS_OFF:
+                            warn = '[WARNING: ALL_BETS_OFF '
+                            warn += 'ENABLED, ANYTHING CAN HAPPEN]'
+                            print(colored(warn, color='red',
+                                          attrs=['bold', 'blink']))
+                            if mm != []:
+                                cb = str(max(mm))
+                                stmts += ['if((' + str(s) + '> 0) && ' +
+                                          str(var.func)+'_u > ' +
+                                          cb + ' && C1'+str(var.func) +
+                                          ' < ' + cb + ')']
+                                stmts += [tab + str(
+                                    var.func) + '_u = ' + cb + ';']
+                                # Decreasing or non-increasing function
+                                cb = str(min(mm))
+                                stmts += ['if((' + str(s) + ' < 0) &&' +
+                                          str(var.func) +
+                                          '_u < ' + cb + ' && C1' +
+                                          str(var.func)+' > ' + cb + ')']
+                                stmts += [tab + str(
+                                    var.func) + '_u = ' + cb + ';']
+                            else:
+                                pass
                         else:
-                            raise Exception('Don\'t know how to saturate: '
-                                            + str(o) + ' with slope: ' +
-                                            str(s))
+                            raise Exception("Don't know how to saturate:"+str(
+                                o) + ' with slope: ' + str(s))
                     else:
                         print 'Cannot saturate: ', str(o), ' in loc: ', lname
                 else:
@@ -411,7 +434,7 @@ def makeMain(sloc, rName, cvars):
 # Function to generate code from HA
 def codeGen(ha):
     with patterns:
-        Ha(han, ls, sloc, edges) << ha
+        Ha(han, ls, sloc, edges, gvs) << ha
         lnames = [None]*len(ls)
         cCodeFile = [None]*len(ls)
         hns = [None]*len(ls)
@@ -451,12 +474,20 @@ def codeGen(ha):
         uContSet = set([str(item)+"_u" for sl in contVars for item in sl])
         uContDecl = ['double ' + ', '.join(uContSet) + ';']
 
+        # Global variable declarations
+        gv = ['// Global variables from outside this HA']
+        ggvs = [str(name) for name in gvs]
+        if ggvs != []:
+            gv += ['extern double ' + ', '.join(ggvs) + ';']
+
         # Build the main function
 
         # Append the included headers
         mainCFile = headers
         # Append the #defines
         mainCFile += defs
+        # Append the global variables
+        mainCFile += gv
         # Append the event declarations
         mainCFile += ['//Events']
         mainCFile += eventDecl
@@ -615,8 +646,8 @@ def updateLocNsteps(loc):
 
 def getSha(ha):
     with patterns:
-        Ha(n, ls, sloc, edges) << ha
-        return Ha(n, map(updateLocNsteps, ls), sloc, edges)
+        Ha(n, ls, sloc, edges, gvs) << ha
+        return Ha(n, map(updateLocNsteps, ls), sloc, edges, gvs)
 
 
 # Function that checks that the ode is OK
@@ -652,7 +683,7 @@ def isWhaLoc(loc):
 # Function to test if the ha is wha
 def isWha(ha):
     with switch(ha):
-        if Ha(n, ls, sloc, edges):
+        if Ha(n, ls, sloc, edges, gvs):
             return reduce(lambda init, x: isWhaLoc(x) and init,
                           ls, True)
         else:

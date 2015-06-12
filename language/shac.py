@@ -12,6 +12,8 @@ def compile(ha, **kwargs):
         if sha is None:
             raise "Cannot generate code!"
         else:
+            if 'ABOF' in kwargs and kwargs['ABOF']:
+                gen.ALL_BETS_OFF = True
             gen.codeGen(sha)
 
 
