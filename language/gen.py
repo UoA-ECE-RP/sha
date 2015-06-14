@@ -243,6 +243,8 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                         for k, v in cu.iteritems():
                             stmts += [str(k.func) + '_u = ' + str(
                                 v[0]) + ';']
+                            # TODO: If ALL_BETS_OFF is enabled then we
+                            # can also compute the slope at runtime
                             if clist[i][k][2]:
                                 cb = str(max(mm))
                                 stmts += ['// Increasing function']
@@ -258,22 +260,32 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                                           ' && ' + str(k.func) + '_u < ' +
                                           str(k.func)+'){']
                             # First compute "k"
-                            fk = Eq(composed[i][k][0].subs(S('t'),
-                                                           S('k*d')), S(cb))
+                            fk = Add(composed[i][k][0].subs(S('t'),
+                                                            S('k*d')),
+                                     Mul(S(cb), -1))
                             sfk = solve(fk, S('k'), check=False)
                             sfk = [r for r in sfk
                                    if ('I' not in str(r) and
                                        r.is_finite is not False)]
                             if sfk != []:
                                 sfk = sfk[0]
+                            elif ALL_BETS_OFF:
+                                warn = '[WARNING: ALL_BETS_OFF '
+                                warn += 'ENABLED, ANYTHING CAN HAPPEN]'
+                                print(colored(warn, color='red',
+                                              attrs=['bold', 'blink']))
                             else:
                                 print(colored(('Not a WHA!: ' + str(fk)),
                                               color='red',
                                               attrs=['bold', 'blink']))
-                            if sfk == []:
+                            if sfk == [] and not ALL_BETS_OFF:
                                 stmts += [tab +
                                           'fprintf(stderr, "Not a WHA!");']
                                 stmts += [tab+'exit(1);']
+                            elif sfk == [] and ALL_BETS_OFF:
+                                # Here one can compute the fk at runtime
+                                # itself!
+                                outcode(stmts, tab, fk, odes, lname)
                             else:
                                 outcode(stmts, tab, sfk, odes, lname)
                             stmts += ["}"]
