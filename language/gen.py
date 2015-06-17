@@ -328,8 +328,10 @@ def getEAndGAndU(edge, events):
         nevents = filter(lambda x: not(x in eus), events)
         nevents = map(lambda x: '!'+x, nevents)
         eeExpr = ' && '.join(eus+nevents)
+        # TODO: CHECK IF THIS IS TRUE!!  This means if there is no event
+        # then there is an enabling event generated automatically
         if eeExpr == '':
-            eeExpr = 'False'
+            eeExpr = 'True'
         # Now for the update statements
         updates = []
         for update in uList:
