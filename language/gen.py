@@ -659,7 +659,7 @@ def updateLocNsteps(excludes, loc):
                 return Loc(n, odes, cf, invariants, time=tts[0])
             else:
                 raise Exception("Not a WHA!!: " + str(times))
-        elif not ALL_BETS_OFF:
+        elif ALL_BETS_OFF:
             pass
         else:
             raise Exception("Not a WHA!!: " + str(times))
