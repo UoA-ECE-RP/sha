@@ -8,12 +8,12 @@ def compile(ha, **kwargs):
     if gen.isWha(ha):
         # Step-2 get a new ha with the Nsteps for each loc computed
         # FIXME: Nsteps might be None in the general case
+        if 'ABOF' in kwargs and kwargs['ABOF']:
+            gen.ALL_BETS_OFF = True
         sha = gen.getSha(ha)
         if sha is None:
             raise "Cannot generate code!"
         else:
-            if 'ABOF' in kwargs and kwargs['ABOF']:
-                gen.ALL_BETS_OFF = True
             gen.codeGen(sha)
 
 
