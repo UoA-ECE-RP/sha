@@ -11,10 +11,10 @@ import shac
 # This is the Raskin model of the waterTank example
 # K = 0.075 heating rate in t4, h = 150.
 
-ode1 = Ode(sympify("diff(x(t))-(0.075*(150-x(t)))"), sympify("x(t)"), 20)
-ode2 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 100)
-ode3 = Ode(sympify("diff(x(t))+(0.075*x(t))"), sympify("x(t)"), 100)
-ode4 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 20)
+ode1 = Ode(sympify("diff(x(t))-(0.075*(150-x(t)))"), sympify("x(t)"), 20, {})
+ode2 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 100, {})
+ode3 = Ode(sympify("diff(x(t))+(0.075*x(t))"), sympify("x(t)"), 100, {})
+ode4 = Ode(sympify("diff(x(t))"), sympify("x(t)"), 20, {})
 
 # The locations of the hybrid automaton
 t1 = Loc("t1", [ode1], [],

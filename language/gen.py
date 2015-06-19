@@ -112,18 +112,17 @@ def subsc(c, contVars, u):
     return c
 
 
-def outcode(stmts, tab, sfk, odes, lname):
+def outcode(stmts, tab, sfk, odes, lname, funcrs):
     stmts += [tab+ccode(sfk, assign_to=S('fk'))]
     for i, od in enumerate(odes):
         with patterns:
             Ode(ode, var, ii, rFuncs) << od
             lhs = str(var.func)+'_u'
             rhs = lname+'_ode_' + str(i+1)
-            if dsolve(ode, var).rhs.diff(S('t')) != 0:
-                r2 = '(C1'+str(var.func)+', d, fk)'
-            else:
-                r2 = '(C1'+str(var.func)+')'
-            rhs += r2
+            mfuncrs = map(lambda x: 'fk'
+                          if str(x.name) == 'k' else str(x.name),
+                          funcrs[i].arguments)
+            rhs += '(' + ', '.join(mfuncrs) + ')'
             stmts += [tab+lhs + ' = ' + rhs + ';']
 
 
@@ -308,9 +307,9 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                             elif sfk == [] and ALL_BETS_OFF:
                                 # Here one can compute the fk at runtime
                                 # itself!
-                                outcode(stmts, tab, fk, odes, lname)
+                                outcode(stmts, tab, fk, odes, lname, funcrs)
                             else:
-                                outcode(stmts, tab, sfk, odes, lname)
+                                outcode(stmts, tab, sfk, odes, lname, funcrs)
                             stmts += ["}"]
                 else:
                     pass
