@@ -14,6 +14,29 @@ from termcolor import colored
 ALL_BETS_OFF = False
 
 
+# Solving odes with free variables
+def solve_ode_system(count, odee):
+    with patterns:
+        Ode(ode, var, iValue, rFuncs) << odee
+        if rFuncs == {} and count > 0:
+            sol = dsolve(ode)
+            sol = sol.rhs.subs(Symbol('C1'), S('C1'+str(var.func)))
+            return sol
+        elif rFuncs != {}:
+            rrFuncs = {}
+            for k, v in rFuncs.iteritems():
+                rrFuncs[k] = solve_ode_system(count+1, v)
+                rft = [(k, v) for k, v in rrFuncs.iteritems()]
+            ode = ode.subs(rft)
+            if count > 0:
+                ode = dsolve(ode).rhs.subs(Symbol('C1'), S('C1'+str(var.func)))
+                return ode
+            odee = Ode(ode, var, iValue, {})
+            return odee
+        else:
+            return odee
+
+
 # Function to generate code from Ode
 def OdeCodegen(os, name):
     odes = [None]*len(os)
@@ -21,7 +44,7 @@ def OdeCodegen(os, name):
     iValues = [None]*len(os)
     for i in xrange(0, len(os)):
         with patterns:
-            Ode(ode, var, iValue) << os[i]
+            Ode(ode, var, iValue, rFuncs) << os[i]
             odes[i] = ode
             vars[i] = var
             iValues[i] = iValue
@@ -93,7 +116,7 @@ def outcode(stmts, tab, sfk, odes, lname):
     stmts += [tab+ccode(sfk, assign_to=S('fk'))]
     for i, od in enumerate(odes):
         with patterns:
-            Ode(ode, var, ii) << od
+            Ode(ode, var, ii, rFuncs) << od
             lhs = str(var.func)+'_u'
             rhs = lname+'_ode_' + str(i+1)
             if dsolve(ode, var).rhs.diff(S('t')) != 0:
@@ -130,7 +153,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                 cks.append(str(k.func)+'_u')
         for i, od in enumerate(odes):
             with patterns:
-                Ode(ode, var, iValue) << od
+                Ode(ode, var, iValue, rFuncs) << od
                 # Get the initial value once!
                 stmts += ['if (pstate != cstate)']
                 rr = lname + '_init_' + str(
@@ -213,7 +236,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
         os = [None]*len(odes)
         for i, o in enumerate(odes):
             with patterns:
-                Ode(ode, v, iValue) << o
+                Ode(ode, v, iValue, rFuncs) << o
                 os[i] = (v, dsolve(ode, v).subs(S('C1'),
                                                 Symbol('C1'+str(v.func),
                                                        real=True)).rhs)
@@ -424,7 +447,7 @@ def makeMain(sloc, rName, cvars):
         # Initialize the continous vars for the sloc
         for i, o in enumerate(ol):
             with patterns:
-                Ode(ode, var, iValue) << o
+                Ode(ode, var, iValue, rFuncs) << o
                 main += [tab*level + str(var.func) + ' = ' +
                          str(iValue) + ';']
         main += [tab*level+'enum states pstate = -1;']
@@ -556,7 +579,7 @@ def getShortestTimes(excludes, lname, ode, invariants):
     warn = '[WARNING: Location '+lname+' needs fairness]'
     try:
         with patterns:
-            Ode(od, var, iValue) << ode
+            Ode(od, var, iValue, rFuncs) << ode
             # This means you could not provide a static initial
             # condition
             if iValue is None:
@@ -678,20 +701,23 @@ def getSha(ha):
 
 # Function that checks that the ode is OK
 def isOdeOK(odee):
-    with switch(odee):
-        if Ode(ode, var, iValue):
-            try:
-                o = dsolve(ode, var)
-                s = o.rhs.diff(Symbol('t'))
-                # TODO: check that this root finding is enough for
-                # monotonicity
-                m = solve(s, Symbol('t'), check=True)
-                return (m == [])
-            except Exception as e:
-                print e
+    if ALL_BETS_OFF:
+        return True
+    else:
+        with switch(odee):
+            if Ode(ode, var, iValue, rFuncs):
+                try:
+                    o = dsolve(ode, var)
+                    s = o.rhs.diff(Symbol('t'))
+                    # TODO: check that this root finding is enough for
+                    # monotonicity
+                    m = solve(s, Symbol('t'), check=True)
+                    return (m == [])
+                except Exception as e:
+                    print e
+                    return False
+            else:
                 return False
-        else:
-            return False
 
 
 # Function to test if location is WHA amenable
@@ -714,3 +740,17 @@ def isWha(ha):
                           ls, True)
         else:
             return False
+
+
+def preprocess(ha):
+    with switch(ha):
+        if Ha(n, ls, sloc, edges, gvs):
+            for i, loc in enumerate(ls):
+                with switch(loc):
+                    if Loc(x, odes, clist, y):
+                        ls[i] = Loc(x,
+                                    map(partial(solve_ode_system, 0), odes),
+                                    clist, y)
+            return Ha(n, ls, sloc, edges, gvs)
+        else:
+            raise Exception("Not a HA: " + str(ha))

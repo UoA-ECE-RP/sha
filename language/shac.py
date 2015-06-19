@@ -5,11 +5,12 @@ import sys
 
 def compile(ha, **kwargs):
     # Step-1: Make sure that the hybrid automaton is well-formed
+    ha = gen.preprocess(ha)
+    if 'ABOF' in kwargs and kwargs['ABOF']:
+        gen.ALL_BETS_OFF = True
     if gen.isWha(ha):
         # Step-2 get a new ha with the Nsteps for each loc computed
         # FIXME: Nsteps might be None in the general case
-        if 'ABOF' in kwargs and kwargs['ABOF']:
-            gen.ALL_BETS_OFF = True
         sha = gen.getSha(ha)
         if sha is None:
             raise "Cannot generate code!"

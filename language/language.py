@@ -7,7 +7,7 @@ from macropy.case_classes import macros, case
 
 
 @case
-class Ode(expr, var, initValue):
+class Ode(expr, var, initValue, replaceFuncs):
     pass
 
 
