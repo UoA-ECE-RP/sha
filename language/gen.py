@@ -55,6 +55,12 @@ def OdeCodegen(os, name):
                     odes, vars)
         iodes = map(lambda o: o.subs(S('t'), 0), iodes)
         iodes = map(lambda o: solve(o, S('C1'))[0], iodes)
+        # BAD HACK IN PROGRESS
+        riodes = map(lambda o, v: o.subs(v, S(str(v.func))),
+                     odes, vars)
+        riodes = map(lambda o: o.subs(S('t'), 0), riodes)
+        riodes = map(lambda o: solve(o, S('C1'))[0], riodes)
+        # BAD HACK FINISHED
         odess = map(lambda o, v:
                     o.subs([(Symbol('t'),
                              Mul(Symbol('k'),
@@ -72,7 +78,7 @@ def OdeCodegen(os, name):
                       odess, xrange(len(odess)))
         ifunc_rs = map(lambda (i, o):
                        make_routine(name+"_init_"+(str(i+1)), o),
-                       enumerate(iodes))
+                       enumerate(riodes))
         [(c_name, c_code), (h_name, h_header)] = codegen(
             (funcs+ifuncs), "C", name,
             header=False, empty=False, to_files=False)
