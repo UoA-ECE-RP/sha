@@ -619,12 +619,23 @@ def getShortestTimes(excludes, lname, ode, invariants):
                         # Used for decreasing functions
                         inv_min = min(invvs)
                         time_max = solve(on.rhs-inv_max, S('t'),
-                                         exclude=excludes, check=False)[0]
+                                         exclude=excludes, check=False)
+                        if time_max == []:
+                            ss = "Could not find MAX time for: "
+                            raise Exception(ss + str(on) +
+                                            " with invariant " + str(inv_max))
+                        time_max = time_max[0]
                         if len(invvs) == 1:
                             time_min = time_max
                         else:
                             time_min = solve(on.rhs-inv_min, S('t'),
-                                             exclude=excludes, check=False)[0]
+                                             exclude=excludes, check=False)
+                            if time_min == []:
+                                ss = "Could not find MIN time for: "
+                                raise Exception(ss + str(on) +
+                                                " with invariant " +
+                                                str(inv_min))
+                            time_min = time_min[0]
                         time = Max(N(Abs(time_max)), N(Abs(time_min)))
                         return {var: (time, on, False)}
                     else:
