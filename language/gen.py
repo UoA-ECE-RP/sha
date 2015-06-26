@@ -4,7 +4,7 @@
 from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
 from language import *
 
-from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs, sign
+from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs, sign, classify_ode
 from sympy.utilities.codegen import codegen, make_routine
 from functools import partial
 import colorama
@@ -417,7 +417,7 @@ def makeReactionFunction(fname, locs, edges, snames, events,
                                                        egExpr]))+') {']
             level += 1
             # Saturate currently only works for non-combinator functions
-            ret += [level*tab+'k=0;']
+            ret += [level*tab+'k=1;']
             ret += [level*tab+'cstate='+dState+';']
             # Put the updates from edge here!
             uStmts = map(lambda x: tab*level+x, uStmts)
