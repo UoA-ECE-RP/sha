@@ -160,11 +160,13 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
             with patterns:
                 Ode(ode, var, iValue, rFuncs) << od
                 # Get the initial value once!
-                stmts += ['if (pstate != cstate)']
+                stmts += ['if ((pstate != cstate) || force_init_update){']
                 rr = lname + '_init_' + str(
                     i+1) + '(' + ', '.join(
                         [str(arg.name) for arg in ifuncrs[i].arguments]) + ')'
                 stmts += [tab+'C1'+str(var.func)+' = '+rr+';']
+                stmts += [tab+'force_init_update = False;']
+                stmts += ['}']
                 lhs = str(var.func)+'_u'
                 rhs = lname+'_ode_' + str(i+1)
                 rhs += '(' + ', '.join(
@@ -213,16 +215,14 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                                           attrs=['bold', 'blink']))
                             if mm != []:
                                 cb = str(max(mm))
-                                stmts += ['if((' + str(s) + ' > 0) && ' +
-                                          str(var.func)+'_u > ' +
+                                stmts += ['if(' + str(var.func)+'_u > ' +
                                           cb + ' && C1'+str(var.func) +
                                           ' < ' + cb + ')']
                                 stmts += [tab + str(
                                     var.func) + '_u = ' + cb + ';']
                                 # Decreasing or non-increasing function
                                 cb = str(min(mm))
-                                stmts += ['if((' + str(s) + ' < 0) &&' +
-                                          str(var.func) +
+                                stmts += ['if(' + str(var.func) +
                                           '_u < ' + cb + ' && C1' +
                                           str(var.func)+' > ' + cb + ')']
                                 stmts += [tab + str(
@@ -393,6 +393,7 @@ def makeReactionFunction(fname, locs, edges, snames, events,
         cks = list(cks) + ['fk']
         if (i == 0):
             ret += [tab*level+'double '+', '.join(cks)+';']
+        ret += [tab*level+'unsigned char force_init_update;']
         ret += [tab*level+'case (' + state + '):']
         level += 1
         # If the ode is still begin solved
@@ -419,6 +420,8 @@ def makeReactionFunction(fname, locs, edges, snames, events,
             # Saturate currently only works for non-combinator functions
             ret += [level*tab+'k=1;']
             ret += [level*tab+'cstate='+dState+';']
+            if state == dState:
+                ret += [level*tab+'force_init_update = True;']
             # Put the updates from edge here!
             uStmts = map(lambda x: tab*level+x, uStmts)
             ret += uStmts
@@ -506,8 +509,10 @@ def codeGen(ha):
         # The string that declares all the Events
         eventList = map(getEventList, edges)
         eventSet = set([item for sl in eventList for item in sl])
-        eventDecl = ['extern unsigned char ' + ', '
-                     .join(eventSet) + ';']
+        eventDecl = []
+        if eventSet != set():
+            eventDecl += ['extern unsigned char ' + ', '
+                          .join(eventSet) + ';']
         eventDecl += ['extern void readInput();']
         eventDecl += ['extern void writeOutput();']
 
