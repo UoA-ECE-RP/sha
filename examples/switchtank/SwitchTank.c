@@ -12,8 +12,6 @@
 
 //Events
 
-extern unsigned char ;
-
 extern void readInput();
 
 extern void writeOutput();
@@ -24,7 +22,7 @@ double x2, x1;
 
 //Continous variable update
 
-double x2_u=0.5, x1_u=0.5;
+double x2_u, x1_u;
 
 //The constant variable
 
@@ -95,23 +93,27 @@ double t2_init_2(double x2_u) {
 enum states SwitchTank(enum states cstate, enum states pstate) {
   switch (cstate) {
   double fk;
+  unsigned char force_init_update;
   case (t1):
     if(x1 <= 1 && x2 > 0.25){
-      if (pstate != cstate)
-        C1x1 = t1_init_1(x1_u);
+      if ((pstate != cstate) || force_init_update){
+        C1x1 = t1_init_1(x1);
+      }
       x1_u = t1_ode_1(C1x1, d, k);
       if(x1_u > 1 && C1x1 < 1)
         x1_u = 1;
-      if (pstate != cstate)
-        C1x2 = t1_init_2(x2_u);
+      if ((pstate != cstate) || force_init_update){
+        C1x2 = t1_init_2(x2);
+      }
       x2_u = t1_ode_2(C1x2, d, k);
       if(x2_u < 0.250000000000000 && C1x2 > 0.250000000000000)
         x2_u = 0.250000000000000;
       ++k;
       cstate = t1;
+      force_init_update = False;
     }
     else if(True && x2 <= 0.25) {
-      k=0;
+      k=1;
       cstate=t2;
       x1_u = x1;
       x2_u = x2;
@@ -123,21 +125,24 @@ enum states SwitchTank(enum states cstate, enum states pstate) {
     break;
   case (t2):
     if(x1 > 0.25 && x2 <= 1){
-      if (pstate != cstate)
-        C1x1 = t2_init_1(x1_u);
+      if ((pstate != cstate) || force_init_update){
+        C1x1 = t2_init_1(x1);
+      }
       x1_u = t2_ode_1(C1x1, d, k);
       if(x1_u < 0.250000000000000 && C1x1 > 0.250000000000000)
         x1_u = 0.250000000000000;
-      if (pstate != cstate)
-        C1x2 = t2_init_2(x2_u);
+      if ((pstate != cstate) || force_init_update){
+        C1x2 = t2_init_2(x2);
+      }
       x2_u = t2_ode_2(C1x2, d, k);
       if(x2_u > 1 && C1x2 < 1)
         x2_u = 1;
       ++k;
       cstate = t2;
+      force_init_update = False;
     }
     else if(True && x1 <= 0.25) {
-      k=0;
+      k=1;
       cstate=t1;
       x1_u = x1;
       x2_u = x2;

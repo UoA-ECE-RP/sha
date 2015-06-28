@@ -165,7 +165,6 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                     i+1) + '(' + ', '.join(
                         [str(arg.name) for arg in ifuncrs[i].arguments]) + ')'
                 stmts += [tab+'C1'+str(var.func)+' = '+rr+';']
-                stmts += [tab+'force_init_update = False;']
                 stmts += ['}']
                 lhs = str(var.func)+'_u'
                 rhs = lname+'_ode_' + str(i+1)
@@ -406,6 +405,7 @@ def makeReactionFunction(fname, locs, edges, snames, events,
             ret += [tab*level+stmt]
         ret += [level*tab+'++k;']
         ret += [level*tab+'cstate = '+state+';']
+        ret += [level*tab+'force_init_update = False;']
         level -= 1
         ret += [tab*level+'}']
 
