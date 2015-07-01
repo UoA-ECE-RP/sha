@@ -1,11 +1,17 @@
 # This is the compiler main module
 import gen
 import sys
+import compose
+
+
+def comp(haList):
+    return compose.compose(haList)
 
 
 def compile(ha, **kwargs):
     # Step-1: Make sure that the hybrid automaton is well-formed
-    ha = gen.preprocess(ha)
+    if 'COMPOSED' not in kwargs:
+        ha = gen.preprocess(ha)
     if 'ABOF' in kwargs and kwargs['ABOF']:
         gen.ALL_BETS_OFF = True
     if gen.isWha(ha):
