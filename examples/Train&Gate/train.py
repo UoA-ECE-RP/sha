@@ -11,14 +11,14 @@ ode_y  = Ode(sympify("diff(y(t))-1"), sympify("y(t)"), 0, {})
 
 
 # The locations of the hybrid automaton
-t1 = Loc("t1", [ode_y],[],
+t1 = Loc("t1", [ode_y], [],
          {S('y(t)'): [Guard(S('y<5'))]})
 
-t2 = Loc("t2", [ode_y],[],
+t2 = Loc("t2", [ode_y], [],
          {S('y(t)'): [Guard(S('y>=5')), 
                       Guard(S('y<15'))]})
 
-t3 = Loc("t3", [ode_y],[],
+t3 = Loc("t3", [ode_y], [],
          {S('y(t)'): [Guard(S('y>=15')), 
                       Guard(S('y<25'))]})
 
@@ -42,11 +42,8 @@ e3 = Edge('t3', 't1', {S("x(t)"): [Guard(S("y>=25")),
           [])
 
 
-
-
-train = Ha("train", [t1, t2, t3], t1,
-               [e1, e2, e3],[])
+train = Ha("train", [t1, t2, t3], t1, [e1, e2, e3], [], [])
 
 
 # Compile
-shac.compile(train)
+# shac.compile(train)

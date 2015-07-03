@@ -481,7 +481,7 @@ def makeMain(sloc, rName, cvars):
 # Function to generate code from HA
 def codeGen(ha):
     with patterns:
-        Ha(han, ls, sloc, edges, gvs) << ha
+        Ha(han, ls, sloc, edges, gvs, igvs) << ha
         lnames = [None]*len(ls)
         cCodeFile = [None]*len(ls)
         hns = [None]*len(ls)
@@ -529,6 +529,10 @@ def codeGen(ha):
         if ggvs != []:
             gv += ['extern double ' + ', '.join(ggvs) + ';']
 
+        gv += ['// Global variables in this HA']
+        iggvs = [str(name) for name in igvs]
+        if iggvs != []:
+            gv += ['double ' + ', '.join(ggvs) + ';']
         # Build the main function
 
         # Append the included headers
@@ -715,9 +719,9 @@ def updateLocNsteps(excludes, loc):
 
 def getSha(ha):
     with patterns:
-        Ha(n, ls, sloc, edges, gvs) << ha
+        Ha(n, ls, sloc, edges, gvs, igvs) << ha
         return Ha(n, map(partial(updateLocNsteps, gvs), ls),
-                  sloc, edges, gvs)
+                  sloc, edges, gvs, igvs)
 
 
 # Function that checks that the ode is OK
@@ -756,7 +760,7 @@ def isWhaLoc(loc):
 # Function to test if the ha is wha
 def isWha(ha):
     with switch(ha):
-        if Ha(n, ls, sloc, edges, gvs):
+        if Ha(n, ls, sloc, edges, gvs, igvs):
             return reduce(lambda init, x: isWhaLoc(x) and init,
                           ls, True)
         else:
@@ -765,13 +769,13 @@ def isWha(ha):
 
 def preprocess(ha):
     with switch(ha):
-        if Ha(n, ls, sloc, edges, gvs):
+        if Ha(n, ls, sloc, edges, gvs, igvs):
             for i, loc in enumerate(ls):
                 with switch(loc):
                     if Loc(x, odes, clist, y):
                         ls[i] = Loc(x,
                                     map(partial(solve_ode_system, 0), odes),
                                     clist, y)
-            return Ha(n, ls, sloc, edges, gvs)
+            return Ha(n, ls, sloc, edges, gvs, igvs)
         else:
             raise Exception("Not a HA: " + str(ha))
