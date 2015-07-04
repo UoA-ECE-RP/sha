@@ -379,7 +379,7 @@ def makeReactionFunction(fname, locs, edges, snames, events,
     tab = ' '*2
     ret = ['enum states ' + fname +
            '(enum states cstate, enum states pstate) {']
-    ret += [tab*level+'switch (cstate) {']
+    retu = [tab*level+'switch (cstate) {']
 
     # All code for state transition goes in here
     for i, state in enumerate(snames):
@@ -391,8 +391,10 @@ def makeReactionFunction(fname, locs, edges, snames, events,
                                                funcrs[i], ifuncrs[i])
         cks = list(cks) + ['fk']
         if (i == 0):
-            ret += [tab*level+'double '+', '.join(cks)+';']
-            ret += [tab*level+'unsigned char force_init_update;']
+            retz = [tab*level+'static double '+', '.join(cks)+';']
+            retz += [tab*level+'static unsigned char force_init_update;']
+            ret += retz
+            ret += retu
         ret += [tab*level+'case (' + state + '):']
         level += 1
         # If the ode is still begin solved
@@ -532,7 +534,7 @@ def codeGen(ha):
         gv += ['// Global variables in this HA']
         iggvs = [str(name) for name in igvs]
         if iggvs != []:
-            gv += ['double ' + ', '.join(ggvs) + ';']
+            gv += ['double ' + ', '.join(iggvs) + ';']
         # Build the main function
 
         # Append the included headers
