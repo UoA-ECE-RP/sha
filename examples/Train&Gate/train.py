@@ -38,7 +38,7 @@ e2 = Edge('t2', 't3', {S("x(t)"): [Guard(S("y>=15")),
 
 e3 = Edge('t3', 't1', {S("x(t)"): [Guard(S("y>=25")),
                                    Guard(S("y<=25"))]},
-          [Update.Update2(Symbol('y'), Symbol('0'))],
+          [Update.Update1(Symbol('y'), Symbol('0'))],
           [])
 
 
