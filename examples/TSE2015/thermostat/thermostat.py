@@ -33,7 +33,7 @@ e2 = Edge('t2', 't1', {S("x(t)"): [Guard(S("x>=25"))]},
 
 
 thermostat = Ha("thermostat", [t1, t2], t2,
-               [e1, e2], [])
+               [e1, e2], [], [])
 
 # Compile
 shac.compile(thermostat)

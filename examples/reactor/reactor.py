@@ -44,7 +44,7 @@ e4 = Edge('t2', 't0', {S("x(t)"): [Guard(S("x<=510"))]},
 
 
 reactorPlant = Ha("reactor", [t0, t1, t2], t0,
-                  [e1, e2, e3, e4])
+                  [e1, e2, e3, e4], [], [])
 
 
 # Compile

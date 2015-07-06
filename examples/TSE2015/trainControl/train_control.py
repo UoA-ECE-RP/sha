@@ -39,7 +39,7 @@ e2 = Edge('t2', 't1', {S("v(t)"): [Guard(S("v<=20"))]},
 
 
 train_control = Ha("train_control", [t1, t2], t1,
-                   [e1, e2], [])
+                   [e1, e2], [], [])
 
 # Compile
 shac.compile(train_control, ABOF=True)

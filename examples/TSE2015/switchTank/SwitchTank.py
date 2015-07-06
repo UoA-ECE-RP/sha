@@ -40,7 +40,7 @@ e2 = Edge('t2', 't1', {S("x1(t)"): [Guard(S("x1<=0.25"))]},
 
 
 SwitchTank = Ha("SwitchTank", [t1, t2], t1,
-               [e1, e2], [])
+               [e1, e2], [], [])
 
 # Compile
 shac.compile(SwitchTank, ABOF=True)

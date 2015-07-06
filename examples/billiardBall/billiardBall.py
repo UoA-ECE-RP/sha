@@ -92,7 +92,7 @@ e9 = Edge('t2', 't1', {S("x(t)"): [Guard(S("y<=0"))]},
           [Event("valid")])
 
 billardBall = Ha("billardBall", [t0, t1, t2, t3, t4], t0,
-                 [e1, e2, e3, e4, e5, e6, e7, e8, e9])
+                 [e1, e2, e3, e4, e5, e6, e7, e8, e9], [], [])
 
 
 # Compile

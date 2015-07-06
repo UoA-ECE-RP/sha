@@ -85,7 +85,7 @@ e5 = Edge('t4', 't1', {S("x(t)"): [Guard(S("x <= 20")),
           [])
 
 cell3D = Ha("cell3d", [t1, t2, t3, t4], t1,
-            [e1, e2, e3, e4, e5], [])
+            [e1, e2, e3, e4, e5], [], [])
 
 
 # Compile
