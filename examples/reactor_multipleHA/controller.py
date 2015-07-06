@@ -66,7 +66,7 @@ e4 = Edge('t2', 't0', {S("x(t)"): [Guard(S("x<=510"))],
           [])
 
 
-controler = Ha("controler", [t0, t1, t2], t0,
+controller = Ha("controller", [t0, t1, t2], t0,
                [e1, e2, e3, e4],[],[signal_u])
 
 

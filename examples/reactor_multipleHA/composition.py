@@ -1,6 +1,6 @@
-import controler
+import controller
 import plant
 import shac
 
-ha = shac.comp([controler.controler, plant.plant])
+ha = shac.comp([controller.controller, plant.plant])
 shac.compile(ha, COMPOSED=True, ABOF=True)
