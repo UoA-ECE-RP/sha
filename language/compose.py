@@ -68,7 +68,13 @@ def compose(haList):
                 newLocname += '_'+name
                 newLocodeList += odeList
                 newLoccList += cList
-                newLocinvsdict.update(invs)
+                #newLocinvsdict.update(invs)
+                for k in invs.iterkeys():
+                    if k in newLocinvsdict.keys() and invs[k] != newLocinvsdict[k]:
+                        for jk in invs[k]:
+                            newLocinvsdict[k].append(jk)
+                    else:
+                        newLocinvsdict.update(invs)
         newLocNames[ii] = newLocname
         newLoc[ii] = Loc(newLocname, newLocodeList,
                          newLoccList, newLocinvsdict)
@@ -94,8 +100,9 @@ def compose(haList):
                 neventList += eventList
                 # Dictionaries need to be handeled correctly
                 for k in guards.iterkeys():
-                    if k in nguards.keys():
-                            nguards[k].append(*guards[k])
+                    if k in nguards.keys() and guards[k] != nguards[k]:
+                        for jk in guards[k]:
+                            nguards[k].append(jk)
                     else:
                         nguards.update(guards)
         newEdges[ii] = Edge(nl1, nl2, nguards, nupdateList, neventList)
@@ -186,8 +193,10 @@ def compose(haList):
                                                 nupdateList += [uu]
                             neventList += mye
                             for k in myg.iterkeys():
-                                if k in nguards.keys():
-                                    nguards[k].append(*myg[k])
+                                if k in nguards.keys() and myg[k] != nguards[k]:
+                                    for jm in myg[k]:
+                                        nguards[k].append(jm)
+                                    print nguards[k]
                                 else:
                                     nguards.update(myg)
                         else:
@@ -199,8 +208,10 @@ def compose(haList):
                                         nupdateList += oupdateList
                                         neventList += oeventList
                                         for k in oguards.iterkeys():
-                                            if k in nguards.keys():
-                                                nguards[k].append(*oguards[k])
+                                            if k in nguards.keys() and oguards[k] != nguards[k]:
+                                                for jo in oguards:
+                                                    nguards[k].append(jo)
+                                                print nguards[k]
                                             else:
                                                 nguards.update(oguards)
                                     else:

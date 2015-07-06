@@ -165,6 +165,7 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                     i+1) + '(' + ', '.join(
                         [str(arg.name) for arg in ifuncrs[i].arguments]) + ')'
                 stmts += [tab+'C1'+str(var.func)+' = '+rr+';']
+                stmts += [tab+str(var.func)+'_init'+' = '+str(var.func)+';']
                 stmts += ['}']
                 lhs = str(var.func)+'_u'
                 rhs = lname+'_ode_' + str(i+1)
@@ -193,16 +194,15 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                                 if sign(s) > 0:
                                     cb = str(max(mm))
                                     stmts += ['if('+str(var.func)+'_u > ' +
-                                              cb + ' && C1'+str(var.func) +
-                                              ' < ' + cb + ')']
+                                              cb + ' && ' + str(var.func) + '_init'+
+                                              ' <= ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                                 else:
                                     # Decreasing or non-increasing function
                                     cb = str(min(mm))
                                     stmts += ['if('+str(var.func) +
-                                              '_u < ' + cb + ' && C1' +
-                                              str(var.func)+' > ' + cb + ')']
+                                              '_u < ' + cb + ' && ' +str(var.func) + '_init'+' >= ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                             else:
@@ -215,15 +215,15 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                             if mm != []:
                                 cb = str(max(mm))
                                 stmts += ['if(' + str(var.func)+'_u > ' +
-                                          cb + ' && C1'+str(var.func) +
-                                          ' < ' + cb + ')']
+                                          cb + ' && '+str(var.func)+'_init' +
+                                          ' <= ' + cb + ')']
                                 stmts += [tab + str(
                                     var.func) + '_u = ' + cb + ';']
                                 # Decreasing or non-increasing function
                                 cb = str(min(mm))
                                 stmts += ['if(' + str(var.func) +
-                                          '_u < ' + cb + ' && C1' +
-                                          str(var.func)+' > ' + cb + ')']
+                                          '_u < ' + cb + ' && ' +
+                                          str(var.func)+'_init >= ' + cb + ')']
                                 stmts += [tab + str(
                                     var.func) + '_u = ' + cb + ';']
                             else:
@@ -525,6 +525,10 @@ def codeGen(ha):
         uContSet = set([str(item)+"_u" for sl in contVars for item in sl])
         uContDecl = ['double ' + ', '.join(uContSet) + ';']
 
+        # Declare the init continous variables
+        iContSet = set([str(item)+"_init" for sl in contVars for item in sl])
+        iContDecl = ['double ' + ', '.join(iContSet) + ';']
+
         # Global variable declarations
         gv = ['// Global variables from outside this HA']
         ggvs = [str(name) for name in gvs]
@@ -552,6 +556,9 @@ def codeGen(ha):
         # The updated continous variables
         mainCFile += ['//Continous variable update']
         mainCFile += uContDecl
+        # The updated continous variables
+        mainCFile += ['//Continous variable init']
+        mainCFile += iContDecl
         # The constant variable
         mainCFile += ['//The constant variable']
         constSet = {"C1"+x for x in contSet}
