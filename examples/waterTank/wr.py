@@ -49,7 +49,7 @@ e6 = Edge('t4', 't1', {S("x(t)"): [Guard(sympify("True"))]},
           [Event("ON")])
 
 waterTank = Ha("watertankR", [t1, t2, t3, t4], t4,
-               [e1, e2, e3, e4, e5, e6], [])
+               [e1, e2, e3, e4, e5, e6], [], [])
 
 # Compile
 shac.compile(waterTank)
