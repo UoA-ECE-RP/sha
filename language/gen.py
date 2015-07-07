@@ -165,7 +165,6 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                     i+1) + '(' + ', '.join(
                         [str(arg.name) for arg in ifuncrs[i].arguments]) + ')'
                 stmts += [tab+'C1'+str(var.func)+' = '+rr+';']
-                stmts += [tab+str(var.func)+'_init'+' = '+str(var.func)+';']
                 stmts += ['}']
                 lhs = str(var.func)+'_u'
                 rhs = lname+'_ode_' + str(i+1)
