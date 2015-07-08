@@ -5,21 +5,22 @@
 #include<assert.h>
 
 /* The files are in csv format */
-#define OFILE "train.csv"
+#define OFILE "train_gate.csv"
 
 #define TRUE 1
 #define FALSE 0
 
-extern double y;
-extern int signal_u;
-int signal_pre=0;
+extern double x,y;
+extern double signal_u;
+double signal_pre=0;
+
+
 
 /* The step size */
 double d = 0.2;
 
 /* The events to print */
 int DOWN=0, UP=0;
-
 
 /* The tick counter */
 /* It is static to hide it inside this file */
@@ -28,10 +29,9 @@ static size_t tick = 0;
 /* The output file pointer */
 FILE *fo = NULL;
 
-void setEvent(int signal_u){
-
+void readInput() {
   if (signal_u != signal_pre){
-    if (signal_u==0){
+    if (signal_u==1){
       DOWN=1;
       UP=0;
     }
@@ -44,12 +44,8 @@ void setEvent(int signal_u){
   else {
     DOWN=0;
     UP=0;}
-
 }
 
-void readInput() {
-  
-}
 
 /* Write output x to file */
 void writeOutput(){
@@ -63,8 +59,7 @@ void writeOutput(){
     ++count;
   }
 
-  setEvent(signal_u);
-  fprintf(fo, "%ld,%f,%s,%d,%s,%d\n", ++tick, y, "DOWN", DOWN, "UP", UP);
+  fprintf(fo, "%ld,%s,%f,%s,%f,%s,%d,%s,%d,%s,%f\n", ++tick, "y", y, "x", x, "UP", UP, "DOWN", DOWN, "signal", signal_u);
 
   if (tick==5000) {
     printf("Finished");
