@@ -1,0 +1,4 @@
+sleep(1);
+me->timer=1;
+
+

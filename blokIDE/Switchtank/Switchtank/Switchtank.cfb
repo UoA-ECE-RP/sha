@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<compositeFunctionBlockModel Id="6ddf2487-6931-408e-ad0a-2d356cca6601" name="Switchtank" organization="PC_THEO" date="2015-07-10" author="Théo" modelType="Composite">
+  <functionBlockInterface>
+    <cFBModelHasFBInterface Id="527ec944-e136-4c51-9198-80712c384e2d">
+      <functionBlockInterface Id="2898901f-56bc-420f-bce8-3aad85aeb5a1" name="Switchtank" x="1400" y="481.25" modelType="Composite" />
+    </cFBModelHasFBInterface>
+  </functionBlockInterface>
+  <functionBlockReferences>
+    <cFBModelHasFBReferences Id="6a986ea0-3cc1-447d-9e98-5fcfe05dfb91">
+      <functionBlockReference Id="61d84348-234f-4c44-a841-9f13041a3823" name="Controller" x="1750" y="568.75" creationMode="Resource" referencedFile="Controller.fb">
+        <events>
+          <functionBlockHasEvents Id="7c4c2d6b-7913-4856-85af-ea69f939a05e">
+            <eventRef Id="ba49d814-f79a-4844-9409-941129c356fd" name="clock" scope="Input" referencedID="3de5384c-678e-466b-9683-fd7fd996b036" />
+          </functionBlockHasEvents>
+          <functionBlockHasEvents Id="f2664779-28a5-4f79-9723-5f9308e97957">
+            <eventRef Id="3c4e88ff-59f5-4cc6-8026-a54dcdf4c793" name="update" scope="Output" referencedID="d7997385-dd39-4072-b00b-0e70cff8e865" />
+          </functionBlockHasEvents>
+        </events>
+        <variables>
+          <functionBlockHasVariables Id="600efa53-f738-40b8-a7b2-7e116cda8703">
+            <variableRef Id="6bd42a9b-1085-4f16-bcc2-cd48d865320a" name="x1" scope="Input" type="REAL" referencedID="54038a38-889f-406d-99bf-34c2dd1f6a4b" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="9c9d12fb-c5f0-46d8-9a65-0981501a10b5">
+            <variableRef Id="5546d938-b1ea-4583-a216-36896caecb96" name="x2" scope="Input" type="REAL" referencedID="8a654a59-613d-4e33-893b-8b8efdb909c3" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="a6c34fb3-ec28-4297-83c8-1892a380ef34">
+            <variableRef Id="382cb417-0bbe-4489-bb52-2054920cf6e9" name="fill1" scope="Output" type="INT" referencedID="4e6d8038-8d8b-4331-9371-7fe39a7ca5aa" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="19af6954-b281-4969-91e7-909de83864fd">
+            <variableRef Id="d7eaa709-4b49-497d-9aee-967c3d2b49ef" name="fill2" scope="Output" type="INT" referencedID="960f6ac9-37cf-4df1-9a86-6006367529fb" />
+          </functionBlockHasVariables>
+        </variables>
+        <inputEventPorts>
+          <functionBlockHasInputEventPorts Id="5c2db2fc-bfeb-401e-964e-7bcca318fcc8">
+            <inputEventPort Id="9c558312-7de0-441a-9f87-359c0871358f">
+              <event>
+                <inputEventPortReferencesEvent Id="1aacc23f-3043-45b3-bcb3-1c4f8b4e2486">
+                  <eventRefMoniker name="/Switchtank/Controller/clock" />
+                </inputEventPortReferencesEvent>
+              </event>
+            </inputEventPort>
+          </functionBlockHasInputEventPorts>
+        </inputEventPorts>
+        <outputEventPorts>
+          <functionBlockHasOutputEventPorts Id="f74d0f57-a333-4e96-a917-800c60b7a7ed">
+            <outputEventPort Id="311190a9-e8cf-4c4b-83b9-7176dbb58fe8">
+              <wireTargetPorts>
+                <wireConnection Id="db2e7321-a850-41fb-80ec-11216522795c" unitDelayed="false">
+                  <inputEventPortMoniker Id="aeb91724-8c0b-4d87-a70e-001333d229e6" />
+                </wireConnection>
+              </wireTargetPorts>
+              <event>
+                <outputEventPortReferencesEvent Id="e8879493-cb0b-4b89-9552-b3d71443d0da">
+                  <eventRefMoniker name="/Switchtank/Controller/update" />
+                </outputEventPortReferencesEvent>
+              </event>
+            </outputEventPort>
+          </functionBlockHasOutputEventPorts>
+        </outputEventPorts>
+        <inputVariablePorts>
+          <functionBlockHasInputVariablePorts Id="6958276a-d6c7-4a61-871d-2b04f01499a6">
+            <inputVariablePort Id="b537b220-388b-49fa-b433-b567b8720d2d">
+              <variable>
+                <inputVariablePortReferencesVariable Id="f54fdaa1-ccad-405e-9656-73d0c269d3da">
+                  <variableRefMoniker name="/Switchtank/Controller/x1" />
+                </inputVariablePortReferencesVariable>
+              </variable>
+            </inputVariablePort>
+          </functionBlockHasInputVariablePorts>
+          <functionBlockHasInputVariablePorts Id="0911dbd5-1f86-489f-b884-4efed96ad9a8">
+            <inputVariablePort Id="36109373-8415-4f46-9055-0888daf732f7">
+              <variable>
+                <inputVariablePortReferencesVariable Id="796612a4-9d25-4b4a-b141-6d07b7f3be57">
+                  <variableRefMoniker name="/Switchtank/Controller/x2" />
+                </inputVariablePortReferencesVariable>
+              </variable>
+            </inputVariablePort>
+          </functionBlockHasInputVariablePorts>
+        </inputVariablePorts>
+        <outputVariablePorts>
+          <functionBlockHasOutputVariablePorts Id="24871db1-2c93-4697-95aa-5d0a7a2bc91a">
+            <outputVariablePort Id="6853908b-5fc1-4e27-9cab-2e5b9d883478">
+              <wireTargetPorts>
+                <wireConnection Id="a65866ce-86a0-45db-ae97-366732c4d356" unitDelayed="false">
+                  <inputVariablePortMoniker Id="f7de1197-f322-4741-b570-4fb7bea26e7e" />
+                </wireConnection>
+              </wireTargetPorts>
+              <variable>
+                <outputVariablePortReferencesVariable Id="3e8c37ab-e767-4c86-b624-6506f0de7bf6">
+                  <variableRefMoniker name="/Switchtank/Controller/fill1" />
+                </outputVariablePortReferencesVariable>
+              </variable>
+            </outputVariablePort>
+          </functionBlockHasOutputVariablePorts>
+          <functionBlockHasOutputVariablePorts Id="f773f8ba-25a4-4ee5-b28c-5625ffa2be04">
+            <outputVariablePort Id="058f7901-9180-4f4e-8318-96ee61ac3b61">
+              <wireTargetPorts>
+                <wireConnection Id="37bf74ed-9666-477a-abb1-c4f7599ce722" unitDelayed="false">
+                  <inputVariablePortMoniker Id="2e263e07-bc38-40d7-a842-9818711fe3b8" />
+                </wireConnection>
+              </wireTargetPorts>
+              <variable>
+                <outputVariablePortReferencesVariable Id="3b9945bb-152c-493a-b0c1-909cdec760de">
+                  <variableRefMoniker name="/Switchtank/Controller/fill2" />
+                </outputVariablePortReferencesVariable>
+              </variable>
+            </outputVariablePort>
+          </functionBlockHasOutputVariablePorts>
+        </outputVariablePorts>
+      </functionBlockReference>
+    </cFBModelHasFBReferences>
+    <cFBModelHasFBReferences Id="435c6f65-9478-4196-81f7-f1be7bd10097">
+      <functionBlockReference Id="f65317d5-5cf1-46d7-a9eb-371ecace12d5" name="Plant" x="568.75" y="568.75" creationMode="Resource" referencedFile="Plant.fb">
+        <events>
+          <functionBlockHasEvents Id="7c2b80f5-a0f9-45f3-8fe2-bad41d7bbd7e">
+            <eventRef Id="cc54970c-8f32-4d22-8430-c67d06d980e8" name="clock" scope="Input" referencedID="db1f7c08-d756-459d-b7d1-cf01ebf7b758" />
+          </functionBlockHasEvents>
+          <functionBlockHasEvents Id="554ee96b-dd1c-4084-8050-c687582921c2">
+            <eventRef Id="3cb70a12-3d1d-4469-802b-95c710ca30f5" name="update" scope="Output" referencedID="6da6054c-29ac-4afb-b0cc-01503de23b34" />
+          </functionBlockHasEvents>
+        </events>
+        <variables>
+          <functionBlockHasVariables Id="40c5fa6e-3a7f-4951-bab0-d69dcc52359c">
+            <variableRef Id="e95c72b5-a31a-4d52-9f8b-63c4914effd9" name="fill1" scope="Input" type="INT" referencedID="ec228a60-bcec-470d-9d94-8badded82bab" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="f38e3cd2-8591-4d0e-86ed-05a87fd06b85">
+            <variableRef Id="66f3f8b3-8bb5-4ac6-a83f-d5abbb8f6de8" name="fill2" scope="Input" type="INT" referencedID="f8ec9a39-ac42-487b-b411-9c4f87743917" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="1a442685-5c9a-4ec6-b6c9-fd921b65063a">
+            <variableRef Id="5ba24548-4960-42bc-90b4-1bfe754a72d0" name="x1" scope="Output" type="REAL" referencedID="4b126692-91ba-47ad-bcf3-c0e7a9d7ceed" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="da365c98-bee4-47c1-bce1-914bf3098bd8">
+            <variableRef Id="20d201fe-1068-4fd4-bc0f-434080eacf2d" name="x2" scope="Output" type="REAL" referencedID="60d7a0ee-58a0-444b-ba39-7f6b88d38c7d" />
+          </functionBlockHasVariables>
+        </variables>
+        <inputEventPorts>
+          <functionBlockHasInputEventPorts Id="84b1ea4d-13c3-4f5a-bbde-a16c3a779478">
+            <inputEventPort Id="aeb91724-8c0b-4d87-a70e-001333d229e6">
+              <event>
+                <inputEventPortReferencesEvent Id="e213b5a5-cee3-4437-970c-8eeb92723fe4">
+                  <eventRefMoniker name="/Switchtank/Plant/clock" />
+                </inputEventPortReferencesEvent>
+              </event>
+            </inputEventPort>
+          </functionBlockHasInputEventPorts>
+        </inputEventPorts>
+        <outputEventPorts>
+          <functionBlockHasOutputEventPorts Id="d82dc70f-29c0-4844-955f-04698fb78e32">
+            <outputEventPort Id="d4740c00-2c2a-444f-99d8-e357ac1a4e30">
+              <wireTargetPorts>
+                <wireConnection Id="4342f831-6d65-40d5-a373-41e600337537" unitDelayed="false">
+                  <inputEventPortMoniker Id="9c558312-7de0-441a-9f87-359c0871358f" />
+                </wireConnection>
+              </wireTargetPorts>
+              <event>
+                <outputEventPortReferencesEvent Id="26616fdc-f361-430e-9e24-0133463835b7">
+                  <eventRefMoniker name="/Switchtank/Plant/update" />
+                </outputEventPortReferencesEvent>
+              </event>
+            </outputEventPort>
+          </functionBlockHasOutputEventPorts>
+        </outputEventPorts>
+        <inputVariablePorts>
+          <functionBlockHasInputVariablePorts Id="a371e6ed-8fcd-4fb8-829b-79ad22166e22">
+            <inputVariablePort Id="f7de1197-f322-4741-b570-4fb7bea26e7e">
+              <variable>
+                <inputVariablePortReferencesVariable Id="b161979a-aadc-42af-8bc2-61428c73855a">
+                  <variableRefMoniker name="/Switchtank/Plant/fill1" />
+                </inputVariablePortReferencesVariable>
+              </variable>
+            </inputVariablePort>
+          </functionBlockHasInputVariablePorts>
+          <functionBlockHasInputVariablePorts Id="7a93004c-3cd2-4463-9eb2-33c82ef389f1">
+            <inputVariablePort Id="2e263e07-bc38-40d7-a842-9818711fe3b8">
+              <variable>
+                <inputVariablePortReferencesVariable Id="891d303f-032e-4a2e-bfe9-4ce2d2722cc7">
+                  <variableRefMoniker name="/Switchtank/Plant/fill2" />
+                </inputVariablePortReferencesVariable>
+              </variable>
+            </inputVariablePort>
+          </functionBlockHasInputVariablePorts>
+        </inputVariablePorts>
+        <outputVariablePorts>
+          <functionBlockHasOutputVariablePorts Id="16278c56-5acc-4b45-a278-849e91ef0bf7">
+            <outputVariablePort Id="9babfd15-13b5-483e-a808-2fe9817ae2a8">
+              <wireTargetPorts>
+                <wireConnection Id="c247f86a-f691-4abf-9e5d-c4e01ca15981" unitDelayed="false">
+                  <inputVariablePortMoniker Id="b537b220-388b-49fa-b433-b567b8720d2d" />
+                </wireConnection>
+              </wireTargetPorts>
+              <variable>
+                <outputVariablePortReferencesVariable Id="22f8d701-4d69-472f-be66-48dc39af796a">
+                  <variableRefMoniker name="/Switchtank/Plant/x1" />
+                </outputVariablePortReferencesVariable>
+              </variable>
+            </outputVariablePort>
+          </functionBlockHasOutputVariablePorts>
+          <functionBlockHasOutputVariablePorts Id="2f333606-3e7a-4683-9388-fefa50993f3e">
+            <outputVariablePort Id="7b095af1-52c0-4450-a423-6195f38f7206">
+              <wireTargetPorts>
+                <wireConnection Id="e60955c0-afd0-444d-a9a3-ccf75356e2cb" unitDelayed="false">
+                  <inputVariablePortMoniker Id="36109373-8415-4f46-9055-0888daf732f7" />
+                </wireConnection>
+              </wireTargetPorts>
+              <variable>
+                <outputVariablePortReferencesVariable Id="3ffec83a-ece3-44d3-aa1a-ac20aee82f13">
+                  <variableRefMoniker name="/Switchtank/Plant/x2" />
+                </outputVariablePortReferencesVariable>
+              </variable>
+            </outputVariablePort>
+          </functionBlockHasOutputVariablePorts>
+        </outputVariablePorts>
+      </functionBlockReference>
+    </cFBModelHasFBReferences>
+  </functionBlockReferences>
+</compositeFunctionBlockModel>

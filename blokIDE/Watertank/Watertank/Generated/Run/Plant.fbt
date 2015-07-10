@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType Name="Plant" Comment="" >
+<Identification Standard="61499-2" />
+<VersionInfo Organization="PC_THEO" Version="0,1" Author="Th?o" Date="2015-00-07" />
+<CompilerInfo header="&quot;/cygdrive/C/Users/Theo/Documents/Visual Studio 2013/Projects/Test/BlokIDEProject1/global.h&quot;;" classdef="">
+</CompilerInfo>
+<InterfaceList>
+<EventInputs>
+  <Event Name="clock" Comment="">
+    <With Var="ON" />
+    <With Var="OFF" />
+  </Event>
+</EventInputs>
+<EventOutputs>
+  <Event Name="update" Comment="">
+    <With Var="x" />
+  </Event>
+</EventOutputs>
+<InputVars>
+  <VarDeclaration Name="ON" Type="INT" Comment="" />
+  <VarDeclaration Name="OFF" Type="INT" Comment="" />
+</InputVars>
+<OutputVars>
+  <VarDeclaration Name="x" Type="REAL" Comment="" />
+</OutputVars>
+</InterfaceList>
+<BasicFB><ECC>
+  <ECState Name="Init" Comment="" x="612,5" y="262,5">
+    <ECAction Algorithm="Init" Output="update" />
+  </ECState>
+  <ECState Name="Start" Comment="" x="568,75" y="743,75">
+    <ECAction Algorithm="generated_c_code" Output="update" />
+  </ECState>
+  <ECTransition Source="Start" Destination="Start" Condition="true" x="612,5" y="1050" />
+  <ECTransition Source="Init" Destination="Start" Condition="true" x="568,75" y="460,125" />
+</ECC><Algorithm Name="generated_c_code" Comment="">
+  <Other Language="C" Prototype="" Text="&#xD;&#xA;&#xD;&#xA;#define True 1&#xD;&#xA;&#xD;&#xA;#define False 0&#xD;&#xA;&#xD;&#xA;// Global variables from outside this HA&#xD;&#xA;&#xD;&#xA;// Global variables in this HA&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;//Continous variables&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;double t1_ode_1(double C1x, double d, double k) {&#xD;&#xA;   double t1_ode_1_result;&#xD;&#xA;   t1_ode_1_result = C1x*exp(-0.075*d*k) + 150.0;&#xD;&#xA;   return t1_ode_1_result;&#xD;&#xA;}&#xD;&#xA;double t1_init_1(double x_u) {&#xD;&#xA;   double t1_init_1_result;&#xD;&#xA;   t1_init_1_result = x_u - 150.0;&#xD;&#xA;   return t1_init_1_result;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;double t2_ode_1(double C1x) {&#xD;&#xA;   double t2_ode_1_result;&#xD;&#xA;   t2_ode_1_result = C1x;&#xD;&#xA;   return t2_ode_1_result;&#xD;&#xA;}&#xD;&#xA;double t2_init_1(double x_u) {&#xD;&#xA;   double t2_init_1_result;&#xD;&#xA;   t2_init_1_result = x_u;&#xD;&#xA;   return t2_init_1_result;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;double t3_ode_1(double C1x, double d, double k) {&#xD;&#xA;   double t3_ode_1_result;&#xD;&#xA;   t3_ode_1_result = C1x*exp(-0.075*d*k);&#xD;&#xA;   return t3_ode_1_result;&#xD;&#xA;}&#xD;&#xA;double t3_init_1(double x_u) {&#xD;&#xA;   double t3_init_1_result;&#xD;&#xA;   t3_init_1_result = x_u;&#xD;&#xA;   return t3_init_1_result;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;double t4_ode_1(double C1x) {&#xD;&#xA;   double t4_ode_1_result;&#xD;&#xA;   t4_ode_1_result = C1x;&#xD;&#xA;   return t4_ode_1_result;&#xD;&#xA;}&#xD;&#xA;double t4_init_1(double x_u) {&#xD;&#xA;   double t4_init_1_result;&#xD;&#xA;   t4_init_1_result = x_u;&#xD;&#xA;   return t4_init_1_result;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;enum states watertank(enum states cstate, enum states pstate) {&#xD;&#xA;  static double fk;&#xD;&#xA;  static unsigned char force_init_update;&#xD;&#xA;  switch (cstate) {&#xD;&#xA;  case (t1):&#xD;&#xA;    if(me-&gt;x &gt;= 20 &amp;&amp; me-&gt;x &lt;= 100 &amp;&amp; !me-&gt;ON &amp;&amp; !me-&gt;OFF){&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x = t1_init_1(me-&gt;x);&#xD;&#xA;        x_init = me-&gt;x;&#xD;&#xA;      }&#xD;&#xA;      x_u = t1_ode_1(C1x, d, k);&#xD;&#xA;      if(x_u &gt; 100 &amp;&amp; x_init &lt;= 100)&#xD;&#xA;        x_u = 100;&#xD;&#xA;      ++k;&#xD;&#xA;      cstate = t1;&#xD;&#xA;      force_init_update = False;&#xD;&#xA;    }&#xD;&#xA;    else if(!me-&gt;ON &amp;&amp; !me-&gt;OFF &amp;&amp; me-&gt;x &gt;= 100 &amp;&amp; me-&gt;x &lt;= 100) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t2;&#xD;&#xA;      x_u = me-&gt;x;&#xD;&#xA;    }&#xD;&#xA;    else if(me-&gt;OFF &amp;&amp; !me-&gt;ON &amp;&amp; True) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t3;&#xD;&#xA;      x_u = me-&gt;x;&#xD;&#xA;    }&#xD;&#xA;    else {&#xD;&#xA;      fprintf(stderr,&quot;Unreachable state!&quot;);&#xD;&#xA;      exit(1);&#xD;&#xA;    }&#xD;&#xA;    break;&#xD;&#xA;  case (t2):&#xD;&#xA;    if(me-&gt;x &gt;= 100 &amp;&amp; me-&gt;x &lt;= 100 &amp;&amp; !me-&gt;ON &amp;&amp; !me-&gt;OFF){&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x = t2_init_1(me-&gt;x);&#xD;&#xA;        x_init = me-&gt;x;&#xD;&#xA;      }&#xD;&#xA;      x_u = t2_ode_1(C1x);&#xD;&#xA;      ++k;&#xD;&#xA;      cstate = t2;&#xD;&#xA;      force_init_update = False;&#xD;&#xA;    }&#xD;&#xA;    else if(me-&gt;OFF &amp;&amp; !me-&gt;ON &amp;&amp; True) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t3;&#xD;&#xA;      x_u = me-&gt;x;&#xD;&#xA;    }&#xD;&#xA;    else {&#xD;&#xA;      fprintf(stderr,&quot;Unreachable state!&quot;);&#xD;&#xA;      exit(1);&#xD;&#xA;    }&#xD;&#xA;    break;&#xD;&#xA;  case (t3):&#xD;&#xA;    if(me-&gt;x &gt;= 20 &amp;&amp; me-&gt;x &lt;= 100 &amp;&amp; !me-&gt;ON &amp;&amp; !me-&gt;OFF){&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x = t3_init_1(me-&gt;x);&#xD;&#xA;        x_init = me-&gt;x;&#xD;&#xA;      }&#xD;&#xA;      x_u = t3_ode_1(C1x, d, k);&#xD;&#xA;      if(x_u &lt; 20 &amp;&amp; x_init &gt;= 20)&#xD;&#xA;        x_u = 20;&#xD;&#xA;      ++k;&#xD;&#xA;      cstate = t3;&#xD;&#xA;      force_init_update = False;&#xD;&#xA;    }&#xD;&#xA;    else if(me-&gt;ON &amp;&amp; !me-&gt;OFF &amp;&amp; True) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t1;&#xD;&#xA;      x_u = me-&gt;x;&#xD;&#xA;    }&#xD;&#xA;    else if(!me-&gt;ON &amp;&amp; !me-&gt;OFF &amp;&amp; me-&gt;x &gt;= 20 &amp;&amp; me-&gt;x &lt;= 20) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t4;&#xD;&#xA;      x_u = me-&gt;x;&#xD;&#xA;    }&#xD;&#xA;    else {&#xD;&#xA;      fprintf(stderr,&quot;Unreachable state!&quot;);&#xD;&#xA;      exit(1);&#xD;&#xA;    }&#xD;&#xA;    break;&#xD;&#xA;  case (t4):&#xD;&#xA;    if(me-&gt;x &gt;= 20 &amp;&amp; me-&gt;x &lt;= 20 &amp;&amp; !me-&gt;ON &amp;&amp; !me-&gt;OFF){&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x = t4_init_1(me-&gt;x);&#xD;&#xA;        x_init = me-&gt;x;&#xD;&#xA;      }&#xD;&#xA;      x_u = t4_ode_1(C1x);&#xD;&#xA;      ++k;&#xD;&#xA;      cstate = t4;&#xD;&#xA;      force_init_update = False;&#xD;&#xA;    }&#xD;&#xA;    else if(me-&gt;ON &amp;&amp; !me-&gt;OFF &amp;&amp; True) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t1;&#xD;&#xA;      x_u = me-&gt;x;&#xD;&#xA;    }&#xD;&#xA;    else {&#xD;&#xA;      fprintf(stderr,&quot;Unreachable state!&quot;);&#xD;&#xA;      exit(1);&#xD;&#xA;    }&#xD;&#xA;    break;&#xD;&#xA;  default: exit(1);&#xD;&#xA;  }&#xD;&#xA;  return cstate;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;  printf(&quot;init&quot;);&#xD;&#xA;&#xD;&#xA;  //while(True) {&#xD;&#xA;    enum states rstate = watertank(cstate, pstate);&#xD;&#xA;    pstate = cstate;&#xD;&#xA;    cstate = rstate;&#xD;&#xA;    me-&gt;x = x_u;&#xD;&#xA;    printf(&quot;Temperature : %f\n&quot;, me-&gt;x);&#xD;&#xA;  //}&#xD;&#xA;  " />
+</Algorithm>
+<Algorithm Name="Init" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;ON=0; me-&gt;OFF=0;&#xD;&#xA;me-&gt;x=20;" />
+</Algorithm></BasicFB>
+</FBType>

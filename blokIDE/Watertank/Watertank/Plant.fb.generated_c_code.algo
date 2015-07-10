@@ -1,0 +1,184 @@
+
+
+#define True 1
+
+#define False 0
+
+// Global variables from outside this HA
+
+// Global variables in this HA
+
+
+//Continous variables
+
+
+
+
+
+
+double t1_ode_1(double C1x, double d, double k) {
+   double t1_ode_1_result;
+   t1_ode_1_result = C1x*exp(-0.075*d*k) + 150.0;
+   return t1_ode_1_result;
+}
+double t1_init_1(double x_u) {
+   double t1_init_1_result;
+   t1_init_1_result = x_u - 150.0;
+   return t1_init_1_result;
+}
+
+
+
+double t2_ode_1(double C1x) {
+   double t2_ode_1_result;
+   t2_ode_1_result = C1x;
+   return t2_ode_1_result;
+}
+double t2_init_1(double x_u) {
+   double t2_init_1_result;
+   t2_init_1_result = x_u;
+   return t2_init_1_result;
+}
+
+
+double t3_ode_1(double C1x, double d, double k) {
+   double t3_ode_1_result;
+   t3_ode_1_result = C1x*exp(-0.075*d*k);
+   return t3_ode_1_result;
+}
+double t3_init_1(double x_u) {
+   double t3_init_1_result;
+   t3_init_1_result = x_u;
+   return t3_init_1_result;
+}
+
+
+double t4_ode_1(double C1x) {
+   double t4_ode_1_result;
+   t4_ode_1_result = C1x;
+   return t4_ode_1_result;
+}
+double t4_init_1(double x_u) {
+   double t4_init_1_result;
+   t4_init_1_result = x_u;
+   return t4_init_1_result;
+}
+
+
+enum states watertank(enum states cstate, enum states pstate) {
+  static double fk;
+  static unsigned char force_init_update;
+  switch (cstate) {
+  case (t1):
+    if(me->x >= 20 && me->x <= 100 && !me->ON && !me->OFF){
+      if ((pstate != cstate) || force_init_update){
+        C1x = t1_init_1(me->x);
+        x_init = me->x;
+      }
+      x_u = t1_ode_1(C1x, d, k);
+      if(x_u > 100 && x_init <= 100)
+        x_u = 100;
+      ++k;
+      cstate = t1;
+      force_init_update = False;
+    }
+    else if(!me->ON && !me->OFF && me->x >= 100 && me->x <= 100) {
+      k=1;
+      cstate=t2;
+      x_u = me->x;
+    }
+    else if(me->OFF && !me->ON && True) {
+      k=1;
+      cstate=t3;
+      x_u = me->x;
+    }
+    else {
+      fprintf(stderr,"Unreachable state!");
+      exit(1);
+    }
+    break;
+  case (t2):
+    if(me->x >= 100 && me->x <= 100 && !me->ON && !me->OFF){
+      if ((pstate != cstate) || force_init_update){
+        C1x = t2_init_1(me->x);
+        x_init = me->x;
+      }
+      x_u = t2_ode_1(C1x);
+      ++k;
+      cstate = t2;
+      force_init_update = False;
+    }
+    else if(me->OFF && !me->ON && True) {
+      k=1;
+      cstate=t3;
+      x_u = me->x;
+    }
+    else {
+      fprintf(stderr,"Unreachable state!");
+      exit(1);
+    }
+    break;
+  case (t3):
+    if(me->x >= 20 && me->x <= 100 && !me->ON && !me->OFF){
+      if ((pstate != cstate) || force_init_update){
+        C1x = t3_init_1(me->x);
+        x_init = me->x;
+      }
+      x_u = t3_ode_1(C1x, d, k);
+      if(x_u < 20 && x_init >= 20)
+        x_u = 20;
+      ++k;
+      cstate = t3;
+      force_init_update = False;
+    }
+    else if(me->ON && !me->OFF && True) {
+      k=1;
+      cstate=t1;
+      x_u = me->x;
+    }
+    else if(!me->ON && !me->OFF && me->x >= 20 && me->x <= 20) {
+      k=1;
+      cstate=t4;
+      x_u = me->x;
+    }
+    else {
+      fprintf(stderr,"Unreachable state!");
+      exit(1);
+    }
+    break;
+  case (t4):
+    if(me->x >= 20 && me->x <= 20 && !me->ON && !me->OFF){
+      if ((pstate != cstate) || force_init_update){
+        C1x = t4_init_1(me->x);
+        x_init = me->x;
+      }
+      x_u = t4_ode_1(C1x);
+      ++k;
+      cstate = t4;
+      force_init_update = False;
+    }
+    else if(me->ON && !me->OFF && True) {
+      k=1;
+      cstate=t1;
+      x_u = me->x;
+    }
+    else {
+      fprintf(stderr,"Unreachable state!");
+      exit(1);
+    }
+    break;
+  default: exit(1);
+  }
+  return cstate;
+}
+
+  printf("init");
+
+  //while(True) {
+    enum states rstate = watertank(cstate, pstate);
+    pstate = cstate;
+    cstate = rstate;
+    me->x = x_u;
+    printf("Temperature : %f\n", me->x);
+  //}
+  

@@ -1,0 +1,10 @@
+List of the examples working in function blocks (BlokIDE)
+To see a detailed description of these systems, please see benchmarks_description.docx
+The code generation on blokIDE doesn't work properly for header inclusion, need to manually correct the path for global.h
+To get the output, I manually made the c code writing in a csv file
+
+
+The following examples are working (10/07/2015):
+
+- Watertank
+- Switchtank

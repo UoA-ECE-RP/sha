@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<functionBlockModel Id="dac7b8db-1466-4675-b1a4-d898e63770d9" name="clock_gen" organization="PC_THEO" date="2015-07-09" author="Théo">
+  <states>
+    <functionBlockModelHasStates Id="a450b993-4f16-4168-bcf5-449649f8a28e">
+      <state Id="5f913566-1ee2-4c3e-a92b-57b7edab2260" name="Start" x="787.5" y="175" isInitial="true">
+        <fromTransitionNodes>
+          <stateConnectsToTransitionNodes Id="177db9f9-03b0-4564-b3d0-9d75924c7c89">
+            <transitionNodeMoniker Id="e0add707-7745-4371-9c34-570b9345bd14" />
+          </stateConnectsToTransitionNodes>
+        </fromTransitionNodes>
+      </state>
+    </functionBlockModelHasStates>
+    <functionBlockModelHasStates Id="044607ec-1f96-43af-9102-ab7c236da69f">
+      <state Id="6e6a2bcd-c2a0-4844-b247-3b1cefbea4a7" name="State1" x="787.5" y="700" isInitial="false">
+        <actionSet>
+          <actionLink Id="cc583f91-d198-4cd0-9ed1-06fa2d628998">
+            <actionSetMoniker Id="9508ad77-582f-462d-8332-309885470740" />
+          </actionLink>
+        </actionSet>
+        <fromTransitionNodes>
+          <stateConnectsToTransitionNodes Id="c99f4795-ff84-4193-a753-576e45f3a5eb">
+            <transitionNodeMoniker Id="e05de42f-a639-4ecf-bcb0-9d5d2859e813" />
+          </stateConnectsToTransitionNodes>
+        </fromTransitionNodes>
+      </state>
+    </functionBlockModelHasStates>
+  </states>
+  <actionSets>
+    <functionBlockModelHasActionSets Id="1a72296a-26f6-4e43-b6b2-097aaa72b1ab">
+      <actionSet Id="9508ad77-582f-462d-8332-309885470740" x="1137.3518845438955" y="700">
+        <actionItems>
+          <actionSetHasActionItems Id="1ca2f2b7-936e-4c0c-b0d3-ba0e15a7fddb">
+            <actionEvent Id="c3e57402-c8ee-4b5f-b3a0-68bb5e61ef16">
+              <event>
+                <actionEventReferencesEvent Id="1f222058-04a1-4390-9466-a9d50d38e6ca">
+                  <eventMoniker name="/clock_gen/clock_gen/clock" />
+                </actionEventReferencesEvent>
+              </event>
+            </actionEvent>
+          </actionSetHasActionItems>
+        </actionItems>
+      </actionSet>
+    </functionBlockModelHasActionSets>
+  </actionSets>
+  <functionBlockInterface>
+    <functionBlockModelHasFunctionBlockInterface Id="ffb8dda4-9240-41b2-a91c-7556714bca53">
+      <functionBlockInterface Id="1f5ea56b-34fe-436c-9796-f9573d0caf10" name="clock_gen" x="1400" y="481.25">
+        <events>
+          <functionBlockHasEvents Id="8868b3ef-b0fd-4076-9ec4-d52338df9cda">
+            <event Id="8a5b28fa-9f66-4709-ac72-0d574978ae9f" name="clock" scope="Output" />
+          </functionBlockHasEvents>
+        </events>
+        <outputEventPorts>
+          <functionBlockHasOutputEventPorts Id="d3b4ddbb-6ce2-4b11-92bb-69b410d067c9">
+            <outputEventPort Id="c27fe0cb-b054-4400-8803-d9aa4821f116">
+              <event>
+                <outputEventPortReferencesEvent Id="fe01e5e4-d97b-487c-82ba-dd192bf1031e">
+                  <eventMoniker name="/clock_gen/clock_gen/clock" />
+                </outputEventPortReferencesEvent>
+              </event>
+            </outputEventPort>
+          </functionBlockHasOutputEventPorts>
+        </outputEventPorts>
+      </functionBlockInterface>
+    </functionBlockModelHasFunctionBlockInterface>
+  </functionBlockInterface>
+  <transitionNodes>
+    <functionBlockModelHasTransitionNodes Id="401c8f2f-6e2e-44c3-a2da-49300bb804e9">
+      <transitionNode Id="e0add707-7745-4371-9c34-570b9345bd14" x="787.5" y="433.50000000000006">
+        <targetState>
+          <transitionNodeConnectsToStates Id="76c782f2-1cd0-4bbf-a472-746670d8a9d6">
+            <stateMoniker name="/clock_gen/State1" />
+          </transitionNodeConnectsToStates>
+        </targetState>
+      </transitionNode>
+    </functionBlockModelHasTransitionNodes>
+    <functionBlockModelHasTransitionNodes Id="82156213-c776-4ee3-b77b-b8e45f09fa12">
+      <transitionNode Id="e05de42f-a639-4ecf-bcb0-9d5d2859e813" x="787.5" y="486.49999999999994">
+        <targetState>
+          <transitionNodeConnectsToStates Id="048df2dc-e1f4-45ed-84f3-3a7fab702105">
+            <stateMoniker name="/clock_gen/Start" />
+          </transitionNodeConnectsToStates>
+        </targetState>
+      </transitionNode>
+    </functionBlockModelHasTransitionNodes>
+  </transitionNodes>
+</functionBlockModel>

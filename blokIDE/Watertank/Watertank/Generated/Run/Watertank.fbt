@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType Name="Watertank" Comment="" >
+<Identification Standard="61499-2" />
+<VersionInfo Organization="PC_THEO" Version="0,1" Author="Th?o" Date="2015-00-07" />
+<CompilerInfo header="" classdef="">
+</CompilerInfo>
+<InterfaceList>
+
+
+
+
+</InterfaceList>
+<FBNetwork>
+  <FB Name="Plant" Type="Plant" x="568,75" y="481,25" />
+  <FB Name="Controler" Type="Controler" x="1750" y="481,25" />
+  <EventConnections><Connection Source="Plant.update" Destination="Controler.clock" />
+<Connection Source="Controler.update" Destination="Plant.clock" /></EventConnections>
+  <DataConnections><Connection Source="Plant.x" Destination="Controler.x" />
+<Connection Source="Controler.ON" Destination="Plant.ON" />
+<Connection Source="Controler.OFF" Destination="Plant.OFF" /></DataConnections>
+</FBNetwork>
+</FBType>

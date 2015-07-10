@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{92B81AF7-8D03-46D0-9C71-430DAE7A074E}") = "Switchtank", "BlokIDEProject2\Switchtank.bproj", "{776CCC40-257E-4ABA-A850-57C572F0CB90}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Deploy|gnu = Deploy|gnu
+		Remote|gnu = Remote|gnu
+		Run|gnu = Run|gnu
+		Simulation|gnu = Simulation|gnu
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Deploy|gnu.ActiveCfg = Deploy|gnu
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Deploy|gnu.Build.0 = Deploy|gnu
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Remote|gnu.ActiveCfg = Remote|gnu
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Remote|gnu.Build.0 = Remote|gnu
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Run|gnu.ActiveCfg = Run|gnu
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Run|gnu.Build.0 = Run|gnu
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Simulation|gnu.ActiveCfg = Simulation|gnu
+		{776CCC40-257E-4ABA-A850-57C572F0CB90}.Simulation|gnu.Build.0 = Simulation|gnu
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

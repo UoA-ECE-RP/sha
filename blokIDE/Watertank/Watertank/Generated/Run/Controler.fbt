@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType Name="Controler" Comment="" >
+<Identification Standard="61499-2" />
+<VersionInfo Organization="PC_THEO" Version="0,1" Author="Th?o" Date="2015-00-07" />
+<CompilerInfo header="" classdef="">
+</CompilerInfo>
+<InterfaceList>
+<EventInputs>
+  <Event Name="clock" Comment="">
+    <With Var="x" />
+  </Event>
+</EventInputs>
+<EventOutputs>
+  <Event Name="update" Comment="">
+    <With Var="ON" />
+    <With Var="OFF" />
+  </Event>
+</EventOutputs>
+<InputVars>
+  <VarDeclaration Name="x" Type="REAL" Comment="" />
+</InputVars>
+<OutputVars>
+  <VarDeclaration Name="ON" Type="INT" Comment="" />
+  <VarDeclaration Name="OFF" Type="INT" Comment="" />
+</OutputVars>
+</InterfaceList>
+<BasicFB><InternalVars>
+  <VarDeclaration Name="timer" Type="BOOL" Comment="" />
+</InternalVars><ECC>
+  <ECState Name="Start" Comment="" x="175" y="175">
+    <ECAction Algorithm="init" Output="update" />
+  </ECState>
+  <ECState Name="Resting" Comment="" x="612,5" y="175">
+    <ECAction Algorithm="wait" Output="update" />
+  </ECState>
+  <ECState Name="TURN_OFF" Comment="" x="525" y="1093,75">
+    <ECAction Algorithm="reset_timer" Output="update" />
+    <ECAction Algorithm="setOFF" />
+  </ECState>
+  <ECState Name="TURN_ON" Comment="" x="1968,75" y="175">
+    <ECAction Algorithm="setON" Output="update" />
+    <ECAction Algorithm="reset_timer" />
+  </ECState>
+  <ECState Name="Boiling" Comment="" x="2056,25" y="1093,75">
+    <ECAction Algorithm="wait" Output="update" />
+  </ECState>
+  <ECState Name="HeatingUp" Comment="" x="2012,5" y="612,5">
+    <ECAction Algorithm="reset" Output="update" />
+  </ECState>
+  <ECState Name="CooolingDown" Comment="" x="525" y="612,5">
+    <ECAction Algorithm="reset" Output="update" />
+  </ECState>
+  <ECTransition Source="Resting" Destination="TURN_ON" Condition="true AND (timer=1)" x="1268,75" y="437,5" />
+  <ECTransition Source="TURN_OFF" Destination="CooolingDown" Condition="true" x="525" y="822,125" />
+  <ECTransition Source="TURN_ON" Destination="HeatingUp" Condition="true" x="1986,625" y="377,75" />
+  <ECTransition Source="Boiling" Destination="TURN_OFF" Condition="true AND (timer=1)" x="1272,83020541072" y="918,75" />
+  <ECTransition Source="HeatingUp" Destination="Boiling" Condition="true AND (x&gt;=100)" x="2037,375" y="876,125" />
+  <ECTransition Source="CooolingDown" Destination="Resting" Condition="true AND (x&lt;=20)" x="443,281133145094" y="356,75" />
+  <ECTransition Source="Start" Destination="Resting" Condition="true" x="395,75" y="350" />
+</ECC><Algorithm Name="setON" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;ON=1;&#xD;&#xA;printf(&quot;setON\n&quot;);&#xD;&#xA;&#xD;&#xA;" />
+</Algorithm>
+<Algorithm Name="setOFF" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;OFF=1;&#xD;&#xA;printf(&quot;setOFF\n&quot;);" />
+</Algorithm>
+<Algorithm Name="wait" Comment="">
+  <Other Language="C" Prototype="" Text="sleep(1);&#xD;&#xA;me-&gt;timer=1;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;" />
+</Algorithm>
+<Algorithm Name="reset_timer" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;timer=0;&#xD;&#xA;" />
+</Algorithm>
+<Algorithm Name="reset" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;ON=0; me-&gt;OFF=0;&#xD;&#xA;&#xD;&#xA;" />
+</Algorithm>
+<Algorithm Name="init" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;ON=0; me-&gt;OFF=0;&#xD;&#xA;me-&gt;timer=0;&#xD;&#xA;me-&gt;x=20;&#xD;&#xA;&#xD;&#xA;" />
+</Algorithm></BasicFB>
+</FBType>

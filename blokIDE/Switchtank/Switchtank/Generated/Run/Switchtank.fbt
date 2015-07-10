@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType Name="Switchtank" Comment="" >
+<Identification Standard="61499-2" />
+<VersionInfo Organization="PC_THEO" Version="0,1" Author="Th?o" Date="2015-00-10" />
+<CompilerInfo header="" classdef="">
+</CompilerInfo>
+<InterfaceList>
+
+
+
+
+</InterfaceList>
+<FBNetwork>
+  <FB Name="Controller" Type="Controller" x="1750" y="568,75" />
+  <FB Name="Plant" Type="Plant" x="568,75" y="568,75" />
+  <EventConnections><Connection Source="Controller.update" Destination="Plant.clock" />
+<Connection Source="Plant.update" Destination="Controller.clock" /></EventConnections>
+  <DataConnections><Connection Source="Controller.fill1" Destination="Plant.fill1" />
+<Connection Source="Controller.fill2" Destination="Plant.fill2" />
+<Connection Source="Plant.x1" Destination="Controller.x1" />
+<Connection Source="Plant.x2" Destination="Controller.x2" /></DataConnections>
+</FBNetwork>
+</FBType>

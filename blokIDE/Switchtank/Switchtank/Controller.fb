@@ -1,0 +1,364 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<functionBlockModel Id="5ff7a720-a562-44d6-89cd-b30cda43c353" name="Controller" organization="PC_THEO" date="2015-07-10" author="Théo">
+  <states>
+    <functionBlockModelHasStates Id="0357cfd3-2c1f-46c7-b6a9-511c16acca39">
+      <state Id="d35af568-c04a-4671-87e6-9593109f9aea" name="Start" x="175" y="218.75" isInitial="true">
+        <actionSet>
+          <actionLink Id="2076fc2a-f0a9-4dfa-88c1-fd893e6f708b">
+            <actionSetMoniker Id="c6a0ee49-db13-4423-ae79-0d0db2bdde58" />
+          </actionLink>
+        </actionSet>
+        <fromTransitionNodes>
+          <stateConnectsToTransitionNodes Id="ee7aa129-deb9-4427-a616-7dbd73c25444">
+            <transitionNodeMoniker Id="b8f664cc-915e-4f91-8ca9-fc831423346d" />
+          </stateConnectsToTransitionNodes>
+        </fromTransitionNodes>
+      </state>
+    </functionBlockModelHasStates>
+    <functionBlockModelHasStates Id="c25a6681-df28-484f-9698-119b05ff7f52">
+      <state Id="5426a4b4-cd80-4f61-aaef-ecb9e37ab8a5" name="State1" x="831.25" y="218.75" isInitial="false">
+        <actionSet>
+          <actionLink Id="21cc2637-3103-4c83-924b-861fa68217f9">
+            <actionSetMoniker Id="0e7f5b9f-f696-4faf-8a65-8517fa450d7d" />
+          </actionLink>
+        </actionSet>
+        <fromTransitionNodes>
+          <stateConnectsToTransitionNodes Id="447304de-d334-46fd-bfb8-b6e2d3fc3893">
+            <transitionNodeMoniker Id="05299a62-a0d6-41fe-911f-5c7ff59648ed" />
+          </stateConnectsToTransitionNodes>
+        </fromTransitionNodes>
+      </state>
+    </functionBlockModelHasStates>
+    <functionBlockModelHasStates Id="00e5049b-fe6c-4e27-a3f7-343f5542f9f2">
+      <state Id="d945f86d-4665-4a81-9965-6ada5faa2764" name="State2" x="2100" y="218.75" isInitial="false">
+        <actionSet>
+          <actionLink Id="e1846e49-a6ef-4105-b2df-03928fb779a4">
+            <actionSetMoniker Id="781a527a-394d-46ea-a241-ae2a41b3be63" />
+          </actionLink>
+        </actionSet>
+        <fromTransitionNodes>
+          <stateConnectsToTransitionNodes Id="b76c6f7f-7bf8-4f33-a4fa-1d1f705371f8">
+            <transitionNodeMoniker Id="bb5a8cab-2ac6-4710-ae90-306b3eb069fc" />
+          </stateConnectsToTransitionNodes>
+        </fromTransitionNodes>
+      </state>
+    </functionBlockModelHasStates>
+    <functionBlockModelHasStates Id="223dd006-227f-4c04-9bf3-ee74f0756540">
+      <state Id="55785f1c-27ac-4da3-af97-9220c5a38783" name="State3" x="2100" y="1006.25" isInitial="false">
+        <actionSet>
+          <actionLink Id="a28e3f11-ad7f-4b2a-a30e-3fc8c782fcea">
+            <actionSetMoniker Id="884f7902-b9e5-4a5f-91cf-fb2db99e8640" />
+          </actionLink>
+        </actionSet>
+        <fromTransitionNodes>
+          <stateConnectsToTransitionNodes Id="7b977b5c-0317-4282-a36a-c4b0e4bc0db8">
+            <transitionNodeMoniker Id="cd60c4c4-afa9-438b-8753-a0df977bf79d" />
+          </stateConnectsToTransitionNodes>
+        </fromTransitionNodes>
+      </state>
+    </functionBlockModelHasStates>
+    <functionBlockModelHasStates Id="dbf76a00-359c-4c29-be4f-134b852342e0">
+      <state Id="d929fede-d1d3-43c6-a562-a1e21ebd7226" name="State4" x="831.25" y="1006.25" isInitial="false">
+        <actionSet>
+          <actionLink Id="bb323524-2b3f-4b9a-bf82-927cf8a6d826">
+            <actionSetMoniker Id="97f5c71d-65ed-488f-8f94-a71985740ab9" />
+          </actionLink>
+        </actionSet>
+        <fromTransitionNodes>
+          <stateConnectsToTransitionNodes Id="0784805c-6e51-4a8a-9032-dc448b7367f4">
+            <transitionNodeMoniker Id="5d65c394-7551-4e88-a239-f0c755c01a17" />
+          </stateConnectsToTransitionNodes>
+        </fromTransitionNodes>
+      </state>
+    </functionBlockModelHasStates>
+  </states>
+  <actionSets>
+    <functionBlockModelHasActionSets Id="274903c3-c5c1-42f7-97eb-bfb027f6feb3">
+      <actionSet Id="0e7f5b9f-f696-4faf-8a65-8517fa450d7d" x="1181.1018845438955" y="218.75">
+        <actionItems>
+          <actionSetHasActionItems Id="e9336aae-1f8e-4598-b4c2-1180166b5359">
+            <actionAlgorithm Id="43edd3b6-bc55-483c-a49e-f16cdbf4c696">
+              <algorithm>
+                <actionAlgorithmReferencesAlgorithm Id="6ad16df4-ebf6-4838-a870-7ea8be507e7f">
+                  <algorithmMoniker name="/Controller/set_fill1" />
+                </actionAlgorithmReferencesAlgorithm>
+              </algorithm>
+            </actionAlgorithm>
+          </actionSetHasActionItems>
+          <actionSetHasActionItems Id="4a30ea5c-1753-4b24-84b7-20d1f91a7fee">
+            <actionEvent Id="aae057ce-5e34-401b-8781-54c92a7d1a8a">
+              <event>
+                <actionEventReferencesEvent Id="0d94ecc5-7e37-4118-81c9-88c32ef5f3f5">
+                  <eventMoniker name="/Controller/Controller/update" />
+                </actionEventReferencesEvent>
+              </event>
+            </actionEvent>
+          </actionSetHasActionItems>
+        </actionItems>
+      </actionSet>
+    </functionBlockModelHasActionSets>
+    <functionBlockModelHasActionSets Id="bea1eff7-30e2-4c86-8f46-e7e65449956c">
+      <actionSet Id="781a527a-394d-46ea-a241-ae2a41b3be63" x="2449.8518845438957" y="218.75">
+        <actionItems>
+          <actionSetHasActionItems Id="e5cf245b-2a41-4729-b553-7f5ca12f00b5">
+            <actionAlgorithm Id="c18f89eb-33c3-4cd0-81ee-3ff9e22a5b8a">
+              <algorithm>
+                <actionAlgorithmReferencesAlgorithm Id="c12fb5d8-5418-4818-8c7d-92d80a23c2bb">
+                  <algorithmMoniker name="/Controller/reset" />
+                </actionAlgorithmReferencesAlgorithm>
+              </algorithm>
+            </actionAlgorithm>
+          </actionSetHasActionItems>
+          <actionSetHasActionItems Id="31a1c58f-714a-4fca-945d-edb75970cca9">
+            <actionEvent Id="bc65e268-e2d4-4aac-9f78-9677e766f945">
+              <event>
+                <actionEventReferencesEvent Id="f699cb6d-ba51-43f7-8bee-e4fbc5c30911">
+                  <eventMoniker name="/Controller/Controller/update" />
+                </actionEventReferencesEvent>
+              </event>
+            </actionEvent>
+          </actionSetHasActionItems>
+        </actionItems>
+      </actionSet>
+    </functionBlockModelHasActionSets>
+    <functionBlockModelHasActionSets Id="754d0a7d-d21e-4364-be3f-831892719d3f">
+      <actionSet Id="c6a0ee49-db13-4423-ae79-0d0db2bdde58" x="393.75" y="437.5">
+        <actionItems>
+          <actionSetHasActionItems Id="50ca46ad-4f4c-485a-a8e6-bfe662628979">
+            <actionAlgorithm Id="fc1f7e0c-205d-4bc8-8569-2e4828932075">
+              <algorithm>
+                <actionAlgorithmReferencesAlgorithm Id="a977976f-d530-4881-8cb1-368b84dedfe9">
+                  <algorithmMoniker name="/Controller/init" />
+                </actionAlgorithmReferencesAlgorithm>
+              </algorithm>
+            </actionAlgorithm>
+          </actionSetHasActionItems>
+          <actionSetHasActionItems Id="053b4f6e-9d1b-45cb-85ca-8af74c19cf7e">
+            <actionEvent Id="049ab639-a334-4e1c-8248-24348edfc62b">
+              <event>
+                <actionEventReferencesEvent Id="25433033-ff18-4309-a9bf-5c59c2433bc1">
+                  <eventMoniker name="/Controller/Controller/update" />
+                </actionEventReferencesEvent>
+              </event>
+            </actionEvent>
+          </actionSetHasActionItems>
+        </actionItems>
+      </actionSet>
+    </functionBlockModelHasActionSets>
+    <functionBlockModelHasActionSets Id="29b8d8e4-9af2-478b-acd1-9aab65ddc9a7">
+      <actionSet Id="884f7902-b9e5-4a5f-91cf-fb2db99e8640" x="2449.8518845438957" y="1006.25">
+        <actionItems>
+          <actionSetHasActionItems Id="05166772-d915-41cd-bbf8-c753cd44772d">
+            <actionAlgorithm Id="6c588560-c39f-47ec-9320-b213c0b1ed8c">
+              <algorithm>
+                <actionAlgorithmReferencesAlgorithm Id="ea77e795-93c0-4bdf-ad0b-6c1860507015">
+                  <algorithmMoniker name="/Controller/set_fill2" />
+                </actionAlgorithmReferencesAlgorithm>
+              </algorithm>
+            </actionAlgorithm>
+          </actionSetHasActionItems>
+          <actionSetHasActionItems Id="8bacdbda-2617-476e-bd46-b15f17164f93">
+            <actionEvent Id="275ce4b2-33a5-493f-a9b0-ee93279aa4b9">
+              <event>
+                <actionEventReferencesEvent Id="70c65470-c74b-4a08-a884-6b3eda42de65">
+                  <eventMoniker name="/Controller/Controller/update" />
+                </actionEventReferencesEvent>
+              </event>
+            </actionEvent>
+          </actionSetHasActionItems>
+        </actionItems>
+      </actionSet>
+    </functionBlockModelHasActionSets>
+    <functionBlockModelHasActionSets Id="481b393b-65d3-415f-b843-e4173276551a">
+      <actionSet Id="97f5c71d-65ed-488f-8f94-a71985740ab9" x="1137.5" y="1093.75">
+        <actionItems>
+          <actionSetHasActionItems Id="71a68cf3-4010-46af-a13b-e7f69794648f">
+            <actionAlgorithm Id="4f1fcf6d-2b72-4b60-be82-7b15a39e9dd3">
+              <algorithm>
+                <actionAlgorithmReferencesAlgorithm Id="3bd6bf39-96f8-4be9-a88e-e298ab6198ab">
+                  <algorithmMoniker name="/Controller/reset" />
+                </actionAlgorithmReferencesAlgorithm>
+              </algorithm>
+            </actionAlgorithm>
+          </actionSetHasActionItems>
+          <actionSetHasActionItems Id="a7c1d168-81f1-4a4c-9979-2a00c1fadc2d">
+            <actionEvent Id="74051734-6d3d-41a9-a022-4fb6f2c56f0e">
+              <event>
+                <actionEventReferencesEvent Id="462563e5-4201-463f-a009-699ff3dbbc47">
+                  <eventMoniker name="/Controller/Controller/update" />
+                </actionEventReferencesEvent>
+              </event>
+            </actionEvent>
+          </actionSetHasActionItems>
+        </actionItems>
+      </actionSet>
+    </functionBlockModelHasActionSets>
+  </actionSets>
+  <algorithms>
+    <functionBlockModelHasAlgorithms Id="66aa3cf0-c1af-4d3c-8e85-abc55aef7f2e">
+      <algorithm Id="1072b418-60da-4760-80fa-e96aa24f3506" name="init" />
+    </functionBlockModelHasAlgorithms>
+    <functionBlockModelHasAlgorithms Id="4e9b6be8-3490-4633-bcee-2ac396f45cb0">
+      <algorithm Id="9047fb3f-7b67-4781-8478-b7549d11b6ec" name="set_fill1" />
+    </functionBlockModelHasAlgorithms>
+    <functionBlockModelHasAlgorithms Id="8b87d7f7-fae1-4f40-86eb-c2216050bfe5">
+      <algorithm Id="424f22a1-2adf-417b-b779-de964df4c412" name="set_fill2" />
+    </functionBlockModelHasAlgorithms>
+    <functionBlockModelHasAlgorithms Id="b454e543-0e46-40c5-916d-b432f21b0115">
+      <algorithm Id="e7839312-8ea0-4d08-85a0-cf06362f28b7" name="reset" />
+    </functionBlockModelHasAlgorithms>
+  </algorithms>
+  <functionBlockInterface>
+    <functionBlockModelHasFunctionBlockInterface Id="d733443c-1aa3-40cb-a7dc-4e51c927bd9d">
+      <functionBlockInterface Id="a9a22fbc-c9a5-4d5f-9255-1f5199eb3a1b" name="Controller" x="1400" y="481.25">
+        <events>
+          <functionBlockHasEvents Id="226f61ae-923b-442f-84f0-13444286a817">
+            <event Id="3de5384c-678e-466b-9683-fd7fd996b036" name="clock" scope="Input" />
+          </functionBlockHasEvents>
+          <functionBlockHasEvents Id="7c02ba49-eb65-460e-af66-6ee00afad4fa">
+            <event Id="d7997385-dd39-4072-b00b-0e70cff8e865" name="update" scope="Output" />
+          </functionBlockHasEvents>
+        </events>
+        <variables>
+          <functionBlockHasVariables Id="26d6ab38-2709-4603-9bfe-060382b47edc">
+            <variable Id="4e6d8038-8d8b-4331-9371-7fe39a7ca5aa" name="fill1" scope="Output" type="INT" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="d528c501-0ca4-403c-9635-64c1287d6a76">
+            <variable Id="960f6ac9-37cf-4df1-9a86-6006367529fb" name="fill2" scope="Output" type="INT" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="a75cdf51-0bd5-418a-8200-eac81de7b5de">
+            <variable Id="54038a38-889f-406d-99bf-34c2dd1f6a4b" name="x1" scope="Input" type="REAL" />
+          </functionBlockHasVariables>
+          <functionBlockHasVariables Id="739a86d0-dbb3-4508-9c4c-8d79feff578a">
+            <variable Id="8a654a59-613d-4e33-893b-8b8efdb909c3" name="x2" scope="Input" type="REAL" />
+          </functionBlockHasVariables>
+        </variables>
+        <inputEventPorts>
+          <functionBlockHasInputEventPorts Id="9ea38d21-239f-4a89-a0b3-192326f4eae8">
+            <inputEventPort Id="eaf656bc-0bcb-44d5-be50-324bdd1302e0">
+              <targetPort>
+                <association Id="eb2559e5-a669-4333-a11c-68ae13b4a2a4">
+                  <inputVariablePortMoniker Id="64863e2a-076d-47c7-8222-5dc08c7f75f9" />
+                </association>
+                <association Id="d5ec250b-1bb0-4215-9f40-9fdb8bcc9bed">
+                  <inputVariablePortMoniker Id="af72a2e9-e246-449f-a353-ca963fa42b25" />
+                </association>
+              </targetPort>
+              <event>
+                <inputEventPortReferencesEvent Id="73748631-c548-4cc7-9faa-d2e517e8d3fb">
+                  <eventMoniker name="/Controller/Controller/clock" />
+                </inputEventPortReferencesEvent>
+              </event>
+            </inputEventPort>
+          </functionBlockHasInputEventPorts>
+        </inputEventPorts>
+        <outputEventPorts>
+          <functionBlockHasOutputEventPorts Id="af25ae95-d9fd-4531-9e05-03d34b4dba26">
+            <outputEventPort Id="8bdea39b-0875-4bb0-ba93-b59b4b7e2f50">
+              <targetPort>
+                <association Id="4dc6d955-b876-419d-abae-438f6c40e3f4">
+                  <outputVariablePortMoniker Id="02d08e7b-8511-4df6-8e4c-15263d0c705e" />
+                </association>
+                <association Id="6fb78094-02ba-46bf-b8a4-15c44a22464c">
+                  <outputVariablePortMoniker Id="4c1a56f6-315d-45e7-9f36-26c46ce507a0" />
+                </association>
+              </targetPort>
+              <event>
+                <outputEventPortReferencesEvent Id="b1fef716-b260-48aa-baa0-4201b6d5a2eb">
+                  <eventMoniker name="/Controller/Controller/update" />
+                </outputEventPortReferencesEvent>
+              </event>
+            </outputEventPort>
+          </functionBlockHasOutputEventPorts>
+        </outputEventPorts>
+        <inputVariablePorts>
+          <functionBlockHasInputVariablePorts Id="e34b7190-c6e0-45dd-8b5c-740ff1cb9545">
+            <inputVariablePort Id="64863e2a-076d-47c7-8222-5dc08c7f75f9">
+              <variable>
+                <inputVariablePortReferencesVariable Id="0c2fbe7b-4b90-4e16-ae78-d577b4899252">
+                  <variableMoniker name="/Controller/Controller/x1" />
+                </inputVariablePortReferencesVariable>
+              </variable>
+            </inputVariablePort>
+          </functionBlockHasInputVariablePorts>
+          <functionBlockHasInputVariablePorts Id="fdfe41d9-bad3-48f0-84e9-32092a6650cd">
+            <inputVariablePort Id="af72a2e9-e246-449f-a353-ca963fa42b25">
+              <variable>
+                <inputVariablePortReferencesVariable Id="525e011a-556b-42b6-adc1-0ca581be35ef">
+                  <variableMoniker name="/Controller/Controller/x2" />
+                </inputVariablePortReferencesVariable>
+              </variable>
+            </inputVariablePort>
+          </functionBlockHasInputVariablePorts>
+        </inputVariablePorts>
+        <outputVariablePorts>
+          <functionBlockHasOutputVariablePorts Id="1aaab4fe-4052-4e3d-b098-c722a493cfd3">
+            <outputVariablePort Id="02d08e7b-8511-4df6-8e4c-15263d0c705e">
+              <variable>
+                <outputVariablePortReferencesVariable Id="08b60b47-bc46-462c-bd7b-190c6baa3f39">
+                  <variableMoniker name="/Controller/Controller/fill1" />
+                </outputVariablePortReferencesVariable>
+              </variable>
+            </outputVariablePort>
+          </functionBlockHasOutputVariablePorts>
+          <functionBlockHasOutputVariablePorts Id="c3ee74aa-a598-42ce-83c1-9bfe1d5a93f6">
+            <outputVariablePort Id="4c1a56f6-315d-45e7-9f36-26c46ce507a0">
+              <variable>
+                <outputVariablePortReferencesVariable Id="e4126493-bfd5-42f3-b66b-ab43b2757b27">
+                  <variableMoniker name="/Controller/Controller/fill2" />
+                </outputVariablePortReferencesVariable>
+              </variable>
+            </outputVariablePort>
+          </functionBlockHasOutputVariablePorts>
+        </outputVariablePorts>
+      </functionBlockInterface>
+    </functionBlockModelHasFunctionBlockInterface>
+  </functionBlockInterface>
+  <transitionNodes>
+    <functionBlockModelHasTransitionNodes Id="c6f0d478-daed-4d2d-b963-06d0d67f427a">
+      <transitionNode Id="05299a62-a0d6-41fe-911f-5c7ff59648ed" x="1443.75" y="393.75">
+        <targetState>
+          <transitionNodeConnectsToStates Id="77a8ee4e-e514-45fa-8f50-0683262eaca3">
+            <stateMoniker name="/Controller/State2" />
+          </transitionNodeConnectsToStates>
+        </targetState>
+      </transitionNode>
+    </functionBlockModelHasTransitionNodes>
+    <functionBlockModelHasTransitionNodes Id="418a1ae2-4f8a-4fb0-8e49-5c54620150cc">
+      <transitionNode Id="bb5a8cab-2ac6-4710-ae90-306b3eb069fc" x="2100" y="574.5" event="true" expression="x1&lt;=0.25">
+        <targetState>
+          <transitionNodeConnectsToStates Id="b873e647-bb7f-4a31-8597-c9e9a714bd08">
+            <stateMoniker name="/Controller/State3" />
+          </transitionNodeConnectsToStates>
+        </targetState>
+      </transitionNode>
+    </functionBlockModelHasTransitionNodes>
+    <functionBlockModelHasTransitionNodes Id="5bc89e44-aa77-4e9a-bcf8-559b6e917db2">
+      <transitionNode Id="cd60c4c4-afa9-438b-8753-a0df977bf79d" x="1487.5" y="918.75">
+        <targetState>
+          <transitionNodeConnectsToStates Id="e0bc8fac-0314-47ae-be03-c82e0b9fbf6a">
+            <stateMoniker name="/Controller/State4" />
+          </transitionNodeConnectsToStates>
+        </targetState>
+      </transitionNode>
+    </functionBlockModelHasTransitionNodes>
+    <functionBlockModelHasTransitionNodes Id="3b7122e3-1d38-4d54-92ad-2f63ba6ac511">
+      <transitionNode Id="5d65c394-7551-4e88-a239-f0c755c01a17" x="580.61676025390625" y="612.5" event="true" expression="x2&lt;=0.25">
+        <targetState>
+          <transitionNodeConnectsToStates Id="a91b91da-5d6f-485a-917b-8b46a0212c43">
+            <stateMoniker name="/Controller/State1" />
+          </transitionNodeConnectsToStates>
+        </targetState>
+      </transitionNode>
+    </functionBlockModelHasTransitionNodes>
+    <functionBlockModelHasTransitionNodes Id="2bf84399-b1fd-4962-935c-95dffc744335">
+      <transitionNode Id="b8f664cc-915e-4f91-8ca9-fc831423346d" x="454.12500000000006" y="619.5">
+        <targetState>
+          <transitionNodeConnectsToStates Id="969f7ba3-48d0-4609-8a38-e86d6a50caf3">
+            <stateMoniker name="/Controller/State4" />
+          </transitionNodeConnectsToStates>
+        </targetState>
+      </transitionNode>
+    </functionBlockModelHasTransitionNodes>
+  </transitionNodes>
+</functionBlockModel>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType Name="clock_gen" Comment="" >
+<Identification Standard="61499-2" />
+<VersionInfo Organization="PC_THEO" Version="0,1" Author="Th?o" Date="2015-00-09" />
+<CompilerInfo header="" classdef="">
+</CompilerInfo>
+<InterfaceList>
+
+<EventOutputs>
+  <Event Name="clock" Comment="">
+  </Event>
+</EventOutputs>
+
+
+</InterfaceList>
+<BasicFB><ECC>
+  <ECState Name="Start" Comment="" x="787,5" y="175">
+  </ECState>
+  <ECState Name="State1" Comment="" x="787,5" y="700">
+    <ECAction Output="clock" />
+  </ECState>
+  <ECTransition Source="Start" Destination="State1" Condition="true" x="787,5" y="433,5" />
+  <ECTransition Source="State1" Destination="Start" Condition="true" x="787,5" y="486,5" />
+</ECC></BasicFB>
+</FBType>

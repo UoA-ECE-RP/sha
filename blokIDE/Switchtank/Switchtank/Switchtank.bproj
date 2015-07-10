@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Run</Configuration>
+    <Platform Condition="'$(Platform)' == ''">gnu</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{776CCC40-257E-4ABA-A850-57C572F0CB90}</ProjectGuid>
+    <ProjectType>BlokIDE Project</ProjectType>
+    <ProjectTypeGuids>{92B81AF7-8D03-46D0-9C71-430DAE7A074E}</ProjectTypeGuids>
+    <RootNamespace>BlokIDENamespace</RootNamespace>
+    <AssemblyName>BlokIDEAssemblyName</AssemblyName>
+    <OutputFormat>CCode</OutputFormat>
+    <MaxStringLength>32</MaxStringLength>
+    <Name>Switchtank</Name>
+    <ActivePlatform>gnu</ActivePlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Deploy'">
+    <CompilationMode>Deploy</CompilationMode>
+    <OutputPath>Generated\Run\</OutputPath>
+    <CodeSortingMode>None</CodeSortingMode>
+    <ExecuteMakeScript>false</ExecuteMakeScript>
+    <CompilerParameters>-w</CompilerParameters>
+    <!--Remove warnings from GCC-->
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Remote'">
+    <CompilationMode>Remote</CompilationMode>
+    <OutputPath>Generated\Simulation\</OutputPath>
+    <CodeSortingMode>None</CodeSortingMode>
+    <ExecuteMakeScript>false</ExecuteMakeScript>
+    <CompilerParameters>-w</CompilerParameters>
+    <!--Remove warnings from GCC-->
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Run'">
+    <CompilationMode>Run</CompilationMode>
+    <OutputPath>Generated\Run\</OutputPath>
+    <CodeSortingMode>None</CodeSortingMode>
+    <CompilerName>gcc</CompilerName>
+    <ExecuteMakeScript>true</ExecuteMakeScript>
+    <CompilerParameters>-w</CompilerParameters>
+    <!--Remove warnings from GCC-->
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Simulation'">
+    <CompilationMode>Simulate</CompilationMode>
+    <OutputPath>Generated\Simulation\</OutputPath>
+    <CodeSortingMode>None</CodeSortingMode>
+    <CompilerName>gcc</CompilerName>
+    <ExecuteMakeScript>true</ExecuteMakeScript>
+    <CompilerParameters>-w</CompilerParameters>
+    <!--Remove warnings from GCC-->
+  </PropertyGroup>
+  <PropertyGroup>
+    <TimeMePath Condition="!Exists('$(TimeMePath)\UoA.IEC61499.Compiler.targets')">
+    </TimeMePath>
+    <TimeMePath Condition="$(TimeMePath) == '' And Exists('$(VSInstallDir)\Common7\IDE\Extensions\BlokIDE\UoA.IEC61499.Compiler.targets')">$(localappdata)\Common7\IDE\Extensions\BlokIDE</TimeMePath>
+    <TimeMePath Condition="$(TimeMePath) == '' And Exists('$(localappdata)\Microsoft\VisualStudio\$(VisualStudioVersion)Exp\Extensions\BlokTech\TimeMe\1.0\UoA.IEC61499.Compiler.targets')">$(localappdata)\Microsoft\VisualStudio\$(VisualStudioVersion)Exp\Extensions\BlokTech\TimeMe\1.0</TimeMePath>
+    <TimeMePath Condition="$(TimeMePath) == '' And Exists('$(localappdata)\Microsoft\VisualStudio\$(VisualStudioVersion)\Extensions\BlokTech\TimeMe\1.0\UoA.IEC61499.Compiler.targets')">$(localappdata)\Microsoft\VisualStudio\$(VisualStudioVersion)\Extensions\BlokTech\TimeMe\1.0</TimeMePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Switchtank.cfb">
+      <SubType>Content</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Plant.fb">
+      <SubType>Content</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controller.fb">
+      <SubType>Content</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Controller.fb.reset.algo">
+      <SubType>Content</SubType>
+      <DependentUpon>Controller.fb</DependentUpon>
+      <LinkedIntoProjectAt>Algorithm3.algo</LinkedIntoProjectAt>
+    </Content>
+    <Content Include="Controller.fb.init.algo">
+      <SubType>Content</SubType>
+      <DependentUpon>Controller.fb</DependentUpon>
+      <LinkedIntoProjectAt>init.algo</LinkedIntoProjectAt>
+    </Content>
+    <Content Include="Controller.fb.set_fill1.algo">
+      <SubType>Content</SubType>
+      <DependentUpon>Controller.fb</DependentUpon>
+      <LinkedIntoProjectAt>set_fill1.algo</LinkedIntoProjectAt>
+    </Content>
+    <Content Include="Controller.fb.set_fill2.algo">
+      <SubType>Content</SubType>
+      <DependentUpon>Controller.fb</DependentUpon>
+      <LinkedIntoProjectAt>set_fill2.algo</LinkedIntoProjectAt>
+    </Content>
+    <Content Include="Plant.fb.generated_c_code.algo">
+      <SubType>Content</SubType>
+      <DependentUpon>Plant.fb</DependentUpon>
+      <LinkedIntoProjectAt>Algorithm2.algo</LinkedIntoProjectAt>
+    </Content>
+    <Content Include="Plant.fb.init.algo">
+      <SubType>Content</SubType>
+      <DependentUpon>Plant.fb</DependentUpon>
+      <LinkedIntoProjectAt>init.algo</LinkedIntoProjectAt>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(TimeMePath)\UoA.IEC61499.Compiler.targets" />
+</Project>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType Name="Plant" Comment="" >
+<Identification Standard="61499-2" />
+<VersionInfo Organization="PC_THEO" Version="0,1" Author="Th?o" Date="2015-00-10" />
+<CompilerInfo header="&quot;/cygdrive/C/Users/Theo/Documents/Visual Studio 2013/Projects/Test/Switchtank/global.h&quot;;" classdef="">
+</CompilerInfo>
+<InterfaceList>
+<EventInputs>
+  <Event Name="clock" Comment="">
+    <With Var="fill1" />
+    <With Var="fill2" />
+  </Event>
+</EventInputs>
+<EventOutputs>
+  <Event Name="update" Comment="">
+    <With Var="x1" />
+    <With Var="x2" />
+  </Event>
+</EventOutputs>
+<InputVars>
+  <VarDeclaration Name="fill1" Type="INT" Comment="" />
+  <VarDeclaration Name="fill2" Type="INT" Comment="" />
+</InputVars>
+<OutputVars>
+  <VarDeclaration Name="x1" Type="REAL" Comment="" />
+  <VarDeclaration Name="x2" Type="REAL" Comment="" />
+</OutputVars>
+</InterfaceList>
+<BasicFB><ECC>
+  <ECState Name="Start" Comment="" x="656,25" y="350">
+    <ECAction Algorithm="init" Output="update" />
+  </ECState>
+  <ECState Name="Run" Comment="" x="656,25" y="743,75">
+    <ECAction Algorithm="generated_c_code" Output="update" />
+  </ECState>
+  <ECTransition Source="Start" Destination="Run" Condition="true" x="656,25" y="530,875" />
+  <ECTransition Source="Run" Destination="Run" Condition="true" x="628,25" y="727,75" />
+</ECC><Algorithm Name="init" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;fill1=0;me-&gt;fill2=0;&#xD;&#xA;me-&gt;x1=0.5;me-&gt;x2=0.5;" />
+</Algorithm>
+<Algorithm Name="generated_c_code" Comment="">
+  <Other Language="C" Prototype="" Text="&#xD;&#xA;double t1_ode_1(double C1x1, double d, double k) {&#xD;&#xA;   double t1_ode_1_result;&#xD;&#xA;   t1_ode_1_result = C1x1 + 0.7*d*k;&#xD;&#xA;   return t1_ode_1_result;&#xD;&#xA;}&#xD;&#xA;double t1_ode_2(double C1x2, double d, double k) {&#xD;&#xA;   double t1_ode_2_result;&#xD;&#xA;   t1_ode_2_result = C1x2 - 0.5*d*k;&#xD;&#xA;   return t1_ode_2_result;&#xD;&#xA;}&#xD;&#xA;double t1_init_1(double x1_u) {&#xD;&#xA;   double t1_init_1_result;&#xD;&#xA;   t1_init_1_result = x1_u;&#xD;&#xA;   return t1_init_1_result;&#xD;&#xA;}&#xD;&#xA;double t1_init_2(double x2_u) {&#xD;&#xA;   double t1_init_2_result;&#xD;&#xA;   t1_init_2_result = x2_u;&#xD;&#xA;   return t1_init_2_result;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;double t2_ode_1(double C1x1, double d, double k) {&#xD;&#xA;   double t2_ode_1_result;&#xD;&#xA;   t2_ode_1_result = C1x1 - 0.3*d*k;&#xD;&#xA;   return t2_ode_1_result;&#xD;&#xA;}&#xD;&#xA;double t2_ode_2(double C1x2, double d, double k) {&#xD;&#xA;   double t2_ode_2_result;&#xD;&#xA;   t2_ode_2_result = C1x2 + 0.5*d*k;&#xD;&#xA;   return t2_ode_2_result;&#xD;&#xA;}&#xD;&#xA;double t2_init_1(double x1_u) {&#xD;&#xA;   double t2_init_1_result;&#xD;&#xA;   t2_init_1_result = x1_u;&#xD;&#xA;   return t2_init_1_result;&#xD;&#xA;}&#xD;&#xA;double t2_init_2(double x2_u) {&#xD;&#xA;   double t2_init_2_result;&#xD;&#xA;   t2_init_2_result = x2_u;&#xD;&#xA;   return t2_init_2_result;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;enum states SwitchTank(enum states cstate, enum states pstate) {&#xD;&#xA;  static double fk;&#xD;&#xA;  static unsigned char force_init_update;&#xD;&#xA;  switch (cstate) {&#xD;&#xA;  case (t1):&#xD;&#xA;    if(me-&gt;x1 &lt;= 1 &amp;&amp; me-&gt;x2 &gt;= 0.25 &amp;&amp; !me-&gt;fill1 &amp;&amp; !me-&gt;fill2){&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x1 = t1_init_1(me-&gt;x1);&#xD;&#xA;        x1_init = me-&gt;x1;&#xD;&#xA;      }&#xD;&#xA;      x1_u = t1_ode_1(C1x1, d, k);&#xD;&#xA;      if(x1_u &gt;= 1 &amp;&amp; x1_init &lt;= 1)&#xD;&#xA;        x1_u = 1;&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x2 = t1_init_2(me-&gt;x2);&#xD;&#xA;        x2_init = me-&gt;x2;&#xD;&#xA;      }&#xD;&#xA;      x2_u = t1_ode_2(C1x2, d, k);&#xD;&#xA;      if(x2_u &lt;= 0.250000000000000 &amp;&amp; x2_init &gt;= 0.250000000000000)&#xD;&#xA;        x2_u = 0.250000000000000;&#xD;&#xA;      ++k;&#xD;&#xA;      cstate = t1;&#xD;&#xA;      force_init_update = False;&#xD;&#xA;    }&#xD;&#xA;    else if(me-&gt;fill1 &amp;&amp; !me-&gt;fill2 &amp;&amp; me-&gt;x2 &lt;= 0.25) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t2;&#xD;&#xA;      x1_u = me-&gt;x1;&#xD;&#xA;      x2_u = me-&gt;x2;&#xD;&#xA;    }&#xD;&#xA;    else {&#xD;&#xA;      fprintf(stderr,&quot;Unreachable state!&quot;);&#xD;&#xA;      exit(1);&#xD;&#xA;    }&#xD;&#xA;    break;&#xD;&#xA;  case (t2):&#xD;&#xA;    if(me-&gt;x1 &gt;= 0.25 &amp;&amp; me-&gt;x2 &lt;= 1 &amp;&amp; !me-&gt;fill1 &amp;&amp; !me-&gt;fill2){&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x1 = t2_init_1(me-&gt;x1);&#xD;&#xA;        x1_init = me-&gt;x1;&#xD;&#xA;      }&#xD;&#xA;      x1_u = t2_ode_1(C1x1, d, k);&#xD;&#xA;      if(x1_u &lt;= 0.250000000000000 &amp;&amp; x1_init &gt;= 0.250000000000000)&#xD;&#xA;        x1_u = 0.250000000000000;&#xD;&#xA;      if ((pstate != cstate) || force_init_update){&#xD;&#xA;        C1x2 = t2_init_2(me-&gt;x2);&#xD;&#xA;        x2_init = me-&gt;x2;&#xD;&#xA;      }&#xD;&#xA;      x2_u = t2_ode_2(C1x2, d, k);&#xD;&#xA;      if(x2_u &gt;= 1 &amp;&amp; x2_init &lt;= 1)&#xD;&#xA;        x2_u = 1;&#xD;&#xA;      ++k;&#xD;&#xA;      cstate = t2;&#xD;&#xA;      force_init_update = False;&#xD;&#xA;    }&#xD;&#xA;    else if(me-&gt;fill2 &amp;&amp; !me-&gt;fill1 &amp;&amp; me-&gt;x1 &lt;= 0.25) {&#xD;&#xA;      k=1;&#xD;&#xA;      cstate=t1;&#xD;&#xA;      x1_u = me-&gt;x1;&#xD;&#xA;      x2_u = me-&gt;x2;&#xD;&#xA;    }&#xD;&#xA;    else {&#xD;&#xA;      fprintf(stderr,&quot;Unreachable state!&quot;);&#xD;&#xA;      exit(1);&#xD;&#xA;    }&#xD;&#xA;    break;&#xD;&#xA;  default: exit(1);&#xD;&#xA;  }&#xD;&#xA;  return cstate;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;&#xD;&#xA;  &#xD;&#xA;    enum states rstate = SwitchTank(cstate, pstate);&#xD;&#xA;    pstate = cstate;&#xD;&#xA;    cstate = rstate;&#xD;&#xA;    me-&gt;x2 = x2_u;&#xD;&#xA;    me-&gt;x1 = x1_u;&#xD;&#xA;&#xD;&#xA;" />
+</Algorithm></BasicFB>
+</FBType>

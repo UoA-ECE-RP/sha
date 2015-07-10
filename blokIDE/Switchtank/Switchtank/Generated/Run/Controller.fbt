@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FBType SYSTEM "http://www.holobloc.com/xml/LibraryElement.dtd" >
+<FBType Name="Controller" Comment="" >
+<Identification Standard="61499-2" />
+<VersionInfo Organization="PC_THEO" Version="0,1" Author="Th?o" Date="2015-00-10" />
+<CompilerInfo header="" classdef="">
+</CompilerInfo>
+<InterfaceList>
+<EventInputs>
+  <Event Name="clock" Comment="">
+    <With Var="x1" />
+    <With Var="x2" />
+  </Event>
+</EventInputs>
+<EventOutputs>
+  <Event Name="update" Comment="">
+    <With Var="fill1" />
+    <With Var="fill2" />
+  </Event>
+</EventOutputs>
+<InputVars>
+  <VarDeclaration Name="x1" Type="REAL" Comment="" />
+  <VarDeclaration Name="x2" Type="REAL" Comment="" />
+</InputVars>
+<OutputVars>
+  <VarDeclaration Name="fill1" Type="INT" Comment="" />
+  <VarDeclaration Name="fill2" Type="INT" Comment="" />
+</OutputVars>
+</InterfaceList>
+<BasicFB><ECC>
+  <ECState Name="Start" Comment="" x="175" y="218,75">
+    <ECAction Algorithm="init" Output="update" />
+  </ECState>
+  <ECState Name="State1" Comment="" x="831,25" y="218,75">
+    <ECAction Algorithm="set_fill1" Output="update" />
+  </ECState>
+  <ECState Name="State2" Comment="" x="2100" y="218,75">
+    <ECAction Algorithm="reset" Output="update" />
+  </ECState>
+  <ECState Name="State3" Comment="" x="2100" y="1006,25">
+    <ECAction Algorithm="set_fill2" Output="update" />
+  </ECState>
+  <ECState Name="State4" Comment="" x="831,25" y="1006,25">
+    <ECAction Algorithm="reset" Output="update" />
+  </ECState>
+  <ECTransition Source="Start" Destination="State4" Condition="true" x="454,125" y="619,5" />
+  <ECTransition Source="State1" Destination="State2" Condition="true" x="1443,75" y="393,75" />
+  <ECTransition Source="State2" Destination="State3" Condition="true AND (x1&lt;=0.25)" x="2100" y="574,5" />
+  <ECTransition Source="State3" Destination="State4" Condition="true" x="1487,5" y="918,75" />
+  <ECTransition Source="State4" Destination="State1" Condition="true AND (x2&lt;=0.25)" x="580,616760253906" y="612,5" />
+</ECC><Algorithm Name="init" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;fill1=0;me-&gt;fill2=0;&#xD;&#xA;me-&gt;x1=0.5;me-&gt;x2=0.5;" />
+</Algorithm>
+<Algorithm Name="set_fill1" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;fill1=1;&#xD;&#xA;" />
+</Algorithm>
+<Algorithm Name="set_fill2" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;fill2=1;" />
+</Algorithm>
+<Algorithm Name="reset" Comment="">
+  <Other Language="C" Prototype="" Text="me-&gt;fill1=0;me-&gt;fill2=0;&#xD;&#xA;" />
+</Algorithm></BasicFB>
+</FBType>

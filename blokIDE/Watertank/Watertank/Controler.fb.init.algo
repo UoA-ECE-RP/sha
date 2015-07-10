@@ -1,0 +1,4 @@
+me->ON=0; me->OFF=0;
+me->timer=0;
+me->x=20;
+
