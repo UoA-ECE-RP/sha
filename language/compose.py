@@ -193,10 +193,10 @@ def compose(haList):
                                                 nupdateList += [uu]
                             neventList += mye
                             for k in myg.iterkeys():
-                                if k in nguards.keys() and myg[k] != nguards[k]:
-                                    for jm in myg[k]:
-                                        nguards[k].append(jm)
-                                    print nguards[k]
+                                if k in nguards.keys():
+                                    if myg[k] != nguards[k]:
+                                        for jm in myg[k]:
+                                            nguards[k].append(jm)
                                 else:
                                     nguards.update(myg)
                         else:
@@ -208,10 +208,10 @@ def compose(haList):
                                         nupdateList += oupdateList
                                         neventList += oeventList
                                         for k in oguards.iterkeys():
-                                            if k in nguards.keys() and oguards[k] != nguards[k]:
-                                                for jo in oguards:
-                                                    nguards[k].append(jo)
-                                                print nguards[k]
+                                            if k in nguards.keys():
+                                                if oguards[k] != nguards[k]:
+                                                    for jo in oguards:
+                                                        nguards[k].append(jo)
                                             else:
                                                 nguards.update(oguards)
                                     else:

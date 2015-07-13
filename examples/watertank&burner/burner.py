@@ -46,4 +46,4 @@ burner = Ha("burner", [b1, b2, b3, b4], b1,
                [e1, e2, e3, e4], [], [signal_u])
 
 # Compile
-#shac.compile(burner)
+# shac.compile(burner)
