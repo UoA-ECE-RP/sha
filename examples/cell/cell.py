@@ -12,10 +12,10 @@ import shac
 # This the the single dimension in "x" example artificially paced cell
 # without any value for f(lambda).
 
-ode1 = Ode(S("diff(x(t))+0.1*x(t)"), S("x(t)"), 0.0001)
-ode2 = Ode(S("diff(x(t))-800"), S("x(t)"), 20)
-ode3 = Ode(S("diff(x(t))-200.0*x(t)"), S("x(t)"), 20)
-ode4 = Ode(S("diff(x(t))+0.002*x(t)"), S("x(t)"), 138)
+ode1 = Ode(S("diff(x(t))+0.1*x(t)"), S("x(t)"), 0.0001, {})
+ode2 = Ode(S("diff(x(t))-800"), S("x(t)"), 20, {})
+ode3 = Ode(S("diff(x(t))-200.0*x(t)"), S("x(t)"), 20, {})
+ode4 = Ode(S("diff(x(t))+0.002*x(t)"), S("x(t)"), 138, {})
 
 # The locations of the hybrid automaton
 t1 = Loc("t1", [ode1], [],
