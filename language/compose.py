@@ -123,7 +123,7 @@ def compose(haList):
     for i in name_permutations:
         there = False
         for (x, y) in same_edge_names:
-            if x in i and y in i:
+            if x in i and y in i and x != y:
                 there = True
                 break
         if not there:
