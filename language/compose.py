@@ -68,11 +68,11 @@ def compose(haList):
                 newLocname += '_'+name
                 newLocodeList += odeList
                 newLoccList += cList
-                #newLocinvsdict.update(invs)
                 for k in invs.iterkeys():
-                    if k in newLocinvsdict.keys() and invs[k] != newLocinvsdict[k]:
-                        for jk in invs[k]:
-                            newLocinvsdict[k].append(jk)
+                    if k in newLocinvsdict.keys():
+                        if invs[k] != newLocinvsdict[k]:
+                            for jk in invs[k]:
+                                newLocinvsdict[k].append(jk)
                     else:
                         newLocinvsdict.update(invs)
         newLocNames[ii] = newLocname
