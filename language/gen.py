@@ -29,7 +29,8 @@ def solve_ode_system(count, odee):
                 rft = [(k, v) for k, v in rrFuncs.iteritems()]
             ode = ode.subs(rft)
             if count > 0:
-                ode = dsolve(ode).rhs.subs(Symbol('C1'), S('C1'+str(var.func)))
+                ode = dsolve(ode).rhs.subs(Symbol('C1'),
+                                           S('C1'+str(var.func)))
                 return ode
             odee = Ode(ode, var, iValue, {})
             return odee
@@ -194,15 +195,18 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                                 if sign(s) > 0:
                                     cb = str(max(mm))
                                     stmts += ['if('+str(var.func)+'_u > ' +
-                                              cb + ' && ' + str(var.func) + '_init'+
+                                              cb + ' && ' +
+                                              str(var.func) + '_init' +
                                               ' <= ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                                 else:
                                     # Decreasing or non-increasing function
                                     cb = str(min(mm))
-                                    stmts += ['if('+str(var.func) +
-                                              '_u < ' + cb + ' && ' +str(var.func) + '_init'+' >= ' + cb + ')']
+                                    stmts += ['if('+str(var.func) + '_u < ' +
+                                              cb + ' && ' +
+                                              str(var.func) + '_init'
+                                              + ' >= ' + cb + ')']
                                     stmts += [tab + str(
                                         var.func) + '_u = ' + cb + ';']
                             else:
