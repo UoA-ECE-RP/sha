@@ -1,13 +1,10 @@
-from macropy.experimental.pattern import macros, _matching, switch, patterns, LiteralMatcher, TupleMatcher, PatternMatchException, NameMatcher, ListMatcher, PatternVarConflict, ClassMatcher, WildcardMatcher
-from language import *
+# This the files that converts the JASON format to HA
+# Author: Avinash Malik
+# Date: Sun Sep  6 23:07:14 NZST 2015
 
-from sympy import Symbol, dsolve, solve, S, Max, Mul, Add, nsolve, solve_undetermined_coeffs, Eq, nsimplify, Function, ccode, N, Abs, sign, classify_ode
-from sympy.utilities.codegen import codegen, make_routine
-from functools import partial
-import colorama
-import copy
-from termcolor import colored
+from sympy import S, Function
 import jsonlib2 as json
+from language import *
 
 
 # Recursively get all the derivatives
