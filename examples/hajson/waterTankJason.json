@@ -1,0 +1,207 @@
+﻿{
+    "modelName": "waterTank",
+    "edges": [
+        {
+            "id": "5",
+            "startLocation": {
+                "id": "0",
+                "showname": "t2",
+                "text": "name:t2;invariants:x>=20, x <= 100;ode:diff(x(t))-(0.075*(150-x(t)));"
+            },
+            "endLocation": {
+                "id": "3",
+                "showname": "t4",
+                "text": "name:t4;invariants:x>=20, x <= 100;ode:diff(x(t))+0.075*x(t);"
+            },
+            "name": [
+                "t2",
+                "t4"
+            ],
+            "invariants": [
+                "OFF"
+            ],
+            "guards": [
+                "x = x"
+            ]
+        },
+        {
+            "id": "6",
+            "startLocation": {
+                "id": "3",
+                "showname": "t4",
+                "text": "name:t4;invariants:x>=20, x <= 100;ode:diff(x(t))+0.075*x(t);"
+            },
+            "endLocation": {
+                "id": "2",
+                "showname": "t1",
+                "text": "name:t1;invariants:x>=20, x <= 20;ode:diff(x(t));"
+            },
+            "name": [
+                "t4",
+                "t1"
+            ],
+            "invariants": [
+                "x >= 20",
+                " x <= 20"
+            ],
+            "guards": [
+                "x = x"
+            ]
+        },
+        {
+            "id": "7",
+            "startLocation": {
+                "id": "1",
+                "showname": "t3",
+                "text": "name:t3;invariants:x >= 100, x<= 100;ode:diff(x(t));"
+            },
+            "endLocation": {
+                "id": "3",
+                "showname": "t4",
+                "text": "name:t4;invariants:x>=20, x <= 100;ode:diff(x(t))+0.075*x(t);"
+            },
+            "name": [
+                "t3",
+                "t4"
+            ],
+            "invariants": [
+                "OFF"
+            ],
+            "guards": [
+                "x = x"
+            ]
+        },
+        {
+            "id": "8",
+            "startLocation": {
+                "id": "3",
+                "showname": "t4",
+                "text": "name:t4;invariants:x>=20, x <= 100;ode:diff(x(t))+0.075*x(t);"
+            },
+            "endLocation": {
+                "id": "0",
+                "showname": "t2",
+                "text": "name:t2;invariants:x>=20, x <= 100;ode:diff(x(t))-(0.075*(150-x(t)));"
+            },
+            "name": [
+                "t4",
+                "t2"
+            ],
+            "invariants": [
+                "ON"
+            ],
+            "guards": [
+                "x = x"
+            ]
+        },
+        {
+            "id": "9",
+            "startLocation": {
+                "id": "2",
+                "showname": "t1",
+                "text": "name:t1;invariants:x>=20, x <= 20;ode:diff(x(t));"
+            },
+            "endLocation": {
+                "id": "0",
+                "showname": "t2",
+                "text": "name:t2;invariants:x>=20, x <= 100;ode:diff(x(t))-(0.075*(150-x(t)));"
+            },
+            "name": [
+                "t1",
+                "t2"
+            ],
+            "invariants": [
+                "ON"
+            ],
+            "guards": [
+                "x = x"
+            ]
+        },
+        {
+            "id": "10",
+            "startLocation": {
+                "id": "0",
+                "showname": "t2",
+                "text": "name:t2;invariants:x>=20, x <= 100;ode:diff(x(t))-(0.075*(150-x(t)));"
+            },
+            "endLocation": {
+                "id": "1",
+                "showname": "t3",
+                "text": "name:t3;invariants:x >= 100, x<= 100;ode:diff(x(t));"
+            },
+            "name": [
+                "t2",
+                "t3"
+            ],
+            "invariants": [
+                "x >= 100",
+                " x <= 100"
+            ],
+            "guards": [
+                "x = x"
+            ]
+        }
+    ],
+    "locations": [
+        {
+            "id": "0",
+            "showname": "t2",
+            "text": "name:t2;invariants:x>=20, x <= 100;ode:diff(x(t))-(0.075*(150-x(t)));",
+            "name": [
+                "t2"
+            ],
+            "invariants": [
+                "x>=20",
+                " x <= 100"
+            ],
+            "ode": [
+                "diff(x(t))-(0.075*(150-x(t)))"
+            ]
+        },
+        {
+            "id": "1",
+            "showname": "t3",
+            "text": "name:t3;invariants:x >= 100, x<= 100;ode:diff(x(t));",
+            "name": [
+                "t3"
+            ],
+            "invariants": [
+                "x >= 100",
+                " x<= 100"
+            ],
+            "ode": [
+                "diff(x(t))"
+            ]
+        },
+        {
+            "id": "2",
+            "showname": "t1",
+            "text": "name:t1;invariants:x>=20, x <= 20;ode:diff(x(t));",
+            "name": [
+                "t1"
+            ],
+            "invariants": [
+                "x>=20",
+                " x <= 20"
+            ],
+            "ode": [
+                "diff(x(t))"
+            ]
+        },
+        {
+            "id": "3",
+            "showname": "t4",
+            "text": "name:t4;invariants:x>=20, x <= 100;ode:diff(x(t))+0.075*x(t);",
+            "name": [
+                "t4"
+            ],
+            "invariants": [
+                "x>=20",
+                " x <= 100"
+            ],
+            "ode": [
+                "diff(x(t))+0.075*x(t)"
+            ]
+        }
+    ]
+}

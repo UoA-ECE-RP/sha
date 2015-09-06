@@ -1,7 +1,9 @@
-# This is the compiler main module
+#!/usr/bin/env python
+import macropy.activate
 import gen
 import sys
 import compose
+import hajson
 
 
 def comp(haList):
@@ -25,10 +27,9 @@ def compile(ha, **kwargs):
 
 
 def main(argv):
-    # Parse XML file
-    # ha = parseHa(argv[0])
-    ha = None
-    compile(ha)
+    # Parse JSON file
+    ha = hajson.parseHA(argv[0])
+    compile(ha, ALL_BETS_OFF=True)
 
 
 if __name__ == '__main__':
