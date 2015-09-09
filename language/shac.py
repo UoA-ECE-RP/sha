@@ -29,7 +29,7 @@ def compile(ha, **kwargs):
 def main(argv):
     # Parse JSON file
     ha = hajson.parseHA(argv[0])
-    compile(ha, ALL_BETS_OFF=True)
+    compile(ha, ABOF=True)
 
 
 if __name__ == '__main__':
