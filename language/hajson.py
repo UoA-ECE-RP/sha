@@ -29,17 +29,12 @@ def parseHA(fileName):
     """
     with open(fileName, 'r') as jsonFile:
         ha = json.read(jsonFile.read())
+        sloc = None
         locs = []
         # Building locations
         for loc in ha['locations']:
-            # Get the odes in this location I am just giving the default
-            # initial value right now (0)
-
-            # The JSON needs to have an initial
-            # value Similarly, I am giving an empty dictionary as the
-            # dependent odes.
-
-            # JSON needs to have the list of dependent odes
+            # XXX: I am giving an empty dictionary as the dependent
+            # odes. JSON needs to have the list of dependent odes
 
             # First get the function from the derivative
             funcs = [S(o) for o in loc['ode']]
@@ -53,7 +48,9 @@ def parseHA(fileName):
                 get_Functions(ders[0], ff)
                 if not all(ff):
                     raise Exception('Not a first order derivative:' + f)
-                odes[i] = Ode(S(o), ff[0], 0, {})
+                if not (len(loc['init']) == 1):
+                    raise Exception('Multiple inits for ode' + loc['ode'])
+                odes[i] = Ode(S(o), ff[0], S(loc['init'][0]), {})
 
             # Get the key for the invariant
             invsS = [S(i) for i in loc['invariants']]
@@ -65,6 +62,12 @@ def parseHA(fileName):
                     if str(i.lhs) == str(k.func):
                         invs[k] += [Guard(i)]
             locs += [Loc(loc['name'][0], odes, [], invs)]
+            if loc['isStartLocation'][0] == 'yes':
+                if sloc is None:
+                    sloc = locs[-1]
+                else:
+                    raise Exception('More than 1 start location specfied: ' +
+                                    str(sloc))
 
         # Now build the edges
         edges = [None]*len(ha['edges'])
@@ -72,24 +75,22 @@ def parseHA(fileName):
             # Names
             [s, t] = e['name']
 
-            # TODO: ZHAN needs to have events, guards, and updates
-            # separate
-
-            # Events and Guards are in invariant!
-
-            # Check there can only be events and relations in invariant
+            # Check that there can only be events and relations in
+            # guards and events
+            guards = filter(lambda x: x != "", e['guards'])
+            events = filter(lambda x: x != "", e['event'])
             alls = map(lambda x: S(x).is_Relational or S(x).is_Symbol,
-                       e['invariants'])
+                       (guards+events))
             allOK = reduce(lambda x, y: y and x, alls, True)
             if not allOK:
                 raise Exception('Only symbols and relations allowed: ' +
-                                str(e['invariants']))
+                                str(guards+events))
 
             # First get the events if any
-            events = [Event(g) for g in e['invariants'] if S(g).is_Symbol]
-
+            events = [Event(g) for g in events if S(g).is_Symbol]
             # Second get the relations if any
-            rels = [S(g) for g in e['invariants'] if S(g).is_Relational]
+            rels = [S(g) for g in guards if S(g).is_Relational]
+
             # Build the key needed to put in the relations
             relsK = set([Function(str(i.lhs))(S('t')) for i in rels])
             relsD = {k: [] for k in relsK}
@@ -98,9 +99,9 @@ def parseHA(fileName):
                     if str(i.lhs) == str(k.func):
                         relsD[k].append(Guard(i))
 
-            # The update is in guards key!
+            # updates are in the update key
             ups = []
-            for u in e['guards']:
+            for u in e['update']:
                 [x1, x2] = u.split('=')
                 if x1 == x2:
                     x1, x2 = S(x1), S(x2)
@@ -115,7 +116,9 @@ def parseHA(fileName):
             edges[ei] = Edge(s, t, relsD, ups, events)
 
         # Finally make the HA
-        # XXX: ZHAN needs to give me the unique start location
         # TODO: How to declare local and global vars in the HA model??
-        ha = Ha(ha['modelName'], locs, locs[0], edges, [], [])
+        if sloc is None:
+            raise Exception('No start location specified')
+
+        ha = Ha(ha['modelName'], locs, sloc, edges, [], [])
         return ha
