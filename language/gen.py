@@ -361,7 +361,7 @@ def getEAndGAndU(edge, events):
         # eeExpr = ' && '.join(eus+nevents)
 
         # XXX: I have now made this a non-complete monomial, hence it is
-        # not non-deterministic
+        # non-deterministic
         eeExpr = ' && '.join(eus)
         # TODO: CHECK IF THIS IS TRUE!!  This means if there is no event
         # then there is an enabling event generated automatically
