@@ -356,9 +356,13 @@ def getEAndGAndU(edge, events):
                 Event(xx) << event
                 eus.append(str(xx))
         eus = filter(lambda x: not(x is None), eus)
-        nevents = filter(lambda x: not(x in eus), events)
-        nevents = map(lambda x: '!'+x, nevents)
-        eeExpr = ' && '.join(eus+nevents)
+        # nevents = filter(lambda x: not(x in eus), events)
+        # nevents = map(lambda x: '!'+x, nevents)
+        # eeExpr = ' && '.join(eus+nevents)
+
+        # XXX: I have now made this a non-complete monomial, hence it is
+        # not non-deterministic
+        eeExpr = ' && '.join(eus)
         # TODO: CHECK IF THIS IS TRUE!!  This means if there is no event
         # then there is an enabling event generated automatically
         if eeExpr == '':
