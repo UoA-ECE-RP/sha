@@ -13,7 +13,7 @@
 extern double h,v;
 
 /* The step size */
-double d = 0.2;
+double d = 0.01;
 
 /* The events to read from file */
 
