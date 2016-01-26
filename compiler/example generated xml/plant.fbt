@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Comment="Basic function block" Name="FBlock">
+  <Identification Standard="61499"/>
+  <VersionInfo Author="Kawsihen" Date="11/20/2015 9:00 AM" Organization="Kawsihen_s Macintosh" Remarks="" Version="1.0"/>
+  <CompilerInfo header="package mypackage"></CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="add1"/>
+      <Event Comment="" Name="remove2"/>
+      <Event Comment="" Name="remove1"/>
+      <Event Comment="" Name="add2"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="update">
+        <With Var="x"/>
+      </Event>
+    </EventOutputs>
+    <InputVars/>
+    <OutputVars>
+      <VarDeclaration Comment="" Name="x" Type="BOOL"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <ECC>
+      <ECState Comment="" Name="Start" x="727" y="1474">
+        <ECAction Algorithm="init" Ouptput=""/>
+      </ECState>
+      <ECState Comment="" Name="t0" x="529" y="951">
+        <ECAction Algorithm="t0Algo" Output=""/>
+      </ECState>
+      <ECState Comment="" Name="t1" x="640" y="730">
+        <ECAction Algorithm="t1Algo" Output=""/>
+      </ECState>
+      <ECState Comment="" Name="t2" x="1219" y="847">
+        <ECAction Algorithm="t2Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="True" Destination="t0" Source="Start" x="603" y="768"/>
+      <ECState Comment="" Name="t_state1" x="1835" y="826">
+        <ECAction Algorithm="t_state1Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="add1" Destination="t_state1" Source="t0" x="725" y="920"/>
+      <ECTransition Condition="True" Destination="t1" Source="t_state1" x="278" y="1809"/>
+      <ECState Comment="" Name="t_state2" x="829" y="556">
+        <ECAction Algorithm="t_state2Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="remove1" Destination="t_state2" Source="t1" x="659" y="1833"/>
+      <ECTransition Condition="True" Destination="t0" Source="t_state2" x="62" y="1918"/>
+      <ECState Comment="" Name="t_state3" x="1863" y="1166">
+        <ECAction Algorithm="t_state3Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="add2" Destination="t_state3" Source="t0" x="1444" y="238"/>
+      <ECTransition Condition="True" Destination="t2" Source="t_state3" x="727" y="465"/>
+      <ECState Comment="" Name="t_state4" x="1750" y="462">
+        <ECAction Algorithm="t_state4Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="remove2" Destination="t_state4" Source="t2" x="1158" y="1625"/>
+      <ECTransition Condition="True" Destination="t0" Source="t_state4" x="1591" y="1415"/>
+      <ECTransition Condition="True" Destination="t0" Source="t0" x="100" y="1898"/>
+      <ECTransition Condition="True" Destination="t1" Source="t1" x="573" y="1198"/>
+      <ECTransition Condition="True" Destination="t2" Source="t2" x="1495" y="1206"/>
+    </ECC>
+    <Algorithm Comment="" Name="t0Algo">
+      <Other Language="C" Text="me-&gt;x = (float) me-&gt;C1x*exp(0.1*me-&gt;d*me-&gt;k) + 500.0;&#10;me-&gt;k++;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t1Algo">
+      <Other Language="C" Text="me-&gt;x = (float) me-&gt;C1x*exp(0.1*me-&gt;d*me-&gt;k) + 560.0;&#10;me-&gt;k++;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t2Algo">
+      <Other Language="C" Text="me-&gt;x = (float) me-&gt;C1x*exp(0.1*me-&gt;d*me-&gt;k) + 600.0;&#10;me-&gt;k++;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="init">
+      <Other Language="C" Text="me-&gt;d = 0.01;&#10;me-&gt;k=0;&#10; me-&gt;x= 510;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state1Algo">
+      <Other Language="C" Text="me-&gt;x = x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state2Algo">
+      <Other Language="C" Text="me-&gt;x = x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state3Algo">
+      <Other Language="C" Text="me-&gt;x = x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state4Algo">
+      <Other Language="C" Text="me-&gt;x = x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>
