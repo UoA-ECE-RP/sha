@@ -1,5 +1,4 @@
 # Author: Avinash Malik
-# Thu May  7 14:21:57 NZST 2015
 
 # This is the HA language encoded in python
 

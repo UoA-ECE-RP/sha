@@ -5,58 +5,65 @@
   <CompilerInfo header="package mypackage"></CompilerInfo>
   <InterfaceList>
     <EventInputs>
-      <Event Comment="" Name="DOWN"/>
       <Event Comment="" Name="UP"/>
+      <Event Comment="" Name="DOWN"/>
+      <Event Comment="" Name="update_in"/>
     </EventInputs>
     <EventOutputs>
-      <Event Comment="" Name="update_g">
-        <With Var="x"/>
+      <Event Comment="" Name="update_out">
+        <With Var="y"/>
       </Event>
     </EventOutputs>
     <InputVars/>
     <OutputVars>
-      <VarDeclaration Comment="" Name="x" Type="BOOL"/>
+      <VarDeclaration Comment="" Name="y" Type="BOOL"/>
     </OutputVars>
   </InterfaceList>
   <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="" Name="k" Type="REAL"/>
+      <VarDeclaration Comment="" Name="d" Type="REAL"/>
+      <VarDeclaration Comment="" Name="x" Type="REAL"/>
+      <VarDeclaration Comment="" Name="C1x" Type="REAL"/>
+    </InternalVars>
     <ECC>
-      <ECState Comment="" Name="Start" x="1634" y="1241">
+      <ECState Comment="" Name="Start" x="1376" y="1411">
         <ECAction Algorithm="init" Ouptput=""/>
       </ECState>
-      <ECState Comment="" Name="t1" x="1937" y="1754">
+      <ECState Comment="" Name="t1" x="1175" y="1877">
         <ECAction Algorithm="t1Algo" Output=""/>
       </ECState>
-      <ECState Comment="" Name="t2" x="1959" y="634">
+      <ECState Comment="" Name="t2" x="953" y="1474">
         <ECAction Algorithm="t2Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="True" Destination="t1" Source="Start" x="1817" y="1769"/>
-      <ECState Comment="" Name="t_state1" x="607" y="472">
+      <ECTransition Condition="True" Destination="t1" Source="Start" x="1040" y="1269"/>
+      <ECState Comment="" Name="t_state1" x="1365" y="257">
         <ECAction Algorithm="t_state1Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="UP" Destination="t_state1" Source="t1" x="1032" y="219"/>
-      <ECTransition Condition="True" Destination="t2" Source="t_state1" x="1529" y="1553"/>
-      <ECState Comment="" Name="t_state2" x="728" y="765">
+      <ECTransition Condition="UP" Destination="t_state1" Source="t1" x="1348" y="1146"/>
+      <ECTransition Condition="True" Destination="t2" Source="t_state1" x="1477" y="1868"/>
+      <ECState Comment="" Name="t_state2" x="948" y="1639">
         <ECAction Algorithm="t_state2Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="DOWN" Destination="t_state2" Source="t2" x="526" y="434"/>
-      <ECTransition Condition="True" Destination="t1" Source="t_state2" x="1021" y="855"/>
-      <ECTransition Condition="x &gt;= 1 &amp;&amp; x &lt;= 10" Destination="t1" Source="t1" x="1019" y="64"/>
-      <ECTransition Condition="x &gt;= 1 &amp;&amp; x &lt;= 10" Destination="t2" Source="t2" x="1970" y="299"/>
+      <ECTransition Condition="DOWN" Destination="t_state2" Source="t2" x="1144" y="1332"/>
+      <ECTransition Condition="True" Destination="t1" Source="t_state2" x="1776" y="1256"/>
+      <ECTransition Condition="x &gt;= 1 &amp;&amp; x &lt;= 10" Destination="t1" Source="t1" x="849" y="1297"/>
+      <ECTransition Condition="x &gt;= 1 &amp;&amp; x &lt;= 10" Destination="t2" Source="t2" x="1663" y="602"/>
     </ECC>
     <Algorithm Comment="" Name="t1Algo">
-      <Other Language="C" Text="me-&gt;x = (float) me-&gt;C1x*exp(-me-&gt;d*me-&gt;k/2);&#10;me-&gt;k++;"/>
+      <Other Language="C" Text="me-&gt;C1x = 10.000;&#10;me-&gt;x = (float) me-&gt;C1x*exp(-me-&gt;d*me-&gt;k/2);&#10;me-&gt;k++;"/>
     </Algorithm>
     <Algorithm Comment="" Name="t2Algo">
-      <Other Language="C" Text="me-&gt;x = (float) me-&gt;C1x*exp(-me-&gt;d*me-&gt;k/2) + 11;&#10;me-&gt;k++;"/>
+      <Other Language="C" Text="me-&gt;C1x = -10.000;&#10;me-&gt;x = (float) me-&gt;C1x*exp(-me-&gt;d*me-&gt;k/2) + 11;&#10;me-&gt;k++;"/>
     </Algorithm>
     <Algorithm Comment="" Name="init">
-      <Other Language="C" Text="me-&gt;d = 0.01;&#10;me-&gt;k=0;&#10; me-&gt;x= 10;"/>
+      <Other Language="C" Text="me-&gt;d = 0.01;&#10;me-&gt;k = 0;&#10;;"/>
     </Algorithm>
     <Algorithm Comment="" Name="t_state1Algo">
-      <Other Language="C" Text="me-&gt;x = x;&#10;me-&gt;k = 0;"/>
+      <Other Language="C" Text="me-&gt;x = me-&gt;x;&#10;me-&gt;k = 0;"/>
     </Algorithm>
     <Algorithm Comment="" Name="t_state2Algo">
-      <Other Language="C" Text="me-&gt;x = x;&#10;me-&gt;k = 0;"/>
+      <Other Language="C" Text="me-&gt;x = me-&gt;x;&#10;me-&gt;k = 0;"/>
     </Algorithm>
   </BasicFB>
 </FBType>

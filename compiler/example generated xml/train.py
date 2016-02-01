@@ -16,37 +16,50 @@ import shac
 #Train and Gate from 
 # http://www.eecs.tufts.edu/~khan/Courses/Spring2013/EE194/Lecs/Hybrid_Systems_Presentation_Elliott_Costello.pdf
 
-ode_x_down = Ode(sympify("diff(x(t))-(0-x(t))/2"), sympify("x(t)"), 10, {})
-ode_x_up = Ode(sympify("diff(x(t))-(11-x(t))/2"), sympify("x(t)"), 1, {})
+ode_y  = Ode(sympify("diff(y(t))-1"), sympify("y(t)"), 0, {})
 
 # CHANGED : Added the external interface of the hybrid automaton 
 
 # Keys are the external events and the values are a list of external variables those events are associated with.
 # First dictionary correponds to the input and the second to the output. 
-extEves = ExternalEvents({ Event("UP") : [], Event("DOWN") : [] }, {})
+extEves = ExternalEvents({}, {})
 # List of external variables. Fist list corresponds to the input and second to the output.
-extVars =  ExternalVars([],[Symbol("y")])
+extVars =  ExternalVars([Symbol("x")],[Symbol("z")])
 
 # The locations of the hybrid automaton
-t1 = Loc("t1", [ode_x_down],[],
-         {S("x(t)"): [Guard(S("x>=1")), Guard(S("x <= 10"))]})
+t1 = Loc("t1", [ode_y], [],
+         {S('y(t)'): [Guard(S('y<5'))]})
 
-t2 = Loc("t2", [ode_x_up],[],
-         {S("x(t)"): [Guard(S("x>=1")), Guard(S("x <= 10"))]})
+t2 = Loc("t2", [ode_y], [],
+         {S('y(t)'): [Guard(S('y>=5')), 
+                      Guard(S('y<15'))]})
+
+t3 = Loc("t3", [ode_y], [],
+         {S('y(t)'): [Guard(S('y>=15')), 
+                      Guard(S('y<25'))]})
 
 
 # The edges
-e1 = Edge('t1', 't2', {S("x(t)"): [Guard(sympify("True"))]},
-          [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("UP")])
-e2 = Edge('t2', 't1', {S("x(t)"): [Guard(sympify("True"))]},
-          [Update.Update2(Symbol('x'), Symbol('x'))],
-          [Event("DOWN")])
+e1 = Edge('t1', 't2', {S("x(t)"): [Guard(S("y>=5")),
+                                   Guard(S("y<=5"))]},
+          [Update.Update2(Symbol('y'), Symbol('y')),
+           Update.Update1(Symbol('signal'), Symbol('1'))],
+          [])
 
+e2 = Edge('t2', 't3', {S("x(t)"): [Guard(S("y>=15")),
+                                   Guard(S("y<=15"))]},
+          [Update.Update2(Symbol('y'), Symbol('y')),
+           Update.Update1(Symbol('signal'), Symbol('0'))],
+          [])
+
+e3 = Edge('t3', 't1', {S("x(t)"): [Guard(S("y>=25")),
+                                   Guard(S("y<=25"))]},
+          [Update.Update1(Symbol('y'), Symbol('0'))],
+          [])
 
 # CHANGED : Added extEves, extVars arguments
-gate = Ha("gate", [t1, t2], t2, [e1, e2], [], [], extEves, extVars)
+train = Ha("train", [t1, t2, t3], t1, [e1, e2, e3], [Symbol("signal")], [], extEves, extVars)
 
 
 # Compile
-# shac.compile(gate)
+# shac.compile(train)

@@ -1,7 +1,10 @@
-# TODO : The algorithms attachd to the states have not been verified
+# Author : Kawsihen Elankumaran
+
+# This is the compiler from Hybrid Automata in Python to IEC-61499 in XML
 
 from lxml import etree
-from sympy import dsolve
+from sympy import dsolve, N
+from sympy.solvers import solve
 from random import randint  
 
 import macropy.activate
@@ -14,7 +17,7 @@ import watertank
 ha_model = watertank.waterTank
 
 # put the complete path of the directory the output should be written to 
-write_path = ''
+write_path = '/Users/kawsihenelankumaran/Desktop/Windows Shared/New Folder/'
 
 FBTYPE = etree.Element('FBType', Name='FBlock', Comment='Basic function block')
 IDENT = etree.SubElement(FBTYPE, 'Identification', Standard='61499')
@@ -23,7 +26,7 @@ COMPILERINFO = etree.SubElement(FBTYPE, 'CompilerInfo', header='package mypackag
 COMPILERINFO.text=''
 
 #---------------------------------------
-# building the function block interface 
+# Building the function block interface 
 #---------------------------------------
 
 INTERFACELIST = etree.SubElement(FBTYPE, 'InterfaceList')
@@ -38,6 +41,12 @@ for ext_inp_eve, asso_vars in ha_model.rest[0].externalInputEvents.iteritems():
 	for asso_var in asso_vars:
 		WITH1 = etree.SubElement(EVENT1, 'With', Var=str(asso_var))  
 
+# input update clock and associations with all input variables
+EVENT = etree.SubElement(EVENTINPUTS, 'Event', Name='update_in' , Comment='')
+
+for ext_inp_var in ha_model.rest[1].externalInputVars:
+	WITH = etree.SubElement(EVENT, 'With', Var=str(ext_inp_var))  
+
 # output events and their associated variables
 EVENTOUTPUTS = etree.SubElement(INTERFACELIST, 'EventOutputs')
 
@@ -47,6 +56,12 @@ for ext_outp_eve, asso_vars in ha_model.rest[0].externalOutputEvents.iteritems()
 	
 	for asso_var in asso_vars:
 		WITH2 = etree.SubElement(EVENT2, 'With', Var=str(asso_var))
+
+# output update clock and associations with all output variables
+EVENT = etree.SubElement(EVENTOUTPUTS, 'Event', Name='update_out' , Comment='')
+
+for ext_outp_var in ha_model.rest[1].externalOutputVars:
+	WITH = etree.SubElement(EVENT, 'With', Var=str(ext_outp_var))  
 
 # input variables
 INPUTVARS = etree.SubElement(INTERFACELIST, 'InputVars')
@@ -66,9 +81,24 @@ for ext_outp_var in ha_model.rest[1].externalOutputVars:
 
 BASICFB = etree.SubElement(FBTYPE, 'BasicFB')
 
+# declaring internl variables. d - step size  k - step counter
+INTERNALVARS = etree.SubElement(BASICFB, 'InternalVars')
+VARDECLARATION3 = etree.SubElement(INTERNALVARS, 'VarDeclaration', Name='k', Type='REAL', Comment='')
+VARDECLARATION3 = etree.SubElement(INTERNALVARS, 'VarDeclaration', Name='d', Type='REAL', Comment='')
+
+# declaring global variables from HA model
+for gVar in ha_model.globalVars:
+	VARDECLARATION3 = etree.SubElement(INTERNALVARS, 'VarDeclaration', Name=str(gVar), Type='REAL', Comment='')
+
+# delcaring internal global variables form HA model
+for igVar in ha_model.iglobalVars:
+	VARDECLARATION3 = etree.SubElement(INTERNALVARS, 'VarDeclaration', Name=str(igVar), Type='REAL', Comment='')
+
 ECC = etree.SubElement(BASICFB, 'ECC')
 
 ECSTATE1 = etree.SubElement(ECC, 'ECState', Name='Start', Comment='',x=str(randint(0,2000)), y=str(randint(0,2000)))
+
+internal_var_set = set()
 
 for loc in ha_model.locations:
 
@@ -80,14 +110,29 @@ for loc in ha_model.locations:
 
 	solution_str = ''
 
-	# solving the ODEs, discretizing them and adding them as algorithm to the states
-	# ODE is supposed to be in x(t) 
+	# solving the ODEs, discretizing them in time and adding them as algorithm to the states.
 	for ode in loc.odeList:
-		solution_str = solution_str + str(dsolve(ode.expr,ode.var)).replace('x(t) ==','me->x =').replace('t','me->d*me->k').replace('C1','(float) me->C1x') + ';\n'
 
+		sol = dsolve(ode.expr, ode.var)
+
+		# using the initial condition at t=0 to deduce the constant C1
+		expr = str(sol.rhs).replace('t','0') + '-(' + str(ode.initValue) + ')'
+		C1value = solve(expr, 'C1')
+		C1soln_str = 'me->C1' + str(ode.var.func) + ' = ' + str(N(C1value[0], 5)) + ';\n'
+
+		solution_str = solution_str + C1soln_str + str(sol).replace(str(ode.var)+' ==','me->'+  str(ode.var.func) + ' =').replace('t','me->d*me->k').replace('C1','(float) me->C1'+ str(ode.var.func)) + ';\n'
+		
+		internal_var_set.add(str(ode.var.func))
+
+	# algorithm to increment the step counter in every cycle
 	solution_str = solution_str + 'me->k++;'
 
 	OTHER = etree.SubElement(ALGORITHM, 'Other', Language='C' , Text=solution_str)
+
+# declaring the collected internal variables and constants of integration
+for var in internal_var_set:
+	VARDECLARATION3 = etree.SubElement(INTERNALVARS, 'VarDeclaration', Name=var, Type='REAL', Comment='')
+	VARDECLARATION3 = etree.SubElement(INTERNALVARS, 'VarDeclaration', Name='C1'+var, Type='REAL', Comment='')
 
 i = 1
 
@@ -98,7 +143,7 @@ ALGORITHM = etree.SubElement(BASICFB, 'Algorithm', Name='init', Comment='')
 first_loc = ha_model.locations[0]
 
 # initializing the varialbles needed for simulation
-init_str = 'me->d = 0.01;\nme->k=0;\n me->x= ' + str(first_loc.odeList[0].initValue) + ';'
+init_str = 'me->d = 0.01;\nme->k = 0;\n'
 
 OTHER = etree.SubElement(ALGORITHM, 'Other', Language='C' , Text=init_str)
 ECTRANSITION = etree.SubElement(ECC, 'ECTransition', Source='Start', Destination=first_loc.name, Condition='True', x=str(randint(0,2000)), y=str(randint(0,2000)))
@@ -116,17 +161,19 @@ for edge in ha_model.edges:
 	update_str = ''
 	for update in edge.updateList:
 		if(isinstance(update,language.Update.Update2)):
-			update_str = update_str +  'me->' + str(update.x)  + ' = '+ str(update.y) + ';\n' 
+			update_str = update_str +  'me->' + str(update.x)  + ' = '+ 'me->' + str(update.y) + ';\n' 
 		elif(isinstance(update,language.Update.Update1)):
 			update_str = update_str +  'me->' + str(update.var)  + ' = '+ str(update.nat) + ';\n' 
 
+	# reset the discrete counter during after transition
 	update_str = update_str + 'me->k = 0;'
 
 	OTHER = etree.SubElement(ALGORITHM, 'Other', Language='C' , Text=update_str)
 
-	# buiding the condition strings for transition to and from the intermediate state
+	# buiding the condition strings for transition to and from the created intermediate state
 	condition_str1 = ''
 
+	# condition string for the events
 	for event in edge.eventList:
 		condition_str1 = condition_str1 + event.s + ' && '	
 	
@@ -136,9 +183,10 @@ for edge in ha_model.edges:
 	condition_str2 = ''
 	final_condition = ''
 
+	# condition string for the guard conditions
 	for condition_list in edge.guard.itervalues():
 		for condition_element in condition_list:
-				if(str(condition_element.relationalExpr) == 'True'):
+				if(str(condition_element.relationalExpr) == 'True'): # multiple True unnecesssary
 					continue
 				condition_str2 = condition_str2 + str(condition_element.relationalExpr) + ' && '
 
@@ -161,7 +209,7 @@ for loc in ha_model.locations:
 	
 	condition_str = ''
 
-	# building self transition condition 
+	# building the self transition condition 
 	for condition_list in loc.invariant.itervalues():
 		for condition_element in condition_list:
 			condition_str = condition_str + str(condition_element.relationalExpr) + ' && '
