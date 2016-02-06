@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import division
 import macropy.activate
 from language import *
@@ -5,9 +7,12 @@ from gen import *
 from sympy import *
 import shac
 
+# Tim says that if we integrate the height "h(t)" in this system then
+# without staturation and with saturation we will get different results.
+# Check the above statement by comparing it with Simulink.
 
 ode_v1 = Ode(sympify("diff(v(t))+9.81"),
-             sympify("v(t)"), 10.001, {})
+             sympify("v(t)"), 0.00, {})
 
 ode_h1 = Ode(sympify("diff(h(t))-v(t)"),
              sympify("h(t)"), 100, {S('v(t)'): ode_v1})
@@ -28,7 +33,6 @@ e1 = Edge('t1', 't1', {S("v(t)"): [Guard(S("h>=0")),
           [])
 
 bouncing_ball2 = Ha("bouncing_ball2", [t1], t1, [e1], [], [])
-
 
 # Compile
 shac.compile(bouncing_ball2, ABOF=True)

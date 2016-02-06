@@ -11,10 +11,10 @@ ode_x_down = Ode(sympify("diff(x(t))-(0-x(t))/2"), sympify("x(t)"), 10, {})
 ode_x_up = Ode(sympify("diff(x(t))-(11-x(t))/2"), sympify("x(t)"), 1, {})
 
 # The locations of the hybrid automaton
-t1 = Loc("t1", [ode_x_down],[],
+t1 = Loc("t1", [ode_x_down], [],
          {S("x(t)"): [Guard(S("x>=1")), Guard(S("x <= 10"))]})
 
-t2 = Loc("t2", [ode_x_up],[],
+t2 = Loc("t2", [ode_x_up], [],
          {S("x(t)"): [Guard(S("x>=1")), Guard(S("x <= 10"))]})
 
 

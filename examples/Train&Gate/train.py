@@ -4,10 +4,10 @@ from gen import *
 from sympy import *
 import shac
 
-#Train and Gate from 
+# Train and Gate from
 # http://www.eecs.tufts.edu/~khan/Courses/Spring2013/EE194/Lecs/Hybrid_Systems_Presentation_Elliott_Costello.pdf
 
-ode_y  = Ode(sympify("diff(y(t))-1"), sympify("y(t)"), 0, {})
+ode_y = Ode(sympify("diff(y(t))-1"), sympify("y(t)"), 0, {})
 
 
 # The locations of the hybrid automaton
@@ -15,11 +15,11 @@ t1 = Loc("t1", [ode_y], [],
          {S('y(t)'): [Guard(S('y<5'))]})
 
 t2 = Loc("t2", [ode_y], [],
-         {S('y(t)'): [Guard(S('y>=5')), 
+         {S('y(t)'): [Guard(S('y>=5')),
                       Guard(S('y<15'))]})
 
 t3 = Loc("t3", [ode_y], [],
-         {S('y(t)'): [Guard(S('y>=15')), 
+         {S('y(t)'): [Guard(S('y>=15')),
                       Guard(S('y<25'))]})
 
 
