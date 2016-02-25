@@ -24,10 +24,10 @@ Plot the wout.csv file in excel!
 2. macropy
 3. colorama
 4. termcolor
-5. jasonlib2
+5. jsonlib2
 6. Python version 2.7 only
 
 ## Installing dependencies 
 ``` bash
-pip install sympy macropy colorama termcolor jasonlib2
+pip install sympy macropy colorama termcolor jsonlib2
 ```
