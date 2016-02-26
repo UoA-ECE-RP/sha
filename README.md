@@ -7,7 +7,7 @@ Generate synchronous code from subset of hybrid automata
 ```bash
 cd ./language
 export PYTHONPATH=`pwd`
-cd ../examples
+cd ../examples/waterTank
 python2.7 wr.py
 
 gcc watertankR.c wior.c -o w -lm
