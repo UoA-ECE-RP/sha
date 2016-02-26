@@ -4,6 +4,7 @@ import gen
 import sys
 import compose
 import hajson
+import HAIEC2
 
 
 def comp(haList):
@@ -29,7 +30,11 @@ def compile(ha, **kwargs):
 def main(argv):
     # Parse JSON file
     ha = hajson.parseHA(argv[0])
-    compile(ha, ABOF=True)
+    if argv[1] == 'fbt':
+		HAIEC2.compileToFBT(ha, argv[2])
+    else:
+		compile(ha, ABOF=True)
+
 
 
 if __name__ == '__main__':
