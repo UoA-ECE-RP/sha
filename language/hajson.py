@@ -73,7 +73,6 @@ def parseHA(fileName):
                                     str(sloc))
 
         # Now build the edges
-		pdb.set_trace()
         edges = [None]*len(ha['edges'])
         for ei, e in enumerate(ha['edges']):
             # Names
@@ -134,7 +133,8 @@ def parseHA(fileName):
 		# TODO: Need to construct extEves and extVars with externalEves and externalVars.
 		# extVars = ExternalEvents(externalInputEvents,externalOutputEvents)
 		# extEves = ExternalVars(externalInputVars,externalOutputVars)
-		# How to distinguish input and output? Take waterTank as an example, externalVars = [u'x = x'], externalEves = [Event(OFF), Event(ON)]
+		# How to distinguish input and output? For now I get them all from nodes 'update' and 'event' of the json file, but not sure if it's right.  
+		# Take waterTank as an example, externalVars = [u'x = x'], externalEves = [Event(OFF), Event(ON)]
 		    
         ha = Ha(ha['modelName'], locs, sloc, edges, [], [])
         return ha
