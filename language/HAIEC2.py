@@ -13,8 +13,6 @@ import gen
 import pdb
 
 def compileToFBT(ha, outPath):
-
-	# import the Ha class from the HA file here
 	ha_model = gen.preprocess(ha)
 
 	FBTYPE = etree.Element('FBType', Name='FBlock', Comment='Basic function block')

@@ -5,6 +5,7 @@
 from sympy import S, Function
 import jsonlib2 as json
 from language import *
+import pdb
 
 
 # Recursively get all the derivatives
@@ -31,6 +32,8 @@ def parseHA(fileName):
         ha = json.read(jsonFile.read())
         sloc = None
         locs = []
+        externalEves = []
+        externalVars = []
         # Building locations
         for loc in ha['locations']:
             # XXX: I am giving an empty dictionary as the dependent
@@ -70,6 +73,7 @@ def parseHA(fileName):
                                     str(sloc))
 
         # Now build the edges
+		pdb.set_trace()
         edges = [None]*len(ha['edges'])
         for ei, e in enumerate(ha['edges']):
             # Names
@@ -102,6 +106,8 @@ def parseHA(fileName):
             # updates are in the update key
             ups = []
             for u in e['update']:
+                if not (u in externalVars):
+                    externalVars.append(u)
                 [x1, x2] = u.split('=')
                 if x1 == x2:
                     x1, x2 = S(x1), S(x2)
@@ -114,11 +120,21 @@ def parseHA(fileName):
 
             # Make the edges
             edges[ei] = Edge(s, t, relsD, ups, events)
+            for e in events:
+			    if not (e in externalEves):
+			        externalEves.append(e)			
 
         # Finally make the HA
         # TODO: How to declare local and global vars in the HA model??
         if sloc is None:
             raise Exception('No start location specified')
-
+        pdb.set_trace()
+        extEves = None
+        extVars = None
+		# TODO: Need to construct extEves and extVars with externalEves and externalVars.
+		# extVars = ExternalEvents(externalInputEvents,externalOutputEvents)
+		# extEves = ExternalVars(externalInputVars,externalOutputVars)
+		# How to distinguish input and output? Take waterTank as an example, externalVars = [u'x = x'], externalEves = [Event(OFF), Event(ON)]
+		    
         ha = Ha(ha['modelName'], locs, sloc, edges, [], [])
         return ha
