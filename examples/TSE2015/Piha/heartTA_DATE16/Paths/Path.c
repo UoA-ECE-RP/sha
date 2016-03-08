@@ -4,11 +4,11 @@
 #define False 0
 
 
-static int  TApath_ode0(Path* me) {
+int Path_ode0(Path* me) {
    // tp_dot=0, no change in t
     return me->t;
 }
-static int TApath_ode1(Path* me) {
+int Path_ode1(Path* me) {
    // tp_dot=1
     return me->t + STEP_SIZE * 1;
 }
@@ -33,27 +33,23 @@ void PathRun(Path* me) {
 
 
   // Path FSM
-  switch (me->state) {
-      case (IDLE):
+  if(me->state == IDLE) {
         if(me->ACTpath==1){
               t_u = 0;
               state_u = ACT;
         }
         else{
-            t_u = TApath_ode0(me);
+            t_u = Path_ode0(me);
         }
-      break;
-      case (ACT):
+	} else if(me->state == ACT) {
         if(me->t > DELAY){
               t_u = 0;
               state_u = IDLE;
               ACTcell_u=1;
         }
         else{
-            t_u = TApath_ode1(me);
+            t_u = Path_ode1(me);
         }
-      break;
-      default: exit(1);
     }
 
 

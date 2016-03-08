@@ -92,6 +92,7 @@ if(is_file("Cells/cells.csv")) {
 			$h_contents = str_replace(strtoupper($filename), strtoupper($safe_name), $h_contents);
 
 			file_put_contents("Cells/Generated/" . $safe_name . ".h", $h_contents);
+			echo "xxx/Cells/Generated/" . $safe_name . ".c,";
 
 			$items[] = $safe_name;
 			$headers[] = "Cells/Generated/" . $safe_name . ".h";
@@ -134,6 +135,7 @@ if(is_file("Paths/paths.csv")) {
 			$h_contents = str_replace(strtoupper("Path"), strtoupper($safe_name), $h_contents);
 
 			file_put_contents("Paths/Generated/" . $safe_name . ".h", $h_contents);
+			echo "xxx/Paths/Generated/" . $safe_name . ".c,";
 
 			$items[] = $safe_name;
 			$headers[] = "Paths/Generated/" . $safe_name . ".h";
@@ -174,11 +176,18 @@ foreach($items as $item) {
 	fwrite($runnable, "\n");
 }
 
-fwrite($runnable, "\tFILE* fo = fopen(\"out.csv\", \"w\");\n");
+fwrite($runnable, "\t//FILE* fo = fopen(\"out.csv\", \"w\");\n");
+fwrite($runnable, "\n");
+
+fwrite($runnable, "\tasm(\"#@PRET_Parse start\");\n");
+fwrite($runnable, "\tasm(\"#@PRET_Thread start PRET_Node_main_ID_0\");\n");
 fwrite($runnable, "\n");
 
 fwrite($runnable, "\tunsigned int i = 0;\n");
 fwrite($runnable, "\tfor(i=0; i < (SIMULATION_TIME / STEP_SIZE); i++) {\n");
+fwrite($runnable, "\t\tasm(\"#@PRET_EOT start\");\n");
+fwrite($runnable, "\t\tasm(\"#@PRET_EOT end\");\n");
+fwrite($runnable, "\n");
 
 if(is_file("custom_code.c")) {
 	fwrite($runnable, "\n");
@@ -194,7 +203,7 @@ foreach($items as $item) {
 fwrite($runnable, "\t}\n");
 fwrite($runnable, "\n");
 
-fwrite($runnable, "\tfclose(fo);\n");
+fwrite($runnable, "\t//fclose(fo);\n");
 fwrite($runnable, "\n");
 
 fwrite($runnable, "\treturn 0;\n");

@@ -343,13 +343,19 @@ int main(void) {
 	(void) memset((void *)&RVS_RVS1_data, 0, sizeof(RVS_RVS1));
 	RVS_RVS1Init(&RVS_RVS1_data);
 
-	FILE* fo = fopen("out.csv", "w");
+	//FILE* fo = fopen("out.csv", "w");
+
+	asm("#@PRET_Parse start");
+	asm("#@PRET_Thread start PRET_Node_main_ID_0");
 
 	unsigned int i = 0;
 	for(i=0; i < (SIMULATION_TIME / STEP_SIZE); i++) {
+		asm("#@PRET_EOT start");
+		asm("#@PRET_EOT end");
 
-fprintf(fo, "%u, %u\n", i*STEP_SIZE, SinoatrialNode_data.t);
-fflush(fo);
+
+//fprintf(fo, "%u, %u\n", i*STEP_SIZE, SinoatrialNode_data.t);
+//fflush(fo);
 
 /* Cell Mappings */
 
@@ -662,7 +668,7 @@ RVS_RVS1_data.ACTpath = RightVentricularSeptum_data.ACTpath;
 		RVS_RVS1Run(&RVS_RVS1_data);
 	}
 
-	fclose(fo);
+	//fclose(fo);
 
 	return 0;
 }

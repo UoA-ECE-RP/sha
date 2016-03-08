@@ -1,6 +1,5 @@
-
-fprintf(fo, "%u, %u\n", i*STEP_SIZE, SinoatrialNode_data.t);
-fflush(fo);
+//fprintf(fo, "%u, %u\n", i*STEP_SIZE, SinoatrialNode_data.t);
+//fflush(fo);
 
 /* Cell Mappings */
 
