@@ -9,19 +9,17 @@
 
 // Cell Data Struct
 typedef struct {
-	// State
-	enum cellStates state;
 
 	// Outputs
-	char ACTnext;
+	char ACTpath;
 
 	// Inputs
-	char ACTnode1;
-	char ACTnode2;
+	char ACTcell1;
+	char ACTcell2;
 
 	// Internal Variables
 	int t;
-	char ACTcell;
+  enum cellStates state;
 
 } Cell3d_2input;
 

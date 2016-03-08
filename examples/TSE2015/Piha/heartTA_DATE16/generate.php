@@ -11,12 +11,12 @@ function CSVToArray($fp) {
 		for ($i=0; $i<$num; $i++)
 			$headers[$i] = $data[$i];
 	}
-	
+
 	if((sizeof($headers) == 0) || strpos($headers[0], 'html')) {
 		fclose($fp);
 		return $array;
 	}
-	
+
 	$j = 0;
 	while(($data = fgetcsv($fp)) !== false) {
 		$num = count($data);
@@ -24,7 +24,7 @@ function CSVToArray($fp) {
 			$array[$j][$headers[$i]] = $data[$i];
 		$j++;
 	}
-	
+
 	fclose($fp);
 	return $array;
 }
@@ -97,13 +97,13 @@ if(is_file("Cells/cells.csv")) {
 			$headers[] = "Cells/Generated/" . $safe_name . ".h";
 			fwrite($makefile, "Objects/" . $safe_name . ": Cells/Generated/" . $safe_name . ".c Generic/step.h\n");
 			fwrite($makefile, "\t@echo Building " . $cell["Name"] . "...\n");
-			fwrite($makefile, "\t@cl /c /O" . $opt_level . " Cells/Generated/" . $safe_name . ".c /Fo" . $dir . "\\Objects\\" . $safe_name . "\n");
+			fwrite($makefile, "\t@gcc -c -O" . $opt_level . " -Wall Cells/Generated/" . $safe_name . ".c -o Objects/" . $safe_name . "\n");
 			fwrite($makefile, "\n");
 		}
 		else {
 			echo "Warning: Unable to find a cell to create with " . $cell["Neighbours"] . " neighbours!!!!\n";
 		}
-	}	
+	}
 }
 
 if(is_file("Paths/paths.csv")) {
@@ -139,7 +139,7 @@ if(is_file("Paths/paths.csv")) {
 			$headers[] = "Paths/Generated/" . $safe_name . ".h";
 			fwrite($makefile, "Objects/" . $safe_name . ": Paths/Generated/" . $safe_name . ".c Generic/step.h\n");
 			fwrite($makefile, "\t@echo Building " . $path["Name"] . "...\n");
-			fwrite($makefile, "\t@cl /c /O" . $opt_level . " Paths/Generated/" . $safe_name . ".c /Fo" . $dir . "\\Objects\\" . $safe_name . "\n");
+			fwrite($makefile, "\t@gcc -c -O" . $opt_level . " -Wall Paths/Generated/" . $safe_name . ".c -o Objects/" . $safe_name . "\n");
 			fwrite($makefile, "\n");
 		}
 		else {
@@ -154,32 +154,11 @@ fwrite($runnable, "#include <stdint.h>\n");
 fwrite($runnable, "#include <stdlib.h>\n");
 fwrite($runnable, "#include <stdio.h>\n");
 fwrite($runnable, "#include <string.h>\n");
-fwrite($runnable, "#include <stdint.h> // portable: uint64_t   MSVC: __int64
-#include <Windows.h>
-
-	
-int gettimeofday(struct timeval * tp, struct timezone * tzp)
-{
-    // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
-    static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
-
-    SYSTEMTIME  system_time;
-    FILETIME    file_time;
-    uint64_t    time;
-	
-	GetSystemTime( &system_time );
-    SystemTimeToFileTime( &system_time, &file_time );
-    time =  ((uint64_t)file_time.dwLowDateTime )      ;
-    time += ((uint64_t)file_time.dwHighDateTime) << 32;
-
-    tp->tv_sec  = (long) ((time - EPOCH) / 10000000L);
-    tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
-    return 0;
-}\n");
+fwrite($runnable, "#include <sys/time.h>\n");
 fwrite($runnable, "\n");
 fwrite($runnable, "#include \"Generic/step.h\"\n");
 foreach($headers as $header) {
-	fwrite($runnable, "#include \"" . $header . "\"\n");	
+	fwrite($runnable, "#include \"" . $header . "\"\n");
 }
 fwrite($runnable, "\n");
 
@@ -198,14 +177,8 @@ foreach($items as $item) {
 fwrite($runnable, "\tFILE* fo = fopen(\"out.csv\", \"w\");\n");
 fwrite($runnable, "\n");
 
-fwrite($runnable, "\tstruct timeval t0, t1;\n");
-fwrite($runnable, "\tgettimeofday(&t0, 0);\n");
-fwrite($runnable, "\n");
-
 fwrite($runnable, "\tunsigned int i = 0;\n");
 fwrite($runnable, "\tfor(i=0; i < (SIMULATION_TIME / STEP_SIZE); i++) {\n");
-fwrite($runnable, "\t\t//fprintf(stdout, \"Time: %fms\\n\", i*STEP_SIZE);\n");
-fwrite($runnable, "\t\t//fflush(stdout);\n");
 
 if(is_file("custom_code.c")) {
 	fwrite($runnable, "\n");
@@ -221,12 +194,6 @@ foreach($items as $item) {
 fwrite($runnable, "\t}\n");
 fwrite($runnable, "\n");
 
-fwrite($runnable, "\tgettimeofday(&t1, 0);\n");
-fwrite($runnable, "\tlong elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;\n");
-fwrite($runnable, "\n");
-fwrite($runnable, "\tprintf(\"Time taken: %ld microseconds (%.3f seconds)\\n\", elapsed, (elapsed / 1000000.0));\n");
-fwrite($runnable, "\n");
-
 fwrite($runnable, "\tfclose(fo);\n");
 fwrite($runnable, "\n");
 
@@ -237,13 +204,18 @@ fclose($runnable);
 
 fwrite($makefile, "runnable: runnable.c Generic/step.h\n");
 fwrite($makefile, "\t@echo Building Runnable...\n");
-fwrite($makefile, "\t@cl /O" . $opt_level . " runnable.c ");
+fwrite($makefile, "\t@gcc -O" . $opt_level . " runnable.c ");
 foreach($items as $item) {
-	fwrite($makefile, "Objects/" . $item . ".obj ");
+	fwrite($makefile, "Objects/" . $item . " ");
 }
-fwrite($makefile, "/Fe\n");
+fwrite($makefile, "-o runnable\n");
+fwrite($makefile, "\n");
 
-fwrite($makefile, "build: ");
+fwrite($makefile, "dir_build:\n");
+fwrite($makefile, "\t@mkdir -p Objects\n");
+fwrite($makefile, "\n");
+
+fwrite($makefile, "build: dir_build ");
 foreach($items as $item) {
 	fwrite($makefile, "Objects/" . $item . " ");
 }

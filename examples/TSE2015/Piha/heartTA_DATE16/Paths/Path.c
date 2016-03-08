@@ -4,13 +4,13 @@
 #define False 0
 
 
-static int  TApath_ode0(Cell3d_1input* me) {
+static int  TApath_ode0(Path* me) {
    // tp_dot=0, no change in t
-    return me->tp;
+    return me->t;
 }
-static int TApath_ode1(Cell3d_1input* me) {
+static int TApath_ode1(Path* me) {
    // tp_dot=1
-    return me->tp + STEP_SIZE * 1;
+    return me->t + STEP_SIZE * 1;
 }
 
 // Initialization function
@@ -28,8 +28,8 @@ void PathInit(Path* me) {
 // Execution function
 void PathRun(Path* me) {
 	enum pathStates state_u = me->state;
-  char ACTcell_u = me->ACTcell;
-  char t_u = me->t;
+	char ACTcell_u = 0;
+	char t_u = me->t;
 
 
   // Path FSM
@@ -40,12 +40,12 @@ void PathRun(Path* me) {
               state_u = ACT;
         }
         else{
-            tp_u = TApath_ode0(me);
+            t_u = TApath_ode0(me);
         }
       break;
       case (ACT):
         if(me->t > DELAY){
-              tp_u = 0;
+              t_u = 0;
               state_u = IDLE;
               ACTcell_u=1;
         }
@@ -58,7 +58,7 @@ void PathRun(Path* me) {
 
 
 
-    me->stateP = stateP_u;
+    me->state = state_u;
     me->t = t_u;
     me->ACTcell=ACTcell_u;
 

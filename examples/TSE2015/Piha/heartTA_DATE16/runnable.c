@@ -2,28 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h> // portable: uint64_t   MSVC: __int64
-#include <Windows.h>
-
-	
-int gettimeofday(struct timeval * tp, struct timezone * tzp)
-{
-    // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
-    static const uint64_t EPOCH = ((uint64_t) 116444736000000000ULL);
-
-    SYSTEMTIME  system_time;
-    FILETIME    file_time;
-    uint64_t    time;
-	
-	GetSystemTime( &system_time );
-    SystemTimeToFileTime( &system_time, &file_time );
-    time =  ((uint64_t)file_time.dwLowDateTime )      ;
-    time += ((uint64_t)file_time.dwHighDateTime) << 32;
-
-    tp->tv_sec  = (long) ((time - EPOCH) / 10000000L);
-    tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
-    return 0;
-}
+#include <sys/time.h>
 
 #include "Generic/step.h"
 #include "Cells/Generated/SinoatrialNode.h"
@@ -366,344 +345,187 @@ int main(void) {
 
 	FILE* fo = fopen("out.csv", "w");
 
-	struct timeval t0, t1;
-	gettimeofday(&t0, 0);
-
 	unsigned int i = 0;
 	for(i=0; i < (SIMULATION_TIME / STEP_SIZE); i++) {
-		//fprintf(stdout, "Time: %fms\n", i*STEP_SIZE);
-		//fflush(stdout);
 
-//fprintf(fo, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", i*STEP_SIZE, SinoatrialNode_data.v, Ostium_data.v, Fast_data.v, Fast1_data.v, AtrioventricularNode_data.v, BundleOfHis_data.v, BundleOfHis1_data.v, BundleOfHis2_data.v, RightBundleBranch_data.v, RightBundleBranch1_data.v, RightVentricularApex_data.v);
-//fflush(fo);
-
-double stim_voltage = 0;
-
-unsigned long cycle_step = i % (unsigned long) (500 / STEP_SIZE);
-if(cycle_step >= (10 / STEP_SIZE) && cycle_step < (15 / STEP_SIZE)) {
-	stim_voltage = 262;
-}
+fprintf(fo, "%u, %u\n", i*STEP_SIZE, SinoatrialNode_data.t);
+fflush(fo);
 
 /* Cell Mappings */
 
 // SA Node
-SinoatrialNode_data.v_i_0 = stim_voltage;
-SinoatrialNode_data.v_i_1 = SA_BB_data.cell2_v_replay;
-SinoatrialNode_data.v_i_2 = SA_OS_data.cell2_v_replay;
-SinoatrialNode_data.v_i_3 = SA_RA_data.cell2_v_replay;
-SinoatrialNode_data.v_i_4 = SA_CT_data.cell2_v_replay;
 
 
 // Left Atrium
-BachmannBundle_data.v_i_0 = SA_BB_data.cell1_v_replay;
-BachmannBundle_data.v_i_1 = BB_LA_data.cell2_v_replay;
+BachmannBundle_data.ACTcell = SA_BB_data.ACTcell;
 
-LeftAtrium_data.v_i_0 = BB_LA_data.cell1_v_replay;
-LeftAtrium_data.v_i_1 = LA_LA1_data.cell2_v_replay;
+LeftAtrium_data.ACTcell = BB_LA_data.ACTcell;
 
-LeftAtrium1_data.v_i_0 = LA_LA1_data.cell1_v_replay;
+LeftAtrium1_data.ACTcell = LA_LA1_data.ACTcell;
 
 
 // Right Atrium
-RightAtrium_data.v_i_0 = SA_RA_data.cell1_v_replay;
-RightAtrium_data.v_i_1 = RA_RA1_data.cell2_v_replay;
+RightAtrium_data.ACTcell = SA_RA_data.ACTcell;
 
-RightAtrium1_data.v_i_0 = RA_RA1_data.cell1_v_replay;
-RightAtrium1_data.v_i_1 = RA1_CS_data.cell2_v_replay;
+RightAtrium1_data.ACTcell = RA_RA1_data.ACTcell;
 
-CoronarySinus_data.v_i_0 = RA1_CS_data.cell1_v_replay;
+CoronarySinus_data.ACTcell = RA1_CS_data.ACTcell;
 
 
 // Crista Terminalis
-CristaTerminalis_data.v_i_0 = SA_CT_data.cell1_v_replay;
-CristaTerminalis_data.v_i_1 = CT_CT1_data.cell2_v_replay;
+CristaTerminalis_data.ACTcell = SA_CT_data.ACTcell;
 
-CristaTerminalis1_data.v_i_0 = CT_CT1_data.cell1_v_replay;
+CristaTerminalis1_data.ACTcell = CT_CT1_data.ACTcell;
 
 
 // AV Loop
-Ostium_data.v_i_0 = SA_OS_data.cell1_v_replay;
-Ostium_data.v_i_1 = OS_Slow_data.cell2_v_replay;
-Ostium_data.v_i_2 = OS_Fast_data.cell2_v_replay;
+Ostium_data.ACTcell = SA_OS_data.ACTcell;
 
-Fast_data.v_i_0 = OS_Fast_data.cell1_v_replay;
-Fast_data.v_i_1 = Fast_Fast1_data.cell2_v_replay;
+Fast_data.ACTcell = OS_Fast_data.ACTcell;
 
-Fast1_data.v_i_0 = Fast_Fast1_data.cell1_v_replay;
-Fast1_data.v_i_1 = Fast1_AV_data.cell2_v_replay;
+Fast1_data.ACTcell = Fast_Fast1_data.ACTcell;
 
-Slow_data.v_i_0 = OS_Slow_data.cell1_v_replay;
-Slow_data.v_i_1 = Slow_Slow1_data.cell2_v_replay;
+Slow_data.ACTcell = OS_Slow_data.ACTcell;
 
-Slow1_data.v_i_0 = Slow_Slow1_data.cell1_v_replay;
-Slow1_data.v_i_1 = Slow1_AV_data.cell2_v_replay;
+Slow1_data.ACTcell = Slow_Slow1_data.ACTcell;
 
-AtrioventricularNode_data.v_i_0 = Slow1_AV_data.cell1_v_replay;
-AtrioventricularNode_data.v_i_1 = Fast1_AV_data.cell1_v_replay;
-AtrioventricularNode_data.v_i_2 = AV_His_data.cell2_v_replay;
+AtrioventricularNode_data.ACTcell1 = Slow1_AV_data.ACTcell;
+AtrioventricularNode_data.ACTcell2 = Fast1_AV_data.ACTcell;
 
 
 // Bundle of His
-BundleOfHis_data.v_i_0 = AV_His_data.cell1_v_replay;
-BundleOfHis_data.v_i_1 = His_His1_data.cell2_v_replay;
+BundleOfHis_data.ACTcell = AV_His_data.ACTcell;
 
-BundleOfHis1_data.v_i_0 = His_His1_data.cell1_v_replay;
-BundleOfHis1_data.v_i_1 = His1_His2_data.cell2_v_replay;
+BundleOfHis1_data.ACTcell = His_His1_data.ACTcell;
 
-BundleOfHis2_data.v_i_0 = His1_His2_data.cell1_v_replay;
-BundleOfHis2_data.v_i_1 = His2_LBB_data.cell2_v_replay;
-BundleOfHis2_data.v_i_2 = His2_RBB_data.cell2_v_replay;
+BundleOfHis2_data.ACTcell = His1_His2_data.ACTcell;
 
 
 // Bundle Branch Loop
-LeftBundleBranch_data.v_i_0 = His2_LBB_data.cell1_v_replay;
-LeftBundleBranch_data.v_i_1 = LBB_LBB1_data.cell2_v_replay;
+LeftBundleBranch_data.ACTcell = His2_LBB_data.ACTcell;
 
-LeftBundleBranch1_data.v_i_0 = LBB_LBB1_data.cell1_v_replay;
-LeftBundleBranch1_data.v_i_1 = LBB1_LVA_data.cell2_v_replay;
+LeftBundleBranch1_data.ACTcell = LBB_LBB1_data.ACTcell;
 
-LeftVentricularApex_data.v_i_0 = LVA_RVA_data.cell2_v_replay;
-LeftVentricularApex_data.v_i_1 = LBB1_LVA_data.cell1_v_replay;
-LeftVentricularApex_data.v_i_2 = LVA_LV_data.cell2_v_replay;
-LeftVentricularApex_data.v_i_3 = LVA_LVS_data.cell2_v_replay;
+LeftVentricularApex_data.ACTcell = LBB1_LVA_data.ACTcell;
 
-RightBundleBranch_data.v_i_0 = His2_RBB_data.cell1_v_replay;
-RightBundleBranch_data.v_i_1 = RBB_RBB1_data.cell2_v_replay;
+RightBundleBranch_data.ACTcell = His2_RBB_data.ACTcell;
 
-RightBundleBranch1_data.v_i_0 = RBB_RBB1_data.cell1_v_replay;
-RightBundleBranch1_data.v_i_1 = RBB1_RVA_data.cell2_v_replay;
+RightBundleBranch1_data.ACTcell = RBB_RBB1_data.ACTcell;
 
-RightVentricularApex_data.v_i_0 = RBB1_RVA_data.cell1_v_replay;
-RightVentricularApex_data.v_i_1 = RVA_RV_data.cell2_v_replay;
-RightVentricularApex_data.v_i_2 = RVA_RVS_data.cell2_v_replay;
-RightVentricularApex_data.v_i_3 = LVA_RVA_data.cell1_v_replay;
+RightVentricularApex_data.ACTcell = RBB1_RVA_data.ACTcell;
 
 
 // Left Ventricle
-LeftVentricle_data.v_i_0 = LVA_LV_data.cell1_v_replay;
-LeftVentricle_data.v_i_1 = LV_LV1_data.cell2_v_replay;
+LeftVentricle_data.ACTcell = LVA_LV_data.ACTcell;
 
-LeftVentricle1_data.v_i_0 = LV_LV1_data.cell1_v_replay;
+LeftVentricle1_data.ACTcell = LV_LV1_data.ACTcell;
 
 
 // Left Ventricular Septum
-LeftVentricularSeptum_data.v_i_0 = LVA_LVS_data.cell1_v_replay;
-LeftVentricularSeptum_data.v_i_1 = LVS_LVS1_data.cell2_v_replay;
+LeftVentricularSeptum_data.ACTcell = LVA_LVS_data.ACTcell;
 
-LeftVentricularSeptum1_data.v_i_0 = LVS_LVS1_data.cell1_v_replay;
-LeftVentricularSeptum1_data.v_i_1 = LVS1_CSLV_data.cell2_v_replay;
+LeftVentricularSeptum1_data.ACTcell = LVS_LVS1_data.ACTcell;
 
-CSLeftVentricular_data.v_i_0 = LVS1_CSLV_data.cell1_v_replay;
+CSLeftVentricular_data.ACTcell = LVS1_CSLV_data.ACTcell;
 
 
 // Right Ventricle
-RightVentricle_data.v_i_0 = RVA_RV_data.cell1_v_replay;
-RightVentricle_data.v_i_1 = RV_RV1_data.cell2_v_replay;
+RightVentricle_data.ACTcell = RVA_RV_data.ACTcell;
 
-RightVentricle1_data.v_i_0 = RV_RV1_data.cell1_v_replay;
+RightVentricle1_data.ACTcell = RV_RV1_data.ACTcell;
 
 
 // Right Ventricular Septum
-RightVentricularSeptum_data.v_i_0 = RVA_RVS_data.cell1_v_replay;
-RightVentricularSeptum_data.v_i_1 = RVS_RVS1_data.cell2_v_replay;
+RightVentricularSeptum_data.ACTcell = RVA_RVS_data.ACTcell;
 
-RightVentricularSeptum1_data.v_i_0 = RVS_RVS1_data.cell1_v_replay;
+RightVentricularSeptum1_data.ACTcell = RVS_RVS1_data.ACTcell;
 
 
 
 /* Path Mappings */
 
 // SA
-SA_BB_data.cell1_v = SinoatrialNode_data.v;
-SA_BB_data.cell1_mode = SinoatrialNode_data.state;
-SA_BB_data.cell2_v = BachmannBundle_data.v;
-SA_BB_data.cell2_mode = BachmannBundle_data.state;
+SA_BB_data.ACTpath = SinoatrialNode_data.ACTpath;
 
-SA_OS_data.cell1_v = SinoatrialNode_data.v;
-SA_OS_data.cell1_mode = SinoatrialNode_data.state;
-SA_OS_data.cell2_v = Ostium_data.v;
-SA_OS_data.cell2_mode = Ostium_data.state;
+SA_OS_data.ACTpath = SinoatrialNode_data.ACTpath;
 
-SA_RA_data.cell1_v = SinoatrialNode_data.v;
-SA_RA_data.cell1_mode = SinoatrialNode_data.state;
-SA_RA_data.cell2_v = RightAtrium_data.v;
-SA_RA_data.cell2_mode = RightAtrium_data.state;
+SA_RA_data.ACTpath = SinoatrialNode_data.ACTpath;
 
-SA_CT_data.cell1_v = SinoatrialNode_data.v;
-SA_CT_data.cell1_mode = SinoatrialNode_data.state;
-SA_CT_data.cell2_v = CristaTerminalis_data.v;
-SA_CT_data.cell2_mode = CristaTerminalis_data.state;
-
-SA_BB_data.cell1_v = SinoatrialNode_data.v;
-SA_BB_data.cell1_mode = SinoatrialNode_data.state;
-SA_BB_data.cell2_v = BachmannBundle_data.v;
-SA_BB_data.cell2_mode = BachmannBundle_data.state;
+SA_CT_data.ACTpath = SinoatrialNode_data.ACTpath;
 
 
 // Left Atrium Branch
-BB_LA_data.cell1_v = BachmannBundle_data.v;
-BB_LA_data.cell1_mode = BachmannBundle_data.state;
-BB_LA_data.cell2_v = LeftAtrium_data.v;
-BB_LA_data.cell2_mode = LeftAtrium_data.state;
+BB_LA_data.ACTpath = BachmannBundle_data.ACTpath;
 
-LA_LA1_data.cell1_v = LeftAtrium_data.v;
-LA_LA1_data.cell1_mode = LeftAtrium_data.state;
-LA_LA1_data.cell2_v = LeftAtrium1_data.v;
-LA_LA1_data.cell2_mode = LeftAtrium1_data.state;
+LA_LA1_data.ACTpath = LeftAtrium_data.ACTpath;
 
 
 // Right Atrium Branch
-RA_RA1_data.cell1_v = RightAtrium_data.v;
-RA_RA1_data.cell1_mode = RightAtrium_data.state;
-RA_RA1_data.cell2_v = RightAtrium1_data.v;
-RA_RA1_data.cell2_mode = RightAtrium1_data.state;
+RA_RA1_data.ACTpath = RightAtrium_data.ACTpath;
 
-RA1_CS_data.cell1_v = RightAtrium1_data.v;
-RA1_CS_data.cell1_mode = RightAtrium1_data.state;
-RA1_CS_data.cell2_v = CoronarySinus_data.v;
-RA1_CS_data.cell2_mode = CoronarySinus_data.state;
+RA1_CS_data.ACTpath = RightAtrium1_data.ACTpath;
 
 
 // CT Branch
-CT_CT1_data.cell1_v = CristaTerminalis_data.v;
-CT_CT1_data.cell1_mode = CristaTerminalis_data.state;
-CT_CT1_data.cell2_v = CristaTerminalis1_data.v;
-CT_CT1_data.cell2_mode = CristaTerminalis1_data.state;
+CT_CT1_data.ACTpath = CristaTerminalis_data.ACTpath;
 
 
 // AV Loop
-OS_Fast_data.cell1_v = Ostium_data.v;
-OS_Fast_data.cell1_mode = Ostium_data.state;
-OS_Fast_data.cell2_v = Fast_data.v;
-OS_Fast_data.cell2_mode = Fast_data.state;
+OS_Fast_data.ACTpath = Ostium_data.ACTpath;
 
-OS_Slow_data.cell1_v = Ostium_data.v;
-OS_Slow_data.cell1_mode = Ostium_data.state;
-OS_Slow_data.cell2_v = Slow_data.v;
-OS_Slow_data.cell2_mode = Slow_data.state;
+OS_Slow_data.ACTpath = Ostium_data.ACTpath;
 
-Fast_Fast1_data.cell1_v = Fast_data.v;
-Fast_Fast1_data.cell1_mode = Fast_data.state;
-Fast_Fast1_data.cell2_v = Fast1_data.v;
-Fast_Fast1_data.cell2_mode = Fast1_data.state;
+Fast_Fast1_data.ACTpath = Fast_data.ACTpath;
 
-Fast1_AV_data.cell1_v = Fast1_data.v;
-Fast1_AV_data.cell1_mode = Fast1_data.state;
-Fast1_AV_data.cell2_v = AtrioventricularNode_data.v;
-Fast1_AV_data.cell2_mode = AtrioventricularNode_data.state;
+Fast1_AV_data.ACTpath = Fast1_data.ACTpath;
 
-Slow_Slow1_data.cell1_v = Slow_data.v;
-Slow_Slow1_data.cell1_mode = Slow_data.state;
-Slow_Slow1_data.cell2_v = Slow1_data.v;
-Slow_Slow1_data.cell2_mode = Slow1_data.state;
+Slow_Slow1_data.ACTpath = Slow_data.ACTpath;
 
-Slow1_AV_data.cell1_v = Slow1_data.v;
-Slow1_AV_data.cell1_mode = Slow1_data.state;
-Slow1_AV_data.cell2_v = AtrioventricularNode_data.v;
-Slow1_AV_data.cell2_mode = AtrioventricularNode_data.state;
+Slow1_AV_data.ACTpath = Slow1_data.ACTpath;
 
 
 // His Bundle
-AV_His_data.cell1_v = AtrioventricularNode_data.v;
-AV_His_data.cell1_mode = AtrioventricularNode_data.state;
-AV_His_data.cell2_v = BundleOfHis_data.v;
-AV_His_data.cell2_mode = BundleOfHis_data.state;
+AV_His_data.ACTpath = AtrioventricularNode_data.ACTpath;
 
-His_His1_data.cell1_v = BundleOfHis_data.v;
-His_His1_data.cell1_mode = BundleOfHis_data.state;
-His_His1_data.cell2_v = BundleOfHis1_data.v;
-His_His1_data.cell2_mode = BundleOfHis1_data.state;
+His_His1_data.ACTpath = BundleOfHis_data.ACTpath;
 
-His1_His2_data.cell1_v = BundleOfHis1_data.v;
-His1_His2_data.cell1_mode = BundleOfHis1_data.state;
-His1_His2_data.cell2_v = BundleOfHis2_data.v;
-His1_His2_data.cell2_mode = BundleOfHis2_data.state;
+His1_His2_data.ACTpath = BundleOfHis1_data.ACTpath;
 
 
 // Bundle Branch Loop
-His2_LBB_data.cell1_v = BundleOfHis2_data.v;
-His2_LBB_data.cell1_mode = BundleOfHis2_data.state;
-His2_LBB_data.cell2_v = LeftBundleBranch_data.v;
-His2_LBB_data.cell2_mode = LeftBundleBranch_data.state;
+His2_LBB_data.ACTpath = BundleOfHis2_data.ACTpath;
 
-LBB_LBB1_data.cell1_v = LeftBundleBranch_data.v;
-LBB_LBB1_data.cell1_mode = LeftBundleBranch_data.state;
-LBB_LBB1_data.cell2_v = LeftBundleBranch1_data.v;
-LBB_LBB1_data.cell2_mode = LeftBundleBranch1_data.state;
+LBB_LBB1_data.ACTpath = LeftBundleBranch_data.ACTpath;
 
-LBB1_LVA_data.cell1_v = LeftBundleBranch1_data.v;
-LBB1_LVA_data.cell1_mode = LeftBundleBranch1_data.state;
-LBB1_LVA_data.cell2_v = LeftVentricularApex_data.v;
-LBB1_LVA_data.cell2_mode = LeftVentricularApex_data.state;
+LBB1_LVA_data.ACTpath = LeftBundleBranch1_data.ACTpath;
 
-His2_RBB_data.cell1_v = BundleOfHis2_data.v;
-His2_RBB_data.cell1_mode = BundleOfHis2_data.state;
-His2_RBB_data.cell2_v = RightBundleBranch_data.v;
-His2_RBB_data.cell2_mode = RightBundleBranch_data.state;
+His2_RBB_data.ACTpath = BundleOfHis2_data.ACTpath;
 
-RBB_RBB1_data.cell1_v = RightBundleBranch_data.v;
-RBB_RBB1_data.cell1_mode = RightBundleBranch_data.state;
-RBB_RBB1_data.cell2_v = RightBundleBranch1_data.v;
-RBB_RBB1_data.cell2_mode = RightBundleBranch1_data.state;
+RBB_RBB1_data.ACTpath = RightBundleBranch_data.ACTpath;
 
-RBB1_RVA_data.cell1_v = RightBundleBranch1_data.v;
-RBB1_RVA_data.cell1_mode = RightBundleBranch1_data.state;
-RBB1_RVA_data.cell2_v = RightVentricularApex_data.v;
-RBB1_RVA_data.cell2_mode = RightVentricularApex_data.state;
-
-LVA_RVA_data.cell1_v = LeftVentricularApex_data.v;
-LVA_RVA_data.cell1_mode = LeftVentricularApex_data.state;
-LVA_RVA_data.cell2_v = RightVentricularApex_data.v;
-LVA_RVA_data.cell2_mode = RightVentricularApex_data.state;
+RBB1_RVA_data.ACTpath = RightBundleBranch1_data.ACTpath;
 
 
 // Left Ventricle
-LVA_LV_data.cell1_v = LeftVentricularApex_data.v;
-LVA_LV_data.cell1_mode = LeftVentricularApex_data.state;
-LVA_LV_data.cell2_v = LeftVentricle_data.v;
-LVA_LV_data.cell2_mode = LeftVentricle_data.state;
+LVA_LV_data.ACTpath = LeftVentricularApex_data.ACTpath;
 
-LV_LV1_data.cell1_v = LeftVentricle_data.v;
-LV_LV1_data.cell1_mode = LeftVentricle_data.state;
-LV_LV1_data.cell2_v = LeftVentricle1_data.v;
-LV_LV1_data.cell2_mode = LeftVentricle1_data.state;
+LV_LV1_data.ACTpath = LeftVentricle_data.ACTpath;
 
-LVA_LVS_data.cell1_v = LeftVentricularApex_data.v;
-LVA_LVS_data.cell1_mode = LeftVentricularApex_data.state;
-LVA_LVS_data.cell2_v = LeftVentricularSeptum_data.v;
-LVA_LVS_data.cell2_mode = LeftVentricularSeptum_data.state;
+LVA_LVS_data.ACTpath = LeftVentricularApex_data.ACTpath;
 
-LVS_LVS1_data.cell1_v = LeftVentricularSeptum_data.v;
-LVS_LVS1_data.cell1_mode = LeftVentricularSeptum_data.state;
-LVS_LVS1_data.cell2_v = LeftVentricularSeptum1_data.v;
-LVS_LVS1_data.cell2_mode = LeftVentricularSeptum1_data.state;
+LVS_LVS1_data.ACTpath = LeftVentricularSeptum_data.ACTpath;
 
-LVS1_CSLV_data.cell1_v = LeftVentricularSeptum1_data.v;
-LVS1_CSLV_data.cell1_mode = LeftVentricularSeptum1_data.state;
-LVS1_CSLV_data.cell2_v = CSLeftVentricular_data.v;
-LVS1_CSLV_data.cell2_mode = CSLeftVentricular_data.state;
+LVS1_CSLV_data.ACTpath = LeftVentricularSeptum1_data.ACTpath;
 
 
 // Right Ventricle
-RVA_RV_data.cell1_v = RightVentricularApex_data.v;
-RVA_RV_data.cell1_mode = RightVentricularApex_data.state;
-RVA_RV_data.cell2_v = RightVentricle_data.v;
-RVA_RV_data.cell2_mode = RightVentricle_data.state;
+RVA_RV_data.ACTpath = RightVentricularApex_data.ACTpath;
 
-RV_RV1_data.cell1_v = RightVentricle_data.v;
-RV_RV1_data.cell1_mode = RightVentricle_data.state;
-RV_RV1_data.cell2_v = RightVentricle1_data.v;
-RV_RV1_data.cell2_mode = RightVentricle1_data.state;
+RV_RV1_data.ACTpath = RightVentricle_data.ACTpath;
 
-RVA_RVS_data.cell1_v = RightVentricularApex_data.v;
-RVA_RVS_data.cell1_mode = RightVentricularApex_data.state;
-RVA_RVS_data.cell2_v = RightVentricularSeptum_data.v;
-RVA_RVS_data.cell2_mode = RightVentricularSeptum_data.state;
+RVA_RVS_data.ACTpath = RightVentricularApex_data.ACTpath;
 
-RVS_RVS1_data.cell1_v = RightVentricularSeptum_data.v;
-RVS_RVS1_data.cell1_mode = RightVentricularSeptum_data.state;
-RVS_RVS1_data.cell2_v = RightVentricularSeptum1_data.v;
-RVS_RVS1_data.cell2_mode = RightVentricularSeptum1_data.state;
+RVS_RVS1_data.ACTpath = RightVentricularSeptum_data.ACTpath;
 
 		SinoatrialNodeRun(&SinoatrialNode_data);
 
@@ -839,11 +661,6 @@ RVS_RVS1_data.cell2_mode = RightVentricularSeptum1_data.state;
 
 		RVS_RVS1Run(&RVS_RVS1_data);
 	}
-
-	gettimeofday(&t1, 0);
-	long elapsed = (t1.tv_sec-t0.tv_sec)*1000000 + t1.tv_usec-t0.tv_usec;
-
-	printf("Time taken: %ld microseconds (%.3f seconds)\n", elapsed, (elapsed / 1000000.0));
 
 	fclose(fo);
 

@@ -1,7 +1,6 @@
 #ifndef PATH_H_
 #define PATH_H_
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "../../Generic/step.h"

@@ -1,7 +1,6 @@
 #ifndef CELL3D_1INPUT_H_
 #define CELL3D_1INPUT_H_
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "../../Generic/step.h"
