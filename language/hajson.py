@@ -32,15 +32,20 @@ def parseHA(fileName):
         ha = json.read(jsonFile.read())
         sloc = None
         locs = []
-        externalEves = []
-        externalVars = []
+        inputEvents = []
+        outputEvents = []
+		extVarInput = []
+		extVarOutput = []
+		#Building interface
+		for interfaceVar in ha["interface"]:
+		
         # Building locations
         for loc in ha['locations']:
             # XXX: I am giving an empty dictionary as the dependent
             # odes. JSON needs to have the list of dependent odes
 
             # First get the function from the derivative
-            funcs = [S(o) for o in loc['ode']]
+			funcs = [S(o) for o in loc['ode']]
             odes = [None]*len(funcs)
             for i, f in enumerate(funcs):
                 ders = []
@@ -105,8 +110,6 @@ def parseHA(fileName):
             # updates are in the update key
             ups = []
             for u in e['update']:
-                if not (u in externalVars):
-                    externalVars.append(u)
                 [x1, x2] = u.split('=')
                 if x1 == x2:
                     x1, x2 = S(x1), S(x2)
@@ -118,23 +121,17 @@ def parseHA(fileName):
                         raise Exception('Invalid Updates: ' + u)
 
             # Make the edges
-            edges[ei] = Edge(s, t, relsD, ups, events)
-            for e in events:
-			    if not (e in externalEves):
-			        externalEves.append(e)			
+            edges[ei] = Edge(s, t, relsD, ups, events)			
 
         # Finally make the HA
         # TODO: How to declare local and global vars in the HA model??
         if sloc is None:
             raise Exception('No start location specified')
-        pdb.set_trace()
-        extEves = None
-        extVars = None
-		# TODO: Need to construct extEves and extVars with externalEves and externalVars.
-		# extVars = ExternalEvents(externalInputEvents,externalOutputEvents)
-		# extEves = ExternalVars(externalInputVars,externalOutputVars)
-		# How to distinguish input and output? For now I get them all from nodes 'update' and 'event' of the json file, but not sure if it's right.  
-		# Take waterTank as an example, externalVars = [u'x = x'], externalEves = [Event(OFF), Event(ON)]
-		    
+		  #TODO: waterTank = Ha("watertankR", [t1, t2, t3, t4], t4,
+               #[e1, e2, e3, e4, e5, e6], [], [], extEves, extVars) 
+# First dictionary correponds to the input and the second to the output. 
+#extEves = ExternalEvents({ Event("ON") : [], Event("OFF") : [] }, {})
+# List of external variables. Fist list corresponds to the input and second to the output.
+#extVars =  ExternalVars([],[Symbol("y")])			   
         ha = Ha(ha['modelName'], locs, sloc, edges, [], [])
         return ha
