@@ -58,10 +58,8 @@ def OdeCodegen(os, name):
             sx[i] = S(str(var.func))
             iValues[i] = iValue
     try:
-        print vars[0]
-        print "solving ode"
+
         odes1 = map(lambda x, y: solve(x, y), odes, diffx)
-        print(odes1)
 
         # TODO: Check!!
         '''
@@ -87,20 +85,17 @@ def OdeCodegen(os, name):
         odes2 = map(lambda o: o.subs(var, vname), odes1[0])
 
         odes3 = map(lambda o: o.subs(o, o * d + vname), odes2)
-        print odes3
-
      
         funcs = map(lambda o, i:
                     (name+"_ode_"+str(i+1), o), odes3,
                     xrange(0, len(odes3)))
-        print "aaaaaaaaaaaaaaa"
+        
         
         #ifuncs = map(lambda (i, o): (name+"_init_"+(str(i+1)), o),
           #           enumerate(iodes))
         ifuncs = map(lambda o, i: (name+"_init_"+(str(i+1)), o),
                      sx, xrange(len(sx)))
-        print "bbbbbbbbbbbbbb" 
-        print ifuncs
+    
 
         # make the routine to see the arguments
         '''
@@ -111,7 +106,6 @@ def OdeCodegen(os, name):
         func_rs = map(lambda o, i:
                       make_routine(name+"_ode_"+str(i+1), o),
                       odes3, xrange(len(odes3)))       
-        print "ccccccccccccc"
         
         #ifunc_rs = map(lambda (i, o):
            #            make_routine(name+"_init_"+(str(i+1)), o),
@@ -119,16 +113,15 @@ def OdeCodegen(os, name):
         ifunc_rs = map(lambda o, i:
                        make_routine(name+"_init_"+(str(i+1)), o),
                        sx, xrange(len(sx)))
-        print "dddddddddd"
         
         [(c_name, c_code), (h_name, h_header)] = codegen(
             (funcs+ifuncs), "C", name,
             header=False, empty=False, to_files=False)
-        print "eeeeeeeeeee"
+
         #pdb.set_trace()
         return (c_code, h_name, h_header, [cv.func for cv in vars],
                 func_rs, ifunc_rs)
-        print c_code
+        
         '''
         [(c_name, c_code), (h_name, h_header)] = codegen(
             (funcs), "C", name,
@@ -557,7 +550,7 @@ def codeGen(ha):
         ifuncrs = [None]*len(ls)
 
         contVars = [None]*len(ls)
-        print len(ls)
+        #print len(ls)
         for i in xrange(len(ls)):
             with patterns:
                 Loc(name, odes, clist, y) << ls[i]
@@ -567,7 +560,7 @@ def codeGen(ha):
                 lnames[i] = name
         # Start generating code
         # First the required headers
-        print "tutu1"
+        #print "tutu1"
         headers = ['#include<stdint.h>']
         headers += ['#include<stdlib.h>']
         headers += ['#include<stdio.h>']
@@ -657,7 +650,7 @@ def codeGen(ha):
 
         # Append the odes
         mainCFile += cCodeFile
-        print "hello world from broken code"
+        #print "hello world from broken code"
         #print pdb.set_trace()
 
         # Make the main reaction function
