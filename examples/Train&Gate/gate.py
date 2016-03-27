@@ -7,7 +7,7 @@ import shac
 #Train and Gate from 
 # http://www.eecs.tufts.edu/~khan/Courses/Spring2013/EE194/Lecs/Hybrid_Systems_Presentation_Elliott_Costello.pdf
 
-ode_x_down = Ode(sympify("diff(x(t))-(0-x(t))/2"), sympify("x(t)"), 10, {})
+ode_x_down = Ode(sympify("diff(x(t))+(x(t))/2"), sympify("x(t)"), 10, {})
 ode_x_up = Ode(sympify("diff(x(t))-(11-x(t))/2"), sympify("x(t)"), 1, {})
 
 # The locations of the hybrid automaton
