@@ -31,11 +31,9 @@ def main(argv):
     # Parse JSON file
     ha = hajson.parseHA(argv[0])
     if argv[1] == 'fbt':
-		HAIEC2.compileToFBT(ha, argv[2])
+        HAIEC2.compileToFBT(ha, argv[2])
     else:
-		compile(ha, ABOF=True)
-
-
+        compile(ha, ABOF=True)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
