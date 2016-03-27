@@ -93,13 +93,11 @@ def parseHA(fileName):
                 if not all(ders):
                     raise Exception('More than one der in:' + f[S('value')])
                 get_Functions(ders[0], ff)
-                pdb.set_trace()
                 if not all(ff):
                     raise Exception(
                         'Not a first order derivative:' + f[S('value')])
                 if not (len(loc['init']) == 1):
                     raise Exception('Multiple inits for ode' + loc['ode'])
-                pdb.set_trace()
                 odes[i] = Ode(S(o)[S('value')], ff[0], S(loc['init'][0]), {})
 
             # Get the key for the invariant
