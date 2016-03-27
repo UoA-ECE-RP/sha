@@ -33,7 +33,7 @@ def compileToFBT(ha, outPath):
         EVENT1 = etree.SubElement(EVENTINPUTS, 'Event', Name=ext_inp_eve.name , Comment='')
 
         for asso_var in asso_vars:
-            WITH1 = etree.SubElement(EVENT1, 'With', Var=str(asso_var))  
+            WITH1 = etree.SubElement(EVENT1, 'With', Var=str(asso_var.name))  
 
     # input update clock and associations with all input variables
     EVENT = etree.SubElement(EVENTINPUTS, 'Event', Name='update_in' , Comment='')
@@ -49,25 +49,25 @@ def compileToFBT(ha, outPath):
         EVENT2 = etree.SubElement(EVENTOUTPUTS, 'Event', Name=ext_outp_eve.name, Comment='')
         
         for asso_var in asso_vars:
-            WITH2 = etree.SubElement(EVENT2, 'With', Var=str(asso_var))
+            WITH2 = etree.SubElement(EVENT2, 'With', Var=str(asso_var.name))
 
     # output update clock and associations with all output variables
     EVENT = etree.SubElement(EVENTOUTPUTS, 'Event', Name='update_out' , Comment='')
 
     for ext_outp_var in ha_model.rest[1].externalOutputVars:
-        WITH = etree.SubElement(EVENT, 'With', Var=str(ext_outp_var))  
+        WITH = etree.SubElement(EVENT, 'With', Var=str(ext_outp_var.name))  
 
     # input variables
     INPUTVARS = etree.SubElement(INTERFACELIST, 'InputVars')
 
     for ext_inp_var in ha_model.rest[1].externalInputVars:
-        VARDECLARATION1 = etree.SubElement(INPUTVARS, 'VarDeclaration', Name=str(ext_inp_var), Type=ext_inp_var.type, Comment='')
+        VARDECLARATION1 = etree.SubElement(INPUTVARS, 'VarDeclaration', Name=str(ext_inp_var.name), Type=ext_inp_var.type, Comment='')
 
     # output variables
     OUTPUTVARS = etree.SubElement(INTERFACELIST, 'OutputVars')
 
     for ext_outp_var in ha_model.rest[1].externalOutputVars:
-        VARDECLARATION2 = etree.SubElement(OUTPUTVARS, 'VarDeclaration', Name=str(ext_outp_var), Type=ext_outp_var.type, Comment='')
+        VARDECLARATION2 = etree.SubElement(OUTPUTVARS, 'VarDeclaration', Name=str(ext_outp_var.name), Type=ext_outp_var.type, Comment='')
 
     #------------------------------
     # Building ECC and Algorithms
@@ -143,6 +143,7 @@ def compileToFBT(ha, outPath):
     ECTRANSITION = etree.SubElement(ECC, 'ECTransition', Source='Start', Destination=first_loc.name, Condition='True', x=str(randint(0,2000)), y=str(randint(0,2000)))
 
     # creating intermediate states
+    pdb.set_trace()
     for edge in ha_model.edges:
 
         ECSTATE = etree.SubElement(ECC, 'ECState', Name='t_state'+str(i), Comment='', x=str(randint(0,2000)), y=str(randint(0,2000)))
@@ -153,7 +154,9 @@ def compileToFBT(ha, outPath):
 
         # extracting the updates and adding them as algorithms to the intermediate states
         update_str = ''
+        
         for update in edge.updateList:
+            pdb.set_trace()
             if(isinstance(update,language.Update.Update2)):
                 update_str = update_str +  'me->' + str(update.x)  + ' = '+ 'me->' + str(update.y) + ';\n' 
             elif(isinstance(update,language.Update.Update1)):
