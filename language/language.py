@@ -13,9 +13,16 @@ class Ode(expr, var, initValue, replaceFuncs):
 class Combinator(symbol, arithExpr, [rest]):
     pass
 
-
 @case
-class Event(s):
+class Variable(name, type, value):
+    pass
+
+#@case
+#class Event(s):
+    #pass
+    
+@case
+class Event(type, name):
     pass
 
 @case
