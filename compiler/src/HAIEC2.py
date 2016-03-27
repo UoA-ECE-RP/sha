@@ -16,7 +16,6 @@ def compileToFBT(ha, outPath):
 
 	# import the Ha class from the HA file here
 	ha_model = gen.preprocess(ha)
-	pdb.set_trace()
 
 	FBTYPE = etree.Element('FBType', Name='FBlock', Comment='Basic function block')
 	IDENT = etree.SubElement(FBTYPE, 'Identification', Standard='61499')
