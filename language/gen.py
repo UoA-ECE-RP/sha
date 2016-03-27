@@ -9,6 +9,7 @@ from sympy.utilities.codegen import codegen, make_routine
 from functools import partial
 import colorama
 import copy
+import pdb
 from termcolor import colored
 
 ALL_BETS_OFF = False
@@ -680,6 +681,7 @@ def getShortestTimes(excludes, lname, ode, invariants):
 def updateLocNsteps(excludes, loc):
     with patterns:
         Loc(n, odes, cf, invariants) << loc
+        pdb.set_trace()
         times = map(lambda o: getShortestTimes(excludes, n, o, invariants),
                     odes)
         (tt, g, mine) = times[0].values()[0]

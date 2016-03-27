@@ -6,7 +6,7 @@ from sympy import S, Function
 import jsonlib2 as json
 from language import *
 import pdb
-from sympy import Symbol
+# from sympy import Symbol
 
 
 # Recursively get all the derivatives
@@ -35,45 +35,49 @@ def parseHA(fileName):
         locs = []
         extVarInput = []
         extVarInputList = []
-        
         extVarOutput = []
         extVarOutputList = []
-        
         inputEvents = []
         outputEvents = []
         dicEventIn = {}
         dicEventOut = {}
 
-        
-        #Building interface
-        pdb.set_trace()
+        # Building interface
+        # pdb.set_trace()
         extVarInput = ha['interface'][0]['ExternalVarableInput']
         if not extVarInput == []:
             for varInItem in extVarInput:
-                extVarInputList.append(Variable(varInItem['Name'], varInItem['Type'], varInItem['Value']))
-                  
+                extVarInputList.append(Variable(varInItem['Name'],
+                                                varInItem['Type'],
+                                                varInItem['Value']))
         extVarOutput = ha['interface'][1]['ExternalVarableOutput']
         if not extVarOutput == []:
             for varOutItem in extVarOutput:
-                extVarOutputList.append(Variable(varOutItem['Name'], varOutItem['Type'], varOutItem['Value']))
-        
+                extVarOutputList.append(Variable(varOutItem['Name'],
+                                                 varOutItem['Type'],
+                                                 varOutItem['Value']))
         inputEvents = ha['interface'][2]['inputEvents']
-        if not inputEvents == []:       
+        if not inputEvents == []:
             for eventInItem in inputEvents:
-                pdb.set_trace()
-                dicEventIn[Event(str(eventInItem['eventType']), str(eventInItem['eventName']))] = eventInItem['variables']
-            
+                # pdb.set_trace()
+                dicEventIn[Event(
+                    str(eventInItem['eventType']),
+                    str(eventInItem['eventName']))] = eventInItem['variables']
         outputEvents = ha['interface'][3]['outputEvents']
         if not outputEvents == []:
             for eventOutItem in outputEvents:
-                pdb.set_trace()
-                dicEventOut[Event(str(eventOutItem['eventType']), str(eventOutItem['eventName']))] = eventOutItem['variables']
-            
-        # List of external variables. Fist list corresponds to the input and second to the output.
-        extVars = ExternalVars(extVarInputList,extVarOutputList)  
-        # First dictionary correponds to the input and the second to the output. 
+                # pdb.set_trace()
+                dicEventOut[
+                    Event(
+                        str(eventOutItem['eventType']),
+                        str(eventOutItem[
+                            'eventName']))] = eventOutItem['variables']
+        # List of external variables.
+        # Fist list corresponds to the input and second to the output.
+        extVars = ExternalVars(extVarInputList,extVarOutputList)
+        # First dictionary correponds to the input and the
+        # second to the output.
         extEves = ExternalEvents(dicEventIn, dicEventOut)
-        
         # Building locations
         for loc in ha['locations']:
             # XXX: I am giving an empty dictionary as the dependent
@@ -85,16 +89,18 @@ def parseHA(fileName):
             for i, f in enumerate(funcs):
                 ders = []
                 ff = []
-                pdb.set_trace()
-                get_Derivatives(f['value'], ders)
+                get_Derivatives(f[S('value')], ders)
                 if not all(ders):
-                    raise Exception('More than one der in:' + f['value'])
+                    raise Exception('More than one der in:' + f[S('value')])
                 get_Functions(ders[0], ff)
+                pdb.set_trace()
                 if not all(ff):
-                    raise Exception('Not a first order derivative:' + f['value'])
+                    raise Exception(
+                        'Not a first order derivative:' + f[S('value')])
                 if not (len(loc['init']) == 1):
                     raise Exception('Multiple inits for ode' + loc['ode'])
-                odes[i] = Ode(S(o), ff[0], S(loc['init'][0]), {})
+                pdb.set_trace()
+                odes[i] = Ode(S(o)[S('value')], ff[0], S(loc['init'][0]), {})
 
             # Get the key for the invariant
             invsS = [S(i) for i in loc['invariants']]
@@ -131,7 +137,8 @@ def parseHA(fileName):
                                 str(guards+events))
 
             # First get the events if any
-            events = [Event(g) for g in events if S(g).is_Symbol]
+            #TODO: for now just give a defaulty type "event" for all events in edges 
+            events = [Event('event', g) for g in events if S(g).is_Symbol]
             # Second get the relations if any
             rels = [S(g) for g in guards if S(g).is_Relational]
 
@@ -157,12 +164,11 @@ def parseHA(fileName):
                         raise Exception('Invalid Updates: ' + u)
 
             # Make the edges
-            edges[ei] = Edge(s, t, relsD, ups, events)          
+            edges[ei] = Edge(s, t, relsD, ups, events)
 
         # Finally make the HA
         # TODO: How to declare local and global vars in the HA model??
         if sloc is None:
-            raise Exception('No start location specified') 
-             
+            raise Exception('No start location specified')
         ha = Ha(ha['modelName'], locs, sloc, edges, [], [], extEves, extVars)
         return ha

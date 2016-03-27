@@ -30,7 +30,7 @@ def compile(ha, **kwargs):
 def main(argv):
     # Parse JSON file
     ha = hajson.parseHA(argv[0])
-    if argv[1] == 'fbt':
+    if len(argv)>1 and argv[1] == 'fbt':
 		HAIEC2.compileToFBT(ha, argv[2])
     else:
 		compile(ha, ABOF=True)
