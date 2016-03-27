@@ -143,7 +143,7 @@ def compileToFBT(ha, outPath):
     ECTRANSITION = etree.SubElement(ECC, 'ECTransition', Source='Start', Destination=first_loc.name, Condition='True', x=str(randint(0,2000)), y=str(randint(0,2000)))
 
     # creating intermediate states
-    pdb.set_trace()
+    #pdb.set_trace()
     for edge in ha_model.edges:
 
         ECSTATE = etree.SubElement(ECC, 'ECState', Name='t_state'+str(i), Comment='', x=str(randint(0,2000)), y=str(randint(0,2000)))
