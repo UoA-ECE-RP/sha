@@ -84,21 +84,21 @@ def parseHA(fileName):
             # odes. JSON needs to have the list of dependent odes
 
             # First get the function from the derivative
-            funcs = [S(o) for o in loc['ode'][1]['odes']]
+            funcs = [o for o in loc['ode'][1]['odes']]
             odes = [None]*len(funcs)
             for i, f in enumerate(funcs):
                 ders = []
                 ff = []
-                get_Derivatives(f[S('value')], ders)
+                get_Derivatives(S(f['value']), ders)
                 if not all(ders):
-                    raise Exception('More than one der in:' + f[S('value')])
+                    raise Exception('More than one der in:' + f['value'])
                 get_Functions(ders[0], ff)
                 if not all(ff):
                     raise Exception(
-                        'Not a first order derivative:' + f[S('value')])
+                        'Not a first order derivative:' + f['value'])
                 if not (len(loc['init']) == 1):
                     raise Exception('Multiple inits for ode' + loc['ode'])
-                odes[i] = Ode(S(o)[S('value')], ff[0], S(loc['init'][0]), {})
+                odes[i] = Ode(ders[0], ff[0], S(loc['init'][0]), {})
 
             # Get the key for the invariant
             invsS = [S(i) for i in loc['invariants']]

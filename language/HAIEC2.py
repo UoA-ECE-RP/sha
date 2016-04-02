@@ -14,7 +14,7 @@ import pdb
 
 def compileToFBT(ha, outPath):
     ha_model = ha
-
+    pdb.set_trace()
     FBTYPE = etree.Element('FBType', Name='FBlock', Comment='Basic function block')
     IDENT = etree.SubElement(FBTYPE, 'Identification', Standard='61499')
     VERSIONINFO = etree.SubElement(FBTYPE, 'VersionInfo', Organization='Kawsihen_s Macintosh', Version='1.0', Author='Kawsihen', Date='11/20/2015 9:00 AM', Remarks='')
