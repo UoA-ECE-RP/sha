@@ -1,6 +1,8 @@
 import macropy.activate
-from language import *
-from gen import *
+#from language import *
+from languageC1 import *
+#from gen import *
+from genChanged2 import *
 from sympy import *
 import shac
 
@@ -42,8 +44,8 @@ e3 = Edge('t3', 't1', {S("x(t)"): [Guard(S("y>=25")),
           [])
 
 
-train = Ha("train", [t1, t2, t3], t1, [e1, e2, e3], [], [])
-
-
+train = Ha("train", [t1, t2, t3], t1, [e1, e2, e3], [], [], [InternalVar("x"), InternalVar("y")], [ExternalInputVar("x1"), ExternalInputVar("z1"), ExternalInputVar("t")], [], [], [ExternalOutputEvent("signal")])
 # Compile
 # shac.compile(train)
+
+#shac.compile(train,ABOF=True,Q=True)

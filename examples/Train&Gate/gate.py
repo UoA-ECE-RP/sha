@@ -1,6 +1,8 @@
 import macropy.activate
-from language import *
-from gen import *
+#from language import *
+from languageC1 import *
+#from gen import *
+from genChanged2 import *
 from sympy import *
 import shac
 
@@ -27,8 +29,11 @@ e2 = Edge('t2', 't1', {S("x(t)"): [Guard(sympify("True"))]},
           [Event("DOWN")])
 
 
-gate = Ha("gate", [t1, t2], t2, [e1, e2], [], [])
+gate = Ha("gate", [t1, t2], t2, [e1, e2], [], [], [InternalVar("x")], [], [ExternalOutputVar("l"), ExternalOutputVar("m"), ExternalOutputVar("n")],
+	[ExternalInputEvent("trianSignalIn")], [])
 
 
 # Compile
 # shac.compile(gate)
+
+#shac.compile(gate,ABOF=True,Q=True)
