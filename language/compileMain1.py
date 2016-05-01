@@ -138,9 +138,28 @@ def codeGen(hal):
           
             hanlist = []
             hanlist +=[han]
+            sloclist = []
+            sloclist +=[sloc]
+
             ps = map(lambda x: 
                 tab*level+'int '+x+'_pstate = -1;', hanlist)
             mainCFile += ps
+
+            for i in xrange(len(sloclist)):
+                with patterns:
+                    Loc(name, ol, y, z) << sloclist[i]
+
+                    namelist = []
+                    namelist +=[name]
+
+                    print"debug1"
+                    print type(hanlist)
+                    print type(name)
+                    print namelist
+                    cs = map(lambda x, y: 
+                        tab*level+'int '+x+'_cstate = '+y+';', hanlist, namelist)
+                    
+                    mainCFile += cs
 
 
     mainCFile += [tab*level+'while(True) {']
