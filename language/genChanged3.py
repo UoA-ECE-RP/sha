@@ -42,7 +42,7 @@ def solve_ode_system(count, odee):
 '''
 
 # Function to generate code from Ode
-def OdeCodegen(os, name, ha):
+def OdeCodegen(os, name):
     odes = [None]*len(os)
     diffx = [None]*len(os)
     vars = [None]*len(os)
@@ -83,17 +83,20 @@ def OdeCodegen(os, name, ha):
 
         # BAD HACK FINISHED
 
+        '''
         with patterns:
             Ha(han, ls, sloc, edges, gvs, igvs, iv, eiv, eov, eie, eoe) << ha
 
 
             vname = S(han + '_' + str(var.func))
-            odes2 = map(lambda o: o.subs(var, vname), odes1[0])
-            print odes2
-            
-            
-            odes3 = map(lambda o: o.subs(o, o * d + vname), odes2)
-            print odes3
+            '''
+        vname = S(str(var.func))
+        odes2 = map(lambda o: o.subs(var, vname), odes1[0])
+        print odes2
+        
+        
+        odes3 = map(lambda o: o.subs(o, o * d + vname), odes2)
+        print odes3
      
         funcs = map(lambda o, i:
                     (name+"_ode_"+str(i+1), o), odes3,
@@ -338,16 +341,16 @@ def getInvariantAndOdeExpr(han, loc, events, tab, contVars,
                             if clist[i][k][2]:
                                 cb = str(max(mm))
                                 stmts += ['// Increasing function']
-                                stmts += ['if('+ fname + '_' + str(k.func)+'_u > ' + cb +
-                                          ' && '+ fname + '_' + str(k.func)+' < ' + cb +
-                                          ' && ' + fname + '_' + str(k.func)+'_u >= ' +
+                                stmts += ['if('+str(k.func)+'_u > ' + cb +
+                                          ' && '+str(k.func)+' < ' + cb +
+                                          ' && ' + str(k.func)+'_u >= ' +
                                           str(k.func) + '){']
                             else:
                                 cb = str(min(mm))
                                 stmts += ['// Decreasing function']
-                                stmts += ['if('+ fname + '_' + str(k.func)+'_u < ' + cb +
-                                          ' &&  '+ fname + '_' + str(k.func)+' > ' + cb +
-                                          ' && ' + fname + '_' + str(k.func) + '_u < ' +
+                                stmts += ['if('+str(k.func)+'_u < ' + cb +
+                                          ' &&  '+str(k.func)+' > ' + cb +
+                                          ' && ' + str(k.func) + '_u < ' +
                                           str(k.func)+'){']
                             # First compute "k"
                             fk = Add(composed[i][k][0].subs(S('t'),
@@ -621,7 +624,7 @@ def codeGen(ha):
                 Loc(name, odes, clist, y) << ls[i]
                 (cCodeFile[i], hns[i],
                  hcs[i], contVars[i],
-                 funcrs[i], ifuncrs[i]) = OdeCodegen(odes, name, ha)
+                 funcrs[i], ifuncrs[i]) = OdeCodegen(odes, name)
                 lnames[i] = name
         # Start generating code
         # First the required headers
