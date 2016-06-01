@@ -42,7 +42,7 @@ def solve_ode_system(count, odee):
 '''
 
 # Function to generate code from Ode
-def OdeCodegen(os, name):
+def OdeCodegen(os, name, han):
     odes = [None]*len(os)
     diffx = [None]*len(os)
     vars = [None]*len(os)
@@ -83,18 +83,18 @@ def OdeCodegen(os, name):
 
         # BAD HACK FINISHED
 
-        '''
-        with patterns:
-            Ha(han, ls, sloc, edges, gvs, igvs, iv, eiv, eov, eie, eoe) << ha
+        
+        #with patterns:
+         #   Ha(han, ls, sloc, edges, gvs, igvs, iv, eiv, eov, eie, eoe) << ha
 
 
-            vname = S(han + '_' + str(var.func))
-            '''
-        vname = S(str(var.func))
+        vname = S(han + '_' + str(var.func))
+        
+        #vname = S(str(var.func))
         odes2 = map(lambda o: o.subs(var, vname), odes1[0])
         print odes2
-        
-        
+    
+    
         odes3 = map(lambda o: o.subs(o, o * d + vname), odes2)
         print odes3
      
@@ -107,6 +107,8 @@ def OdeCodegen(os, name):
           #           enumerate(iodes))
         ifuncs = map(lambda o, i: (name+"_init_"+(str(i+1)), o),
                      sx, xrange(len(sx)))
+        print "sx------------------------------:"
+        print sx
         print ifuncs
 
         # make the routine to see the arguments
@@ -194,6 +196,7 @@ def getInvariantAndOdeExpr(han, loc, events, tab, contVars,
                            funcrs, ifuncrs):
     with patterns:
         Loc(lname, odes, clist, guards) << loc
+        print guards
         exprs = [item for sl in guards.values() for item in sl]
         invs = [None]*len(exprs)
         for i, x in enumerate(exprs):
@@ -201,6 +204,11 @@ def getInvariantAndOdeExpr(han, loc, events, tab, contVars,
                 if Guard(y):
                     invs[i] = y
         invs = filter(lambda x: x is not None, invs)
+        invs = map(lambda x: han + '_' + str(x), invs)
+
+        print "1111111111111111"
+        print invs
+        print type(invs)
         # Adding not events as well to this expr
         stmts = []
         cstmts = []
@@ -230,10 +238,15 @@ def getInvariantAndOdeExpr(han, loc, events, tab, contVars,
                 stmts += [tab+ han + '_' + str(var.func)+'_init'+' = '+ han + '_' + str(var.func)+';']
                 stmts += ['}']
 
+
+
                 lhs = han + '_' + str(var.func)+'_u'
                 rhs = lname+'_ode_' + str(i+1)
                 rhs += '(' + ', '.join(
                     [str(arg.name) for arg in funcrs[i].arguments]) + ')'
+                print "rhs: ----------------------"
+                print rhs
+                print funcrs
                 stmts += [lhs + ' = ' + rhs + ';']
                 # Now put the saturation function in
                 o = dsolve(ode, var)
@@ -404,11 +417,36 @@ def getEAndGAndU(han, edge, events):
         Edge(t1, t2, guards, uList, eList) << edge
         guards = [item for sl in guards.values() for item in sl]
         gus = []
+        gus1 = []
+
         for i, guard in enumerate(guards):
             with patterns:
                 Guard(xx) << guard
                 gus.append(str(xx))
-        egExpr = ' && '.join(filter(lambda x: not(x is None), gus))
+
+        print "bbbbbbbbbbaiaisjiajisjiajsijsai"
+        print gus
+
+        gus1 = filter(lambda x: not(x is None), gus)
+        gus1 = map(lambda x: han + '_' + x, gus)
+
+        for i in gus:
+            if i == 'True' or i == 'False' :
+                egExpr = ' && '.join(filter(lambda x: not(x is None), gus))
+                print "is bool"
+            else:
+
+                egExpr = ' && '.join(gus1)
+                print " is expr"
+                print gus
+        #gus1 = filter(lambda x: not(x is True), gus)
+        #gus2 = map(lambda x: han + '_' + x, gus1)
+
+        #gus3 = filter(lambda x: x is True, gus)
+
+        #print gus
+        #egExpr = ' && '.join(filter(lambda x: not(x is None), gus))
+        #egExpr = ' && '.join(filter(lambda x: not(x is None), gus3))
         if egExpr == '':
             egExpr = 'False'
         # Now the event list
@@ -435,7 +473,8 @@ def getEAndGAndU(han, edge, events):
         for update in uList:
             with switch(update):
                 if Update.Update1(v, xx):
-                    updates.append(han + '_' + str(v) + '_u =' + str(xx) + ';')
+                    #updates.append(han + '_' + str(v) + '_u =' + str(xx) + ';')
+                    updates.append(han + '_' + str(v) + ' = ' + str(xx) + ';')
                 elif Update.Update2(v, xx):
                     updates.append(han + '_' + str(v) + '_u = ' + han + '_' + str(xx) + ';')
                 else:
@@ -624,7 +663,7 @@ def codeGen(ha):
                 Loc(name, odes, clist, y) << ls[i]
                 (cCodeFile[i], hns[i],
                  hcs[i], contVars[i],
-                 funcrs[i], ifuncrs[i]) = OdeCodegen(odes, name)
+                 funcrs[i], ifuncrs[i]) = OdeCodegen(odes, name, han)
                 lnames[i] = name
         # Start generating code
         # First the required headers
