@@ -10,11 +10,11 @@ from random import randint
 import macropy.activate
 import language
 import gen 
-import pdb
+#import pdb
 
 def compileToFBT(ha, outPath):
     ha_model = ha
-    pdb.set_trace()
+    #pdb.set_trace()
     FBTYPE = etree.Element('FBType', Name='FBlock', Comment='Basic function block')
     IDENT = etree.SubElement(FBTYPE, 'Identification', Standard='61499')
     VERSIONINFO = etree.SubElement(FBTYPE, 'VersionInfo', Organization='Kawsihen_s Macintosh', Version='1.0', Author='Kawsihen', Date='11/20/2015 9:00 AM', Remarks='')
@@ -156,7 +156,7 @@ def compileToFBT(ha, outPath):
         update_str = ''
         
         for update in edge.updateList:
-            pdb.set_trace()
+            #pdb.set_trace()
             if(isinstance(update,language.Update.Update2)):
                 update_str = update_str +  'me->' + str(update.x)  + ' = '+ 'me->' + str(update.y) + ';\n' 
             elif(isinstance(update,language.Update.Update1)):
