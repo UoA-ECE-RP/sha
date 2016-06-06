@@ -12,6 +12,9 @@ import language
 import gen 
 #import pdb
 
+def compileToCFB(haList, outPath):
+    print(haList)
+
 def compileToFBT(ha, outPath):
     ha_model = ha
     #pdb.set_trace()

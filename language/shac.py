@@ -28,12 +28,22 @@ def compile(ha, **kwargs):
 
 
 def main(argv):
-    # Parse JSON file
-    ha = hajson.parseHA(argv[0])
-    if len(argv)>1 and argv[1] == 'fbt':
-		HAIEC2.compileToFBT(ha, argv[2])
+    if len(argv)>1:
+        if argv[1] == 'fbt':
+            # Parse JSON file
+            ha = hajson.parseHA(argv[0])
+            HAIEC2.compileToFBT(ha, argv[2])
+        elif argv[1] == 'cfb':
+            modules = hajson.parseModule(argv[0])
+            print(modules)
+            haList = []
+            for module in modules:
+                haList.append(hajson.parseHA('../examples/hajson/' + str(module) + '.json'))
+            HAIEC2.compileToCFB(haList, argv[2])
     else:
-		compile(ha, ABOF=True)
+        # Parse JSON file
+        ha = hajson.parseHA(argv[0])
+        compile(ha, ABOF=True)
 
 
 

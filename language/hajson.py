@@ -24,6 +24,20 @@ def get_Functions(der, ff):
     for arg in der.args:
         get_Functions(arg, ff)
 
+def parseModule(fileName):
+    with open(fileName, 'r') as jsonFile:
+        wholeFile = json.read(jsonFile.read())
+        modules = set()
+
+        connections = wholeFile['connections']
+        if not connections == []:
+            for con in connections:
+                if con['startPoint']['modelname'] not in modules:
+                    modules.add(con['startPoint']['modelname'])
+                if con['endPoint']['modelname'] not in modules:
+                    modules.add(con['endPoint']['modelname'])
+        return modules
+
 
 def parseHA(fileName):
     """
