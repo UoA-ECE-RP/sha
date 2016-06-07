@@ -34,12 +34,14 @@ def main(argv):
             ha = hajson.parseHA(argv[0])
             HAIEC2.compileToFBT(ha, argv[2])
         elif argv[1] == 'cfb':
-            modules = hajson.parseModule(argv[0])
+            modules = (hajson.parseModule(argv[0]))['modules']
             print(modules)
+            connectionList = (hajson.parseModule(argv[0]))['connectionList']
+            print(connectionList)
             haList = []
             for module in modules:
                 haList.append(hajson.parseHA('../examples/hajson/' + str(module) + '.json'))
-            HAIEC2.compileToCFB(haList, argv[2])
+            HAIEC2.compileToCFB(haList, connectionList, argv[2])
     else:
         # Parse JSON file
         ha = hajson.parseHA(argv[0])

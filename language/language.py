@@ -16,10 +16,6 @@ class Combinator(symbol, arithExpr, [rest]):
 @case
 class Variable(name, type, value):
     pass
-
-#@case
-#class Event(s):
-    #pass
     
 @case
 class Event(type, name):
@@ -28,7 +24,6 @@ class Event(type, name):
 @case
 class Guard(relationalExpr):
     pass
-
 
 @case
 class Update():
@@ -63,4 +58,8 @@ class ExternalVars(externalInputVars,externalOutputVars):
 
 @case
 class Ha(name, locations, startLocation, edges, globalVars, iglobalVars, [rest]):
+    pass
+
+@case
+class Connection(outputName, outputId, inputName, inputId):
     pass

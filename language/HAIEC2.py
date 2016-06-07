@@ -1,4 +1,5 @@
 # Author : Kawsihen Elankumaran
+# Author : Jin Chen
 
 # This is the compiler from Hybrid Automata in Python to IEC-61499 in XML
 
@@ -12,8 +13,30 @@ import language
 import gen 
 #import pdb
 
-def compileToCFB(haList, outPath):
-    print(haList)
+def compileToCFB(haList, connectionList, outPath):
+    CFB = etree.Element('compositeFunctionBlockModel', Name='CFBlock', Comment='Combined function block')
+    IDENT = etree.SubElement(CFB, 'Identification', Standard='61499')
+    VERSIONINFO = etree.SubElement(CFB, 'VersionInfo', Organization='Jin_s Macintosh', Version='1.0', Author='Jin Chen', Date='06/06/2016 13:00 PM', modelType='Composite')
+
+    #---------------------------------------
+    # Building functionBlockInterface 
+    #---------------------------------------
+    functionBlockInterface = etree.SubElement(CFB, 'functionBlockInterface')
+    cFBModelHasFBInterface = etree.SubElement(functionBlockInterface, 'functionBlockInterface')
+    Interface = etree.SubElement(cFBModelHasFBInterface, 'functionBlockInterface', name="Watertank_Burner", x="1006.25", y="437.5", modelType="Composite")
+    #---------------------------------------
+    # Building functionBlockReferences 
+    #---------------------------------------
+
+    # writing the generated XML tree to the output file
+    fHandle = open(outPath +'cjtest.cfb','w')
+
+    fHandle.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+
+    fHandle.write(etree.tostring(CFB, pretty_print=True))
+
+    fHandle.close()
+
 
 def compileToFBT(ha, outPath):
     ha_model = ha

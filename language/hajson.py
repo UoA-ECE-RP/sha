@@ -6,6 +6,7 @@ from sympy import S, Function
 import jsonlib2 as json
 from language import *
 import pdb
+import uuid
 # from sympy import Symbol
 
 
@@ -28,6 +29,8 @@ def parseModule(fileName):
     with open(fileName, 'r') as jsonFile:
         wholeFile = json.read(jsonFile.read())
         modules = set()
+        connectionList = []
+        interfaces = {}
 
         connections = wholeFile['connections']
         if not connections == []:
@@ -36,7 +39,20 @@ def parseModule(fileName):
                     modules.add(con['startPoint']['modelname'])
                 if con['endPoint']['modelname'] not in modules:
                     modules.add(con['endPoint']['modelname'])
-        return modules
+                if con['startPoint'].has_key('Name'):
+                    outputName = str(con['startPoint']['modelname'] + '/outputVariable/' + con['startPoint']['Name'])
+                else:
+                    outputName = str(con['startPoint']['modelname'] + '/outputEvent/' + con['startPoint']['eventName'])
+                outputId = uuid.uuid4();
+                if con['endPoint'].has_key('Name'):
+                    inputName = str(con['endPoint']['modelname'] + '/inputVariable/' + con['endPoint']['Name'])
+                else:
+                    inputName = str(con['endPoint']['modelname'] + '/inputEvent/' + con['endPoint']['eventName'])
+                inputId = uuid.uuid4();
+                connectionList.append(Connection(outputName, outputId, inputName, inputId))
+        interfaces['modules'] = modules
+        interfaces['connectionList'] = connectionList
+        return interfaces
 
 
 def parseHA(fileName):
