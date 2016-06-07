@@ -40,14 +40,14 @@ def parseModule(fileName):
                 if con['endPoint']['modelname'] not in modules:
                     modules.add(con['endPoint']['modelname'])
                 if con['startPoint'].has_key('Name'):
-                    outputName = str(con['startPoint']['modelname'] + '/outputVariable/' + con['startPoint']['Name'])
+                    outputName = str(con['startPoint']['modelname'] + '/Variable/' + con['startPoint']['Name'])
                 else:
-                    outputName = str(con['startPoint']['modelname'] + '/outputEvent/' + con['startPoint']['eventName'])
+                    outputName = str(con['startPoint']['modelname'] + '/Event/' + con['startPoint']['eventName'])
                 outputId = uuid.uuid4();
                 if con['endPoint'].has_key('Name'):
-                    inputName = str(con['endPoint']['modelname'] + '/inputVariable/' + con['endPoint']['Name'])
+                    inputName = str(con['endPoint']['modelname'] + '/Variable/' + con['endPoint']['Name'])
                 else:
-                    inputName = str(con['endPoint']['modelname'] + '/inputEvent/' + con['endPoint']['eventName'])
+                    inputName = str(con['endPoint']['modelname'] + '/Event/' + con['endPoint']['eventName'])
                 inputId = uuid.uuid4();
                 connectionList.append(Connection(outputName, outputId, inputName, inputId))
         interfaces['modules'] = modules
