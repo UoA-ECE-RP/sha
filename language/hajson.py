@@ -31,7 +31,8 @@ def parseInterface(fileName):
         modules = set()
         connectionList = []
         exposedInterface = []
-        interfaces = {}
+
+        sysName = wholeFile['modelName']
 
         connections = wholeFile['connections']
         if not connections == []:
@@ -53,10 +54,9 @@ def parseInterface(fileName):
                 connectionList.append(Connection(outputName, outputId, inputName, inputId))
 
         exposedInterface = wholeFile['exposedInterface']
-        interfaces['modules'] = modules
-        interfaces['connectionList'] = connectionList
-        interfaces['exposedInterface'] = exposedInterface
-        return interfaces
+
+        interface = Interface(sysName, modules, connectionList, exposedInterface)
+        return interface
 
 
 def parseHA(fileName):

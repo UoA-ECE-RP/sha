@@ -63,3 +63,7 @@ class Ha(name, locations, startLocation, edges, globalVars, iglobalVars, [rest])
 @case
 class Connection(outputName, outputId, inputName, inputId):
     pass
+
+@case
+class Interface(sysName, modules, connectionList, exposedInterface):
+    pass

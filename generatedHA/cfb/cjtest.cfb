@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<compositeFunctionBlockModel Comment="Combined function block" Name="CFBlock">
+  <Identification Standard="61499"/>
+  <VersionInfo Author="Jin Chen" Date="06/06/2016 13:00 PM" Organization="Jin_s Macintosh" Version="1.0" modelType="Composite"/>
+  <functionBlockInterface>
+    <functionBlockInterface>
+      <functionBlockInterface modelType="Composite" name="Watertank_Burner" x="1006.25" y="437.5"/>
+    </functionBlockInterface>
+  </functionBlockInterface>
+</compositeFunctionBlockModel>

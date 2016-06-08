@@ -13,7 +13,7 @@ import language
 import gen 
 #import pdb
 
-def compileToCFB(haList, connectionList, exposedInterface, outPath):
+def compileToCFB(haList, interface, outPath):
     CFB = etree.Element('compositeFunctionBlockModel', Name='CFBlock', Comment='Combined function block')
     IDENT = etree.SubElement(CFB, 'Identification', Standard='61499')
     VERSIONINFO = etree.SubElement(CFB, 'VersionInfo', Organization='Jin_s Macintosh', Version='1.0', Author='Jin Chen', Date='06/06/2016 13:00 PM', modelType='Composite')
@@ -23,7 +23,69 @@ def compileToCFB(haList, connectionList, exposedInterface, outPath):
     #---------------------------------------
     functionBlockInterface = etree.SubElement(CFB, 'functionBlockInterface')
     cFBModelHasFBInterface = etree.SubElement(functionBlockInterface, 'functionBlockInterface')
-    Interface = etree.SubElement(cFBModelHasFBInterface, 'functionBlockInterface', name="Watertank_Burner", x="1006.25", y="437.5", modelType="Composite")
+    Interface = etree.SubElement(cFBModelHasFBInterface, 'functionBlockInterface', name=interface.sysName, x="1006.25", y="962.5", modelType="Composite")
+
+    events = etree.SubElement(Interface, 'events')
+    variables = etree.SubElement(Interface, 'variables')
+    inputEventPorts = etree.SubElement(Interface, 'inputEventPorts')
+    outputEventPorts = etree.SubElement(Interface, 'outputEventPorts')
+    inputVariablePorts = etree.SubElement(Interface, 'inputVariablePorts')
+    outputVariablePorts = etree.SubElement(Interface, 'outputVariablePorts')
+
+    for ExposedInterface in interface.exposedInterface:
+        module_name, interface_Type, value_Type, interface_Name = ExposedInterface.split("/")
+        if(interface_Type == "inputEvent"):
+            functionBlockHasEvents = etree.SubElement(events, 'functionBlockHasEvents')
+            event = etree.SubElement(functionBlockHasEvents, 'event', name=ExposedInterface, scope='Input')
+
+            functionBlockHasInputEventPorts = etree.SubElement(inputEventPorts, 'functionBlockHasInputEventPorts')
+            inputEventPort = etree.SubElement(functionBlockHasInputEventPorts, 'inputEventPort')
+            proxyTargetPorts = etree.SubElement(inputEventPort, 'proxyTargetPorts')
+            proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
+            inputEventPortMoniker = etree.SubElement(proxyConnection, 'inputEventPortMoniker')
+            inputEventPort_event = etree.SubElement(inputEventPort, 'event')
+            inputEventPortReferencesEvent = etree.SubElement(inputEventPort_event, 'inputEventPortReferencesEvent')
+            eventMoniker = etree.SubElement(inputEventPortReferencesEvent, 'eventMoniker', name=ExposedInterface)
+
+        elif(interface_Type == "outputEvent"):
+            functionBlockHasEvents = etree.SubElement(events, 'functionBlockHasEvents')
+            event = etree.SubElement(functionBlockHasEvents, 'event', name=ExposedInterface, scope='Output')
+
+            functionBlockHasOutputEventPorts = etree.SubElement(outputEventPorts, 'functionBlockHasOutputEventPorts')
+            outputEventPort = etree.SubElement(functionBlockHasOutputEventPorts, 'outputEventPort')
+            proxyTargetPorts = etree.SubElement(outputEventPort, 'proxyTargetPorts')
+            proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
+            outputEventPortMoniker = etree.SubElement(proxyConnection, 'outputEventPortMoniker')
+            outputEventPort_event = etree.SubElement(outputEventPort, 'event')
+            outputEventPortReferencesEvent = etree.SubElement(outputEventPort_event, 'outputEventPortReferencesEvent')
+            eventMoniker = etree.SubElement(outputEventPortReferencesEvent, 'eventMoniker', name=ExposedInterface)
+
+        elif(interface_Type == "inputVariable"):
+            functionBlockHasVariables = etree.SubElement(variables, 'functionBlockHasVariables')
+            variable = etree.SubElement(functionBlockHasVariables, 'variable', name=ExposedInterface, scope='Input', type=value_Type)
+
+            functionBlockHasInputVariablePorts = etree.SubElement(inputVariablePorts, 'functionBlockHasInputVariablePorts')
+            inputVariablePort = etree.SubElement(functionBlockHasInputVariablePorts, 'inputVariablePort')
+            proxyTargetPorts = etree.SubElement(inputVariablePort, 'proxyTargetPorts')
+            proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
+            inputVariablePortMoniker = etree.SubElement(proxyConnection, 'inputVariablePortMoniker')
+            inputVariablePort_variable = etree.SubElement(inputVariablePort, 'variable')
+            inputVariablePortReferencesVariable = etree.SubElement(inputVariablePort_variable, 'inputVariablePortReferencesVariable')
+            variableMoniker = etree.SubElement(inputVariablePortReferencesVariable, 'variableMoniker', name=ExposedInterface)
+
+        else:
+            functionBlockHasVariables = etree.SubElement(variables, 'functionBlockHasVariables')
+            variable = etree.SubElement(functionBlockHasVariables, 'variable', name=ExposedInterface, scope='Output', type=value_Type)
+
+            functionBlockHasOutputVariablePorts = etree.SubElement(outputVariablePorts, 'functionBlockHasOutputVariablePorts')
+            outputVariablePort = etree.SubElement(functionBlockHasOutputVariablePorts, 'outputVariablePort')
+            proxyTargetPorts = etree.SubElement(outputVariablePort, 'proxyTargetPorts')
+            proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
+            outputVariablePortMoniker = etree.SubElement(proxyConnection, 'outputVariablePortMoniker')
+            outputVariablePort_variable = etree.SubElement(outputVariablePort, 'variable')
+            outputVariablePortReferencesVariable = etree.SubElement(outputVariablePort_variable, 'outputVariablePortReferencesVariable')
+            variableMoniker = etree.SubElement(outputVariablePortReferencesVariable, 'variableMoniker', name=ExposedInterface)
+
     #---------------------------------------
     # Building functionBlockReferences 
     #---------------------------------------
