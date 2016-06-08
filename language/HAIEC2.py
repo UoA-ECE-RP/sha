@@ -13,7 +13,7 @@ import language
 import gen 
 #import pdb
 
-def compileToCFB(haList, connectionList, outPath):
+def compileToCFB(haList, connectionList, exposedInterface, outPath):
     CFB = etree.Element('compositeFunctionBlockModel', Name='CFBlock', Comment='Combined function block')
     IDENT = etree.SubElement(CFB, 'Identification', Standard='61499')
     VERSIONINFO = etree.SubElement(CFB, 'VersionInfo', Organization='Jin_s Macintosh', Version='1.0', Author='Jin Chen', Date='06/06/2016 13:00 PM', modelType='Composite')

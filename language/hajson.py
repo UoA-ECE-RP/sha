@@ -25,11 +25,12 @@ def get_Functions(der, ff):
     for arg in der.args:
         get_Functions(arg, ff)
 
-def parseModule(fileName):
+def parseInterface(fileName):
     with open(fileName, 'r') as jsonFile:
         wholeFile = json.read(jsonFile.read())
         modules = set()
         connectionList = []
+        exposedInterface = []
         interfaces = {}
 
         connections = wholeFile['connections']
@@ -50,8 +51,11 @@ def parseModule(fileName):
                     inputName = str(con['endPoint']['modelname'] + '/Event/' + con['endPoint']['eventName'])
                 inputId = uuid.uuid4();
                 connectionList.append(Connection(outputName, outputId, inputName, inputId))
+
+        exposedInterface = wholeFile['exposedInterface']
         interfaces['modules'] = modules
         interfaces['connectionList'] = connectionList
+        interfaces['exposedInterface'] = exposedInterface
         return interfaces
 
 
