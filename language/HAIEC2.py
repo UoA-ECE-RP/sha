@@ -11,9 +11,11 @@ from random import randint
 import macropy.activate
 import language
 import gen 
+import uuid
 #import pdb
 
 def compileToCFB(haList, interface, outPath):
+    ids = {}
     CFB = etree.Element('compositeFunctionBlockModel', Name='CFBlock', Comment='Combined function block')
     IDENT = etree.SubElement(CFB, 'Identification', Standard='61499')
     VERSIONINFO = etree.SubElement(CFB, 'VersionInfo', Organization='Jin_s Macintosh', Version='1.0', Author='Jin Chen', Date='06/06/2016 13:00 PM', modelType='Composite')
@@ -22,7 +24,7 @@ def compileToCFB(haList, interface, outPath):
     # Building functionBlockInterface 
     #---------------------------------------
     functionBlockInterface = etree.SubElement(CFB, 'functionBlockInterface')
-    cFBModelHasFBInterface = etree.SubElement(functionBlockInterface, 'functionBlockInterface')
+    cFBModelHasFBInterface = etree.SubElement(functionBlockInterface, 'cFBModelHasFBInterface')
     Interface = etree.SubElement(cFBModelHasFBInterface, 'functionBlockInterface', name=interface.sysName, x="1006.25", y="962.5", modelType="Composite")
 
     events = etree.SubElement(Interface, 'events')
@@ -42,7 +44,12 @@ def compileToCFB(haList, interface, outPath):
             inputEventPort = etree.SubElement(functionBlockHasInputEventPorts, 'inputEventPort')
             proxyTargetPorts = etree.SubElement(inputEventPort, 'proxyTargetPorts')
             proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
-            inputEventPortMoniker = etree.SubElement(proxyConnection, 'inputEventPortMoniker')
+            eventId=str(uuid.uuid4())
+            for connection in interface.connectionList:
+                if(connection.inputName == module_name + '/Event/' + interface_Name):
+                    eventId=str(connection.inputId)
+            ids[module_name+"/"+interface_Type+"/"+interface_Name] = eventId
+            inputEventPortMoniker = etree.SubElement(proxyConnection, 'inputEventPortMoniker', Id=eventId)
             inputEventPort_event = etree.SubElement(inputEventPort, 'event')
             inputEventPortReferencesEvent = etree.SubElement(inputEventPort_event, 'inputEventPortReferencesEvent')
             eventMoniker = etree.SubElement(inputEventPortReferencesEvent, 'eventMoniker', name=ExposedInterface)
@@ -55,7 +62,12 @@ def compileToCFB(haList, interface, outPath):
             outputEventPort = etree.SubElement(functionBlockHasOutputEventPorts, 'outputEventPort')
             proxyTargetPorts = etree.SubElement(outputEventPort, 'proxyTargetPorts')
             proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
-            outputEventPortMoniker = etree.SubElement(proxyConnection, 'outputEventPortMoniker')
+            eventId=str(uuid.uuid4())
+            for connection in interface.connectionList:
+                if(connection.inputName == module_name + '/Event/' + interface_Name):
+                    eventId=str(connection.inputId)
+            ids[module_name+"/"+interface_Type+"/"+interface_Name] = eventId
+            outputEventPortMoniker = etree.SubElement(proxyConnection, 'outputEventPortMoniker', Id=eventId)
             outputEventPort_event = etree.SubElement(outputEventPort, 'event')
             outputEventPortReferencesEvent = etree.SubElement(outputEventPort_event, 'outputEventPortReferencesEvent')
             eventMoniker = etree.SubElement(outputEventPortReferencesEvent, 'eventMoniker', name=ExposedInterface)
@@ -68,7 +80,12 @@ def compileToCFB(haList, interface, outPath):
             inputVariablePort = etree.SubElement(functionBlockHasInputVariablePorts, 'inputVariablePort')
             proxyTargetPorts = etree.SubElement(inputVariablePort, 'proxyTargetPorts')
             proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
-            inputVariablePortMoniker = etree.SubElement(proxyConnection, 'inputVariablePortMoniker')
+            variableId=str(uuid.uuid4())
+            for connection in interface.connectionList:
+                if(connection.inputName == module_name + '/Variable/' + interface_Name):
+                    variableId=str(connection.inputId)
+            ids[module_name+"/"+interface_Type+"/"+interface_Name] = variableId
+            inputVariablePortMoniker = etree.SubElement(proxyConnection, 'inputVariablePortMoniker', Id=variableId)
             inputVariablePort_variable = etree.SubElement(inputVariablePort, 'variable')
             inputVariablePortReferencesVariable = etree.SubElement(inputVariablePort_variable, 'inputVariablePortReferencesVariable')
             variableMoniker = etree.SubElement(inputVariablePortReferencesVariable, 'variableMoniker', name=ExposedInterface)
@@ -81,7 +98,12 @@ def compileToCFB(haList, interface, outPath):
             outputVariablePort = etree.SubElement(functionBlockHasOutputVariablePorts, 'outputVariablePort')
             proxyTargetPorts = etree.SubElement(outputVariablePort, 'proxyTargetPorts')
             proxyConnection = etree.SubElement(proxyTargetPorts, 'proxyConnection')
-            outputVariablePortMoniker = etree.SubElement(proxyConnection, 'outputVariablePortMoniker')
+            variableId=str(uuid.uuid4())
+            for connection in interface.connectionList:
+                if(connection.inputName == module_name + '/Variable/' + interface_Name):
+                    variableId=str(connection.inputId)
+            ids[module_name+"/"+interface_Type+"/"+interface_Name] = variableId
+            outputVariablePortMoniker = etree.SubElement(proxyConnection, 'outputVariablePortMoniker', Id=variableId)
             outputVariablePort_variable = etree.SubElement(outputVariablePort, 'variable')
             outputVariablePortReferencesVariable = etree.SubElement(outputVariablePort_variable, 'outputVariablePortReferencesVariable')
             variableMoniker = etree.SubElement(outputVariablePortReferencesVariable, 'variableMoniker', name=ExposedInterface)
@@ -89,6 +111,88 @@ def compileToCFB(haList, interface, outPath):
     #---------------------------------------
     # Building functionBlockReferences 
     #---------------------------------------
+    functionBlockReferences = etree.SubElement(CFB, 'functionBlockReferences')
+    for ha in haList:
+        ha_model = ha
+        cFBModelHasFBReferences = etree.SubElement(functionBlockReferences, 'cFBModelHasFBReferences')
+        functionBlockReference = etree.SubElement(cFBModelHasFBReferences, 'functionBlockReference', name=ha.name, x="1531.25", y="218.75", creationMode="Resource", referencedFile=ha.name + ".fb")
+
+        functionBlockReferences_events = etree.SubElement(functionBlockReference, 'events')
+        functionBlockReferences_variables = etree.SubElement(functionBlockReference, 'variables')
+        functionBlockReferences_inputEventPorts = etree.SubElement(functionBlockReference, 'inputEventPorts')
+        functionBlockReferences_outputEventPorts = etree.SubElement(functionBlockReference, 'outputEventPorts')
+        functionBlockReferences_inputVariablePorts = etree.SubElement(functionBlockReference, 'inputVariablePorts')
+        functionBlockReferences_outputVariablePorts = etree.SubElement(functionBlockReference, 'outputVariablePorts')
+
+        for ext_inp_eve, asso_vars in ha_model.rest[0].externalInputEvents.iteritems():
+            functionBlockHasEvents = etree.SubElement(functionBlockReferences_events, 'functionBlockHasEvents')
+            eventRef = etree.SubElement(functionBlockHasEvents, 'eventRef', Name=ext_inp_eve.name, scope="Input")
+
+            functionBlockHasInputEventPorts = etree.SubElement(functionBlockReferences_inputEventPorts, 'functionBlockHasEvents')
+            eventId=""
+            for connection in interface.connectionList:
+                if(connection.inputName == ha.name + '/Event/' + ext_inp_eve.name):
+                    eventId = str(connection.inputId)
+            if(eventId==""):
+                if(ids.has_key(ha.name + '/inputEvent/' + ext_inp_eve.name)):
+                    eventId = ids[ha.name + '/inputEvent/' + ext_inp_eve.name]
+            inputEventPort = etree.SubElement(functionBlockHasInputEventPorts, 'inputEventPort', Id=eventId)
+            event = etree.SubElement(inputEventPort, 'event')
+            inputEventPortReferencesEvent = etree.SubElement(event, 'inputEventPortReferencesEvent')
+            eventRefMoniker = etree.SubElement(inputEventPortReferencesEvent, 'eventRefMoniker', name=interface.sysName+"/"+ha.name+"/"+ext_inp_eve.name)
+
+        for ext_outp_eve, asso_vars in ha_model.rest[0].externalOutputEvents.iteritems():
+            functionBlockHasEvents = etree.SubElement(functionBlockReferences_events, 'functionBlockHasEvents')
+            eventRef = etree.SubElement(functionBlockHasEvents, 'eventRef', Name=ext_outp_eve.name, scope="Output")
+
+            functionBlockHasOutputEventPorts = etree.SubElement(functionBlockReferences_outputEventPorts, 'functionBlockHasOutputEventPorts')
+            eventId=str(uuid.uuid4())
+            if(ids.has_key(ha.name + '/outputEvent/' + ext_outp_eve.name)):
+                    eventId = ids[ha.name + '/outputEvent/' + ext_outp_eve.name]
+            outputEventPort = etree.SubElement(functionBlockHasOutputEventPorts, 'outputEventPort', Id=eventId)
+            for connection in interface.connectionList:
+                if(connection.outputName == ha.name + '/Event/' + ext_outp_eve.name):
+                    wireTargetPorts = etree.SubElement(outputEventPort, 'wireTargetPorts')
+                    wireConnection = etree.SubElement(wireTargetPorts, 'wireConnection', unitDelayed="false")
+                    inputEventPortMoniker = etree.SubElement(wireConnection, 'inputEventPortMoniker', Id=str(connection.inputId))
+            event = etree.SubElement(outputEventPort, 'event')
+            outputEventPortReferencesEvent = etree.SubElement(event, 'outputEventPortReferencesEvent')
+            eventRefMoniker = etree.SubElement(outputEventPortReferencesEvent, 'eventRefMoniker', name=interface.sysName+"/"+ha.name+"/"+ext_outp_eve.name)
+
+        for ext_inp_var in ha_model.rest[1].externalInputVars:
+            functionBlockHasVariables = etree.SubElement(functionBlockReferences_variables, 'functionBlockHasVariables')
+            variableRef = etree.SubElement(functionBlockHasVariables, 'variableRef', Name=ext_inp_var.name, scope="Input", type=ext_inp_var.type)
+
+            functionBlockHasInputVariablePorts = etree.SubElement(functionBlockReferences_inputVariablePorts, 'functionBlockHasInputVariablePorts')
+            variableId=""
+            for connection in interface.connectionList:
+                if(connection.inputName == ha.name + '/Variable/' + ext_inp_var.name):
+                    variableId=str(connection.inputId)
+            if(variableId==""):
+                if(ids.has_key(ha.name + '/inputVariable/' + ext_inp_var.name)):
+                    variableId = ids[ha.name + '/inputVariable/' + ext_inp_var.name]
+            inputVariablePort = etree.SubElement(functionBlockHasInputVariablePorts, 'inputVariablePort', Id=variableId)
+            variable = etree.SubElement(inputVariablePort, 'variable')
+            inputVariablePortReferencesVariable = etree.SubElement(variable, 'inputVariablePortReferencesVariable')
+            variableRefMoniker = etree.SubElement(inputVariablePortReferencesVariable, 'variableRefMoniker', name=interface.sysName+"/"+ha.name+"/"+ext_inp_var.name)
+
+        for ext_outp_var in ha_model.rest[1].externalOutputVars:
+            functionBlockHasVariables = etree.SubElement(functionBlockReferences_variables, 'functionBlockHasVariables')
+            variableRef = etree.SubElement(functionBlockHasVariables, 'variableRef', Name=ext_outp_var.name, scope="Output", type=ext_outp_var.type)
+
+            functionBlockHasOutputVariablePorts = etree.SubElement(functionBlockReferences_outputVariablePorts, 'functionBlockHasOutputVariablePorts')
+            variableId=str(uuid.uuid4())
+            if(ids.has_key(ha.name + '/outputVariable/' + ext_outp_var.name)):
+                variableId = ids[ha.name + '/outputVariable/' + ext_outp_var.name]
+            outputVariablePort = etree.SubElement(functionBlockHasOutputVariablePorts, 'outputVariablePort', Id=variableId)
+            for connection in interface.connectionList:
+                if(connection.outputName == ha.name + '/Variable/' + ext_outp_var.name):
+                    wireTargetPorts = etree.SubElement(outputVariablePort, 'wireTargetPorts')
+                    wireConnection = etree.SubElement(wireTargetPorts, 'wireConnection', unitDelayed="false")
+                    inputVariablePortMoniker = etree.SubElement(wireConnection, 'inputVariablePortMoniker', Id=str(connection.inputId))
+            variable = etree.SubElement(outputVariablePort, 'variable')
+            outputVariablePortReferencesVariable = etree.SubElement(variable, 'outputVariablePortReferencesVariable')
+            variableRefMoniker = etree.SubElement(outputVariablePortReferencesVariable, 'variableRefMoniker', name=interface.sysName+"/"+ha.name+"/"+ext_outp_var.name)
 
     # writing the generated XML tree to the output file
     fHandle = open(outPath +'cjtest.cfb','w')
@@ -121,7 +225,7 @@ def compileToFBT(ha, outPath):
         EVENT1 = etree.SubElement(EVENTINPUTS, 'Event', Name=ext_inp_eve.name , Comment='')
 
         for asso_var in asso_vars:
-            WITH1 = etree.SubElement(EVENT1, 'With', Var=str(asso_var.name))  
+            WITH1 = etree.SubElement(EVENT1, 'With', Var=str(asso_var['variableName']))  
 
     # input update clock and associations with all input variables
     EVENT = etree.SubElement(EVENTINPUTS, 'Event', Name='update_in' , Comment='')
@@ -137,7 +241,7 @@ def compileToFBT(ha, outPath):
         EVENT2 = etree.SubElement(EVENTOUTPUTS, 'Event', Name=ext_outp_eve.name, Comment='')
         
         for asso_var in asso_vars:
-            WITH2 = etree.SubElement(EVENT2, 'With', Var=str(asso_var.name))
+            WITH2 = etree.SubElement(EVENT2, 'With', Var=str(asso_var['variableName']))
 
     # output update clock and associations with all output variables
     EVENT = etree.SubElement(EVENTOUTPUTS, 'Event', Name='update_out' , Comment='')
