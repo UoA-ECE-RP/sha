@@ -106,7 +106,6 @@ def compileToCFB(haList, interface, outPath):
             outputVariablePortReferencesVariable = etree.SubElement(outputVariablePort_variable, 'outputVariablePortReferencesVariable')
             variableMoniker = etree.SubElement(outputVariablePortReferencesVariable, 'variableMoniker', name="/" + interface.sysName + "/" + interface.sysName +  "/" + interface_Name)
 
-    print(ids)
     #---------------------------------------
     # Building functionBlockReferences 
     #---------------------------------------
