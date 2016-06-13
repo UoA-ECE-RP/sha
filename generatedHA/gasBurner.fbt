@@ -5,13 +5,13 @@
   <CompilerInfo header="package mypackage"></CompilerInfo>
   <InterfaceList>
     <EventInputs>
-      <Event Comment="" Name="d"/>
+      <Event Comment="" Name="X"/>
       <Event Comment="" Name="update_in">
         <With Var="Variable(a, ANY, )"/>
       </Event>
     </EventInputs>
     <EventOutputs>
-      <Event Comment="" Name="f"/>
+      <Event Comment="" Name="Y"/>
       <Event Comment="" Name="update_out">
         <With Var="s"/>
       </Event>
@@ -33,46 +33,46 @@
       <VarDeclaration Comment="" Name="C1x" Type="REAL"/>
     </InternalVars>
     <ECC>
-      <ECState Comment="" Name="Start" x="254" y="1519">
+      <ECState Comment="" Name="Start" x="1191" y="1544">
         <ECAction Algorithm="init" Ouptput=""/>
       </ECState>
-      <ECState Comment="" Name="b2" x="1037" y="830">
+      <ECState Comment="" Name="b2" x="1645" y="415">
         <ECAction Algorithm="b2Algo" Output=""/>
       </ECState>
-      <ECState Comment="" Name="b3" x="1925" y="1928">
+      <ECState Comment="" Name="b3" x="808" y="170">
         <ECAction Algorithm="b3Algo" Output=""/>
       </ECState>
-      <ECState Comment="" Name="b1" x="709" y="1230">
+      <ECState Comment="" Name="b1" x="1123" y="779">
         <ECAction Algorithm="b1Algo" Output=""/>
       </ECState>
-      <ECState Comment="" Name="b4" x="975" y="710">
+      <ECState Comment="" Name="b4" x="1890" y="1499">
         <ECAction Algorithm="b4Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="True" Destination="b2" Source="Start" x="233" y="1152"/>
-      <ECState Comment="" Name="t_state1" x="1142" y="1295">
+      <ECTransition Condition="True" Destination="b2" Source="Start" x="1595" y="1620"/>
+      <ECState Comment="" Name="t_state1" x="966" y="1737">
         <ECAction Algorithm="t_state1Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="true &amp;&amp;  (y &gt;= 0.1)" Destination="t_state1" Source="b4" x="119" y="1443"/>
-      <ECTransition Condition="True" Destination="b1" Source="t_state1" x="677" y="1566"/>
-      <ECState Comment="" Name="t_state2" x="1122" y="944">
+      <ECTransition Condition="true &amp;&amp;  (y &gt;= 0.1)" Destination="t_state1" Source="b4" x="667" y="788"/>
+      <ECTransition Condition="True" Destination="b1" Source="t_state1" x="1878" y="236"/>
+      <ECState Comment="" Name="t_state2" x="761" y="222">
         <ECAction Algorithm="t_state2Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="TURN_OFF" Destination="t_state2" Source="b3" x="760" y="770"/>
-      <ECTransition Condition="True" Destination="b4" Source="t_state2" x="334" y="384"/>
-      <ECState Comment="" Name="t_state3" x="805" y="54">
+      <ECTransition Condition="TURN_OFF" Destination="t_state2" Source="b3" x="391" y="736"/>
+      <ECTransition Condition="True" Destination="b4" Source="t_state2" x="1665" y="611"/>
+      <ECState Comment="" Name="t_state3" x="1647" y="599">
         <ECAction Algorithm="t_state3Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="TURN_ON" Destination="t_state3" Source="b1" x="1795" y="941"/>
-      <ECTransition Condition="True" Destination="b2" Source="t_state3" x="1455" y="640"/>
-      <ECState Comment="" Name="t_state4" x="1612" y="367">
+      <ECTransition Condition="TURN_ON" Destination="t_state3" Source="b1" x="433" y="695"/>
+      <ECTransition Condition="True" Destination="b2" Source="t_state3" x="1506" y="566"/>
+      <ECState Comment="" Name="t_state4" x="495" y="1254">
         <ECAction Algorithm="t_state4Algo" Output=""/>
       </ECState>
-      <ECTransition Condition="true &amp;&amp;  (y &gt;= 0.1)" Destination="t_state4" Source="b2" x="1737" y="1641"/>
-      <ECTransition Condition="True" Destination="b3" Source="t_state4" x="1626" y="883"/>
-      <ECTransition Condition="y &lt; 0.1" Destination="b2" Source="b2" x="7" y="373"/>
-      <ECTransition Condition="y &gt;= 0 &amp;&amp; y &lt;= 0" Destination="b3" Source="b3" x="1718" y="1897"/>
-      <ECTransition Condition="y &gt;= 0 &amp;&amp; y &lt;= 0" Destination="b1" Source="b1" x="1393" y="872"/>
-      <ECTransition Condition="y &lt; 0.1" Destination="b4" Source="b4" x="496" y="1092"/>
+      <ECTransition Condition="true &amp;&amp;  (y &gt;= 0.1)" Destination="t_state4" Source="b2" x="1230" y="1563"/>
+      <ECTransition Condition="True" Destination="b3" Source="t_state4" x="1005" y="1411"/>
+      <ECTransition Condition="y &lt; 0.1" Destination="b2" Source="b2" x="1741" y="1714"/>
+      <ECTransition Condition="y &gt;= 0 &amp;&amp; y &lt;= 0" Destination="b3" Source="b3" x="67" y="1211"/>
+      <ECTransition Condition="y &gt;= 0 &amp;&amp; y &lt;= 0" Destination="b1" Source="b1" x="1121" y="71"/>
+      <ECTransition Condition="y &lt; 0.1" Destination="b4" Source="b4" x="1232" y="1027"/>
     </ECC>
     <Algorithm Comment="" Name="b2Algo">
       <Other Language="C" Text="me-&gt;C1y = 0;&#10;Eq(y(me-&gt;d*me-&gt;k), (float) me-&gt;C1y);&#10;me-&gt;k++;"/>
