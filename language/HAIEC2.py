@@ -127,7 +127,7 @@ def compileToCFB(haList, interface, outPath):
             functionBlockHasEvents = etree.SubElement(functionBlockReferences_events, 'functionBlockHasEvents')
             eventRef = etree.SubElement(functionBlockHasEvents, 'eventRef', name=ext_inp_eve.name, scope="Input")
 
-            functionBlockHasInputEventPorts = etree.SubElement(functionBlockReferences_inputEventPorts, 'functionBlockHasEvents')
+            functionBlockHasInputEventPorts = etree.SubElement(functionBlockReferences_inputEventPorts, 'functionBlockHasInputEventPorts')
             eventId=""
             for connection in interface.connectionList:
                 if(connection.inputName == ha.name + '/Event/' + ext_inp_eve.name):
