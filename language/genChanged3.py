@@ -99,13 +99,13 @@ def OdeCodegen(os, name, han):
         print odes3
      
         funcs = map(lambda o, i:
-                    (name+"_ode_"+str(i+1), o), odes3,
+                    (han+"_"+name+"_ode_"+str(i+1), o), odes3,
                     xrange(0, len(odes3)))
         print funcs
         
         #ifuncs = map(lambda (i, o): (name+"_init_"+(str(i+1)), o),
           #           enumerate(iodes))
-        ifuncs = map(lambda o, i: (name+"_init_"+(str(i+1)), o),
+        ifuncs = map(lambda o, i: (han+"_"+name+"_init_"+(str(i+1)), o),
                      sx, xrange(len(sx)))
         print "sx------------------------------:"
         print sx
@@ -118,14 +118,14 @@ def OdeCodegen(os, name, han):
                       odess, xrange(len(odess)))
         '''
         func_rs = map(lambda o, i:
-                      make_routine(name+"_ode_"+str(i+1), o),
+                      make_routine(han+"_"+name+"_ode_"+str(i+1), o),
                       odes3, xrange(len(odes3)))       
 
         #ifunc_rs = map(lambda (i, o):
            #            make_routine(name+"_init_"+(str(i+1)), o),
            #            enumerate(riodes))
         ifunc_rs = map(lambda o, i:
-                       make_routine(name+"_init_"+(str(i+1)), o),
+                       make_routine(han+"_"+name+"_init_"+(str(i+1)), o),
                        sx, xrange(len(sx)))
 
         [(c_name, c_code), (h_name, h_header)] = codegen(
@@ -229,7 +229,7 @@ def getInvariantAndOdeExpr(han, loc, events, tab, contVars,
                 stmts += ['if ((pstate != cstate) || force_init_update){']
                 
                 
-                rr = lname + '_init_' + str(
+                rr = han + '_' + lname + '_init_' + str(
                     i+1) + '(' + han + '_' + ', '.join(
                         [str(arg.name) for arg in ifuncrs[i].arguments]) + ')'
                 
@@ -241,7 +241,7 @@ def getInvariantAndOdeExpr(han, loc, events, tab, contVars,
 
 
                 lhs = han + '_' + str(var.func)+'_u'
-                rhs = lname+'_ode_' + str(i+1)
+                rhs = han + '_' + lname+'_ode_' + str(i+1)
                 rhs += '(' + ', '.join(
                     [str(arg.name) for arg in funcrs[i].arguments]) + ')'
                 print "rhs: ----------------------"
@@ -702,7 +702,8 @@ def codeGen(ha):
                     
                     #contDecl = ['static double ' + ', '.join(contSet) + '=' + str(iValue) + ';']
                     
-                    contDecl = ['static double ' + han + '_' + ', '.join(contSet) + '=' + str(iValue) + ';']
+                    #contDecl = ['static double ' + han + '_' + ', '.join(contSet) + '=' + str(iValue) + ';']
+                    contDecl = ['double ' + han + '_' + ', '.join(contSet) + '=' + str(iValue) + ';']
 
                     #contDecl = map(lambda x: 'static double ' + x + ', '.join(contSet) + '=' + str(iValue) + ';', han)
                    
