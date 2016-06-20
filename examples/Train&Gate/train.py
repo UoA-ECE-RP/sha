@@ -1,15 +1,15 @@
 import macropy.activate
 #from language import *
-from languageC1 import *
+from languageNC1 import *
 #from gen import *
-from genChanged2 import *
+from genChanged3 import *
 from sympy import *
 import shac
 
 # Train and Gate from
 # http://www.eecs.tufts.edu/~khan/Courses/Spring2013/EE194/Lecs/Hybrid_Systems_Presentation_Elliott_Costello.pdf
 
-ode_y = Ode(sympify("diff(y(t))-1"), sympify("y(t)"), 0, {})
+ode_y = Ode(sympify("diff(y(t))-1"), sympify("y(t)"), 0.0, {})
 
 
 # The locations of the hybrid automaton
@@ -44,7 +44,11 @@ e3 = Edge('t3', 't1', {S("x(t)"): [Guard(S("y>=25")),
           [])
 
 
-train = Ha("train", [t1, t2, t3], t1, [e1, e2, e3], [], [], [InternalVar("x"), InternalVar("y")], [ExternalInputVar("x1"), ExternalInputVar("z1"), ExternalInputVar("t")], [], [], [ExternalOutputEvent("signal")])
+train = Ha("train", [t1, t2, t3], t1, [e1, e2, e3], [], [], [InternalVar("y")], [ExternalInputVar("x1"), ExternalInputVar("z1"), ExternalInputVar("t")], [], [], [ExternalOutputEvent("signal")])
+
+
+#train = Ha("train", [t1, t2, t3], t1, [e1, e2, e3], [], [], [InternalVar("y")], [ExternalInputVar("x1"), ExternalInputVar("z1"), ExternalInputVar("t")], [], [], [ExternalOutputEvent("signal")])
+
 # Compile
 # shac.compile(train)
 
