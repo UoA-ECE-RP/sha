@@ -242,7 +242,7 @@ def codeGen(hal, blist):
                             raise Exception("WRONG!")
                     print vsl, vdl
                     for (i,j) in zip(vsl, vdl):
-                        mainCFile += [tab*level+ source_ha.name + '_' + i.name + ' = ' + dest_ha.name + '_' + j.name + ';\n']
+                        mainCFile += [tab*level+ dest_ha.name + '_' + j.name + ' = ' + source_ha.name + '_' + i.name + ';\n']
                 elif Bind.Bind2(esl, edl):
                     if len(esl) != len(edl):
                         raise Exception("WRONG!!")
@@ -254,7 +254,7 @@ def codeGen(hal, blist):
                             raise Exception("WRONG!")
                     print esl, edl
                     for (i,j) in zip(esl, edl):
-                        mainCFile += [tab*level+ source_ha.name + '_' + i.name + ' = ' + dest_ha.name + '_' + j.name + ';\n']
+                        mainCFile += [tab*level+ dest_ha.name + '_' + j.name + ' = ' + source_ha.name + '_' + i.name + ';\n']
                 else:
                     raise ("Unrecognized option: ", bindlist)
 
