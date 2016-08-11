@@ -17,27 +17,15 @@ halist=[]
 blist = []
 n = 10
 
-# def haname(ha):
-#   with patterns:
-#     Ha(han, ls, sloc, edges, gvs, igvs, iv, eiv, eov, eie, eoe) << ha
-#     han = "watertank" + i
 
 for i in range(n):
-  # haname(wr.watertank)
-  # with patterns:
-  #   Ha(han, ls, sloc, edges, gvs, igvs, iv, eiv, eov, eie, eoe) << ha
-  #   han = "watertank" + str(i)
+
   watertank = Ha("watertank"+str(i), [wr.t1, wr.t2, wr.t3, wr.t4], wr.t4, [wr.e1, wr.e2, wr.e3, wr.e4, wr.e5, wr.e6], [], [], [], [], [externalOutputVars("x")], [externalInputEvent("ON"), externalInputEvent("OFF")], [])
   
-  # if (watertank.InternalVar == 20){
-
-  # }
 
   halist.append(watertank)
 
 
-# halist = [watertank.watertank, burner.burner]
-#print halist[0]
 if (n > 0):
   for i in range(n):
     
@@ -48,7 +36,7 @@ if (n > 0):
         bind12 = Bind.Bind1(halist[m].externalOutputVars, halist[i].externalInputVars)
         bind21 = Bind.Bind2(halist[i].externalOutputEvent, halist[m].externalInputEvent)
         bind22 = Bind.Bind2(halist[m].externalOutputEvent, halist[i].externalInputEvent)
-        # blist.append(BindHa(halist[i], bind11, halist[m]), BindHa(halist[m], bind12, halist[i]), BindHa(halist[i], bind21, halist[m]), BindHa(halist[m], bind22, halist[i]))
+        
         blist.append(BindHa(halist[i], bind11, halist[m]))
         blist.append(BindHa(halist[m], bind12, halist[i]))
         blist.append(BindHa(halist[i], bind21, halist[m]))
