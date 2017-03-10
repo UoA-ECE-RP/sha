@@ -29,10 +29,11 @@ t2 = Loc("t2", [ode_x1e, ode_x2f], [],
 
 
 # The edges
-e1 = Edge('t1', 't2', {S("x2(t)"): [Guard(S("x2<=0.25"))],},
+e1 = Edge('t1', 't2', {S("x2(t)"): [Guard(S("x2<=0.25"))]},
           [Update.Update2(Symbol('x1'), Symbol('x1')),
-          Update.Update2(Symbol('x2'), Symbol('x2'))],
+           Update.Update2(Symbol('x2'), Symbol('x2'))],
           [])
+
 e2 = Edge('t2', 't1', {S("x1(t)"): [Guard(S("x1<=0.25"))]},
           [Update.Update2(Symbol('x1'), Symbol('x1')),
           Update.Update2(Symbol('x2'), Symbol('x2'))],
@@ -40,7 +41,7 @@ e2 = Edge('t2', 't1', {S("x1(t)"): [Guard(S("x1<=0.25"))]},
 
 
 SwitchTank = Ha("SwitchTank", [t1, t2], t1,
-               [e1, e2], [], [])
+                [e1, e2], [], [])
 
 # Compile
 shac.compile(SwitchTank, ABOF=True)
