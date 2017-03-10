@@ -5,6 +5,8 @@
 from sympy import S, Function
 import jsonlib2 as json
 from language import *
+# import pdb
+# from sympy import Symbol
 
 
 # Recursively get all the derivatives
@@ -31,23 +33,69 @@ def parseHA(fileName):
         ha = json.read(jsonFile.read())
         sloc = None
         locs = []
+        extVarInput = []
+        extVarInputList = []
+        extVarOutput = []
+        extVarOutputList = []
+        inputEvents = []
+        outputEvents = []
+        dicEventIn = {}
+        dicEventOut = {}
+
+        # Building interface
+        # pdb.set_trace()
+        extVarInput = ha['interface'][0]['ExternalVarableInput']
+        if not extVarInput == []:
+            for varInItem in extVarInput:
+                extVarInputList.append(Variable(varInItem['Name'],
+                                                varInItem['Type'],
+                                                varInItem['Value']))
+        extVarOutput = ha['interface'][1]['ExternalVarableOutput']
+        if not extVarOutput == []:
+            for varOutItem in extVarOutput:
+                extVarOutputList.append(Variable(varOutItem['Name'],
+                                                 varOutItem['Type'],
+                                                 varOutItem['Value']))
+        inputEvents = ha['interface'][2]['inputEvents']
+        if not inputEvents == []:
+            for eventInItem in inputEvents:
+                # pdb.set_trace()
+                dicEventIn[Event(
+                    str(eventInItem['eventType']),
+                    str(eventInItem['eventName']))] = eventInItem['variables']
+        outputEvents = ha['interface'][3]['outputEvents']
+        if not outputEvents == []:
+            for eventOutItem in outputEvents:
+                # pdb.set_trace()
+                dicEventOut[
+                    Event(
+                        str(eventOutItem['eventType']),
+                        str(eventOutItem[
+                            'eventName']))] = eventOutItem['variables']
+        # List of external variables.
+        # Fist list corresponds to the input and second to the output.
+        # extVars = ExternalVars(extVarInputList,extVarOutputList)
+        # First dictionary correponds to the input and the
+        # second to the output.
+        extEves = ExternalEvents(dicEventIn, dicEventOut)
         # Building locations
         for loc in ha['locations']:
             # XXX: I am giving an empty dictionary as the dependent
             # odes. JSON needs to have the list of dependent odes
 
             # First get the function from the derivative
-            funcs = [S(o) for o in loc['ode']]
+            funcs = [S(o) for o in loc['ode'][1]['odes']]
             odes = [None]*len(funcs)
             for i, f in enumerate(funcs):
                 ders = []
                 ff = []
-                get_Derivatives(f, ders)
+                get_Derivatives(f[S('value')], ders)
                 if not all(ders):
-                    raise Exception('More than one der in:' + f)
+                    raise Exception('More than one der in:' + f[S('value')])
                 get_Functions(ders[0], ff)
                 if not all(ff):
-                    raise Exception('Not a first order derivative:' + f)
+                    raise Exception(
+                        'Not a first order derivative:' + f[S('value')])
                 if not (len(loc['init']) == 1):
                     raise Exception('Multiple inits for ode' + loc['ode'])
                 odes[i] = Ode(S(o), ff[0], S(loc['init'][0]), {})
@@ -119,6 +167,5 @@ def parseHA(fileName):
         # TODO: How to declare local and global vars in the HA model??
         if sloc is None:
             raise Exception('No start location specified')
-
-        ha = Ha(ha['modelName'], locs, sloc, edges, [], [])
+        ha = Ha(ha['modelName'], locs, sloc, edges, [], [], extEves, extVars)
         return ha

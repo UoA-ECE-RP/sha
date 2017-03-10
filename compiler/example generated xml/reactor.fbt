@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType Comment="Basic function block" Name="FBlock">
+  <Identification Standard="61499"/>
+  <VersionInfo Author="Kawsihen" Date="11/20/2015 9:00 AM" Organization="Kawsihen_s Macintosh" Remarks="" Version="1.0"/>
+  <CompilerInfo header="package mypackage"></CompilerInfo>
+  <InterfaceList>
+    <EventInputs>
+      <Event Comment="" Name="refresh2"/>
+      <Event Comment="" Name="refresh1"/>
+      <Event Comment="" Name="remove1"/>
+      <Event Comment="" Name="remove2"/>
+      <Event Comment="" Name="add2"/>
+      <Event Comment="" Name="add1"/>
+      <Event Comment="" Name="update_in">
+        <With Var="y"/>
+        <With Var="timer1"/>
+        <With Var="timer2"/>
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Comment="" Name="update_out"/>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Comment="" Name="y" Type="BOOL"/>
+      <VarDeclaration Comment="" Name="timer1" Type="BOOL"/>
+      <VarDeclaration Comment="" Name="timer2" Type="BOOL"/>
+    </InputVars>
+    <OutputVars/>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+      <VarDeclaration Comment="" Name="k" Type="REAL"/>
+      <VarDeclaration Comment="" Name="d" Type="REAL"/>
+      <VarDeclaration Comment="" Name="x" Type="REAL"/>
+      <VarDeclaration Comment="" Name="C1x" Type="REAL"/>
+    </InternalVars>
+    <ECC>
+      <ECState Comment="" Name="Start" x="482" y="474">
+        <ECAction Algorithm="init" Ouptput=""/>
+      </ECState>
+      <ECState Comment="" Name="t0" x="236" y="613">
+        <ECAction Algorithm="t0Algo" Output=""/>
+      </ECState>
+      <ECState Comment="" Name="t1" x="135" y="316">
+        <ECAction Algorithm="t1Algo" Output=""/>
+      </ECState>
+      <ECState Comment="" Name="t2" x="1289" y="1363">
+        <ECAction Algorithm="t2Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="True" Destination="t0" Source="Start" x="1218" y="112"/>
+      <ECState Comment="" Name="t_state1" x="1095" y="929">
+        <ECAction Algorithm="t_state1Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="add1 &amp;&amp;  (x &gt;= 550)" Destination="t_state1" Source="t0" x="259" y="1888"/>
+      <ECTransition Condition="True" Destination="t1" Source="t_state1" x="1741" y="236"/>
+      <ECState Comment="" Name="t_state2" x="999" y="1271">
+        <ECAction Algorithm="t_state2Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="remove1 &amp;&amp;  (x &lt;= 510)" Destination="t_state2" Source="t1" x="1862" y="391"/>
+      <ECTransition Condition="True" Destination="t0" Source="t_state2" x="1770" y="1434"/>
+      <ECState Comment="" Name="t_state3" x="507" y="1254">
+        <ECAction Algorithm="t_state3Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="add2 &amp;&amp;  (x &gt;= 550)" Destination="t_state3" Source="t0" x="50" y="1802"/>
+      <ECTransition Condition="True" Destination="t2" Source="t_state3" x="100" y="1810"/>
+      <ECState Comment="" Name="t_state4" x="1399" y="1279">
+        <ECAction Algorithm="t_state4Algo" Output=""/>
+      </ECState>
+      <ECTransition Condition="remove2 &amp;&amp;  (x &lt;= 510)" Destination="t_state4" Source="t2" x="950" y="647"/>
+      <ECTransition Condition="True" Destination="t0" Source="t_state4" x="724" y="1773"/>
+      <ECTransition Condition="x &lt;= 550" Destination="t0" Source="t0" x="316" y="1177"/>
+      <ECTransition Condition="x &gt;= 510" Destination="t1" Source="t1" x="1785" y="927"/>
+      <ECTransition Condition="x &gt;= 510" Destination="t2" Source="t2" x="1794" y="451"/>
+    </ECC>
+    <Algorithm Comment="" Name="t0Algo">
+      <Other Language="C" Text="me-&gt;C1x = 10.000;&#10;me-&gt;x = (float) me-&gt;C1x*exp(0.1*me-&gt;d*me-&gt;k) + 500.0;&#10;me-&gt;k++;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t1Algo">
+      <Other Language="C" Text="me-&gt;C1x = -10.000;&#10;me-&gt;x = (float) me-&gt;C1x*exp(0.1*me-&gt;d*me-&gt;k) + 560.0;&#10;me-&gt;k++;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t2Algo">
+      <Other Language="C" Text="me-&gt;C1x = -50.000;&#10;me-&gt;x = (float) me-&gt;C1x*exp(0.1*me-&gt;d*me-&gt;k) + 600.0;&#10;me-&gt;k++;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="init">
+      <Other Language="C" Text="me-&gt;d = 0.01;&#10;me-&gt;k = 0;&#10;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state1Algo">
+      <Other Language="C" Text="me-&gt;x = me-&gt;x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state2Algo">
+      <Other Language="C" Text="me-&gt;x = me-&gt;x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state3Algo">
+      <Other Language="C" Text="me-&gt;x = me-&gt;x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+    <Algorithm Comment="" Name="t_state4Algo">
+      <Other Language="C" Text="me-&gt;x = me-&gt;x;&#10;me-&gt;k = 0;"/>
+    </Algorithm>
+  </BasicFB>
+</FBType>
