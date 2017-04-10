@@ -9,9 +9,8 @@ import shac
 # Example of an external signal declaration
 signal_u = Symbol('signal_u')
 
-CELL_NAMES = ["SA","C1"]
+CELL_NAMES = ["SA", "C1"]
 
-cellHAs =[]
 # This the the single dimension in "x" example artificially paced cell
 # without any value for f(lambda).
 
@@ -48,36 +47,32 @@ e6 = Edge('RRP', 'Rest', {S("x(t)"): [Guard(S("x >= 100"))]},
           [])
 
 
-
-
-
-
-
+cellHAs = []
 for c in CELL_NAMES:
-    name=c;
+    name = c
     e2 = Edge('Rest', 'Cond', {S("x(t)"): [Guard(sympify("True"))]},
-          # reset x to zero
-          [Update.Update1(Symbol('x'), 0)],
-          # ACTnode is an input
-          [Event("ACTnode_"+c)])
+              # reset x to zero
+              [Update.Update1(Symbol('x'), 0)],
+              # ACTnode is an input
+              [Event("ACTnode_"+c)])
     e3 = Edge('RRP', 'Cond', {S("x(t)"): [Guard(sympify("True"))]},
-          # reset x to zero
-          [Update.Update1(Symbol('x'), 0)],
-          # ACTnode is an input
-          [Event("ACTnode_"+c)])
+              # reset x to zero
+              [Update.Update1(Symbol('x'), 0)],
+              # ACTnode is an input
+              [Event("ACTnode_"+c)])
     e4 = Edge('Cond', 'ERP', {S("x(t)"): [Guard(S("x>=10"))]},
-          # reset x to zero
-          [Update.Update1(Symbol('x'), 0)],
-          # ACTnext is an output event
-          [Event("ACTnext_"+c)])
+              # reset x to zero
+              [Update.Update1(Symbol('x'), 0)],
+              # ACTnext is an output event
+              [Event("ACTnext_"+c)])
 
     newCell = Ha("cell_"+name, [Rest, Cond, ERP, RRP], Rest,
-            [e1, e2, e3, e4, e5, e6], [], [signal_u])
+                 [e1, e2, e3, e4, e5, e6], [], [signal_u])
 
-    cellHAs.append(newCell);
+    cellHAs.append(newCell)
 
-#cell_SA = Ha("cell_SA", [Rest, Cond, ERP, RRP], Rest,
- #           [e1, e2, e3, e4, e5, e6], [], [signal_u])
+# cell_SA = Ha("cell_SA", [Rest, Cond, ERP, RRP], Rest,
+#             [e1, e2, e3, e4, e5, e6], [], [signal_u])
 
 
 
