@@ -6,8 +6,8 @@ from gen import *
 from sympy import *
 import shac
 
-PATHS_INFO =[["P1","SA","C1"]];
-pathHAs =[];
+PATHS_INFO = [["P1", "SA", "C1"]]
+pathHAs = []
 # Example of an external signal declaration
 signal_u = Symbol('signal_u')
 
@@ -27,9 +27,9 @@ ActB = Loc("ActB", [ode3], [],
            {S("x(t)"): [Guard(S("x<= 25"))]})
 
 for p in PATHS_INFO:
-    id=p[0];
-    A=p[1];
-    B=p[2];
+    id = p[0]
+    A = p[1]
+    B = p[2]
     # The edges
     e1 = Edge('Idle', 'ActA', {S("x(t)"): [Guard(sympify("True"))]},
               [Update.Update1(Symbol('x'), 0)],
@@ -49,7 +49,6 @@ for p in PATHS_INFO:
               [Update.Update1(Symbol('x'), 0)],
               [Event("ACTnext_"+A)])
 
-
     e5 = Edge('ActB', 'Idle', {S("x(t)"): [Guard(S("x>=25"))]},
               # reset x to zero
               [Update.Update1(Symbol('x'), 0)],
@@ -62,6 +61,6 @@ for p in PATHS_INFO:
     pathHA = Ha("path_"+id, [Idle, ActA, ActB], Idle,
                 [e1, e2, e3, e4, e5, e6], [], [signal_u])
 
-    pathHAs.append(pathHA);
+    pathHAs.append(pathHA)
 # Compile
 #shac.compile(path)

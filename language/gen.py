@@ -238,7 +238,8 @@ def getInvariantAndOdeExpr(loc, events, tab, contVars,
                     else:
                         print 'Cannot saturate: ', str(o), ' in loc: ', lname
                 else:
-                    print 'Cannot saturate: ', str(o), ' in loc: ', lname
+                    print 'Cannot saturate: ', str(o), 'init value is: ',
+                    str(iValue), ' in loc: ', lname
         # Add the saturation function for combinators
         # Step-1 solve odes
         os = [None]*len(odes)
